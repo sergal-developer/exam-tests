@@ -1,0 +1,125 @@
+// # Resposive Design Section
+
+// #region Responsive section
+$mobile-width: 0px;
+$tablet-width: 768px;
+$desktop-width: 1204px;
+
+@mixin mobile {
+    @media (min-width: #{$mobile-width}) and (max-width: #{$tablet-width - 1px}) {
+      @content;
+    }
+}
+
+@mixin tablet {
+    @media (min-width: #{$tablet-width}) and (max-width: #{$desktop-width - 1px}) {
+      @content;
+    }
+}
+
+@mixin mobile-tablet {
+    @media (min-width: #{$mobile-width}) and (max-width: #{$desktop-width - 1px}) {
+      @content;
+    }
+}
+
+@mixin desktop {
+    @media (min-width: #{$desktop-width}) {
+      @content;
+    }
+}
+// #endregion
+
+// #region Misc
+
+/**
+ * @description
+ * Generate scroll into container 
+ *
+ * @param $size | define size of scroll
+ * 
+ * @param $foreground-color | define foreground color
+ * $foreground-color : rgba(255, 255, 255, 0.1);
+ * 
+ * @param $background-color | define background color
+ * background-color : rgba(255, 255, 255, 0.1);
+ *
+ * @param $radius | define trackbar with radius
+ */
+@mixin scroll($size, $foreground-color, $background-color, $radius) {
+    &::-webkit-scrollbar {
+        width: $size;
+        height: $size;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: $background-color;
+        //outline: 1px solid $foreground-color;
+        border-radius: $radius;
+    }
+    
+    &::-webkit-scrollbar-track {
+        border-radius: $radius;
+        -webkit-box-shadow: inset 0 0 8px rgba(0,0,0,0.2);
+        box-shadow: inset 0 0 8px rgba(0,0,0,0.2);
+    }
+    
+    body {
+        scrollbar-face-color: $foreground-color;
+        scrollbar-track-color: $background-color;
+    }
+    
+}
+
+/**
+ * @description
+ * Generate linear gradient
+ *
+ * @param $from-color | define initial color
+ * $from-color: rgba(255, 255, 255, 0.5);
+ * 
+ * @param $to-color | define end color
+ * $to-color: rgba(255, 255, 255, 0.1);
+ * 
+ * @param $deg | is defined by the center of the box containing the gradient image and by an angle
+ * $deg: 217deg | 0deg | top | top bottom | left | 0.25turn
+ */
+@mixin gradient($from-color, $to-color, $deg) {
+    background: -moz-linear-gradient($deg, #{$from-color} 0%, #{$to-color} 100%);
+    background: -webkit-linear-gradient($deg, #{$from-color} 0%, #{$to-color} 100%);
+    background: linear-gradient($deg, #{$from-color} 0%, #{$to-color} 100%); 
+}
+
+/**
+ * @description
+ * Set element is selectable only text or none
+ *
+ * @param $value: contain | text | none
+ *
+ */
+@mixin user-select($value) {
+    -webkit-touch-callout: $value;
+    -webkit-user-select: $value;
+    -khtml-user-select: $value;
+    -moz-user-select: $value;
+    -ms-user-select: $value;
+    user-select: $value;
+}
+// #endregion
+
+/**
+ * @description
+ * Convert Px into Em
+ *
+ * @param $value: contain | text | none
+ *
+ */
+ $base-font-size: 16;
+@function em($px) {
+    @return #{calc($px / $base-font-size)}em;
+}
+
+@function rem($px) {
+    $rem-value: #{calc($px / $base-font-size)};
+    @return #{calc($rem-value * 1rem)};
+}

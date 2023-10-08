@@ -1,0 +1,31 @@
+---
+export interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content="Astro description">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<link rel="apple-touch-icon" sizes="180x180" href="/invitations/apple-touch-icon.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="/invitations/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="/invitations/favicon-16x16.png">
+		<link rel="manifest" href="/invitations/site.webmanifest">
+		<link rel="stylesheet" href="/invitations/css/animate.min.css">
+		<meta name="generator" content={Astro.generator} />
+		
+		<title>{title}</title>
+	</head>
+	<body>
+		<slot />
+	</body>
+</html>
+<style lang="scss">
+ @import '../scss/main.scss';
+</style>

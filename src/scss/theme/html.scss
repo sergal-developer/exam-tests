@@ -1,0 +1,84 @@
+@import "../core/globals.scss";
+@import "../core/mixins";
+
+// headings
+h1 {
+    font-size: em(35);
+    line-height: em(37);
+}
+
+h2 {
+    font-size: em(30);
+    line-height: em(32);
+}
+
+h3 {
+    font-size: em(25);
+    line-height: em(27);
+}
+
+h4 {
+    font-size: em(23);
+    line-height: em(25);
+}
+
+h5 {
+    font-size: em(20);
+    line-height: em(22);
+}
+
+h6 {
+    font-size: em(18);
+    line-height: em(20);
+}
+
+// Paragraphs
+p,
+pre,
+b,
+i {
+    font-size: em(16);
+}
+
+// Sections
+article,
+aside,
+figure,
+footer,
+header,
+hgroup,
+nav,
+section {
+    display: inline-block;
+}
+
+img,
+object,
+embed {
+    max-width: 100%;
+}
+
+img {
+    border-style: none;
+    border-color: transparent;
+    border-width: 0;
+}
+
+
+a {}
+
+[button] {
+    cursor: pointer;
+    margin: 0;
+    width: auto;
+    overflow: visible;
+}
+
+[link], .link {
+    border: none;
+    background: none;
+    text-transform: uppercase;
+    color: black;
+    font-size: inherit;
+    font-family: inherit;
+}

@@ -1,0 +1,38 @@
+@import "../core/globals.scss";
+
+.accent {
+    font-size: inherit;
+    font-weight: 700;
+    color: $accentColor;
+}
+
+.app-page {
+    width: 100vw;
+    min-height: 100vh;
+    font-family: $openSansFont;
+
+    &.graduation {
+        background: black;
+        color: white;
+        font-family: $oswaldFont;
+        overflow-x: hidden;
+        font-size: 1rem;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        padding: 4% 10%;
+        position: relative;
+        line-height: 1.5;
+    }
+}
+
+img {
+    width: inherit;
+    height: auto;
+}
+
+p {
+    margin-bottom: 30px;
+}

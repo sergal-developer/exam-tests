@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "module": "es2020",
+        "moduleResolution": "node",
+        "target": "es2015",
+        "noImplicitAny": false,
+        "removeComments": false,
+        "preserveConstEnums": true,
+        "outDir": "../lib/",
+        "sourceMap": true,
+        "experimentalDecorators": true,
+        "strictNullChecks": false,
+        "declaration": false,
+        "lib": [
+        "es2018",
+        "dom"
+        ],
+        "skipLibCheck": true,
+        "noUnusedLocals": false,
+        "noUnusedParameters": false
+    },
+    "filesGlob": [
+        "./**/*.ts",
+        "!./node_modules/**/*.ts"
+    ]
+}
