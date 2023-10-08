@@ -11,10 +11,31 @@ import NotFound from "../components/404.astro";
 </Main>
 
 <script>
-  // import { APP } from "../data/index";
-  // const app = new APP();
+  import { APP } from "../data/main";
+  const app = new APP();
+  window.onload = (e) => {
+    app.init();
+    console.log("loaded!");
+  };
+
+  let callFile = () => {
+    return new Promise((done, reject) => {
+      const data = fetch('/exam-test/data/questions-db.md')
+        .then((response) => response.text())
+        .then((text) => done(text))
+        .catch(err => {
+          console.log('err: ', err);
+          done(null)
+        });
+    });
+  };
+
+  const invoke = async() => {
+    const data = await callFile();
+    console.log('data: ', data);
+  }
+
   // window.onload = (e) => {
-  //   app.init();
-  //   console.log("loaded!");
-  // };
+  //   invoke();
+  // }
 </script>
