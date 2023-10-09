@@ -1,5 +1,8 @@
 import { Services } from './services';
 import { Storage } from './storage';
+
+// let $: any;
+
 export class APP {
 
     storage = new Storage('exam');
@@ -13,16 +16,19 @@ export class APP {
         let val = this.storage.get();
         console.log('val: ', val);
 
-        if(!val) {
-            this.storage.save({ user: 'test', role: 'test'});
+        if (!val) {
+            this.storage.save({ user: 'test', role: 'test' });
             val = this.storage.get();
-        console.log('val: ', val);
+            console.log('val: ', val);
         }
 
         this.services.getRawData((data) => {
-            console.log('data: ', data);
+            // console.log('data: ', data);
         })
 
+
+        $('.ui.modal').modal('setting', 'closable', false)
+            .modal('show');
     }
 }
 

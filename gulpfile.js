@@ -16,7 +16,7 @@ const config = {
 
   astroFiles: './docs/**/*.html',
   astroFilesDest: './public/**/*.html',
-  baseUrl: '/exam-test/',
+  baseUrl: '/exam-tests/',
 }
 
 // gulp.task('clear', () => {
@@ -61,13 +61,13 @@ gulp.task('update-references-styles', () => {
 
 gulp.task('update-references-css', () => {
   return gulp.src('./docs/**/*.html', {base: './'})
-    .pipe(replace(/href="\/exam-test\/(styles|_astro)\/[\S]*.css"/g, 'href="/exam-test/main.css"'))
+    .pipe(replace(/href="\/exam-tests\/(styles|_astro)\/[\S]*.css"/g, 'href="/exam-tests/main.css"'))
     .pipe(gulp.dest('./'));
 });
 
 gulp.task('update-references-scrpts', () => {
   return gulp.src('./docs/**/*.html', {base: './'})
-    .pipe(replace(/src="\/exam-test\/(styles|_astro)\/"/g, 'src="/exam-test/styles/"'))
+    .pipe(replace(/src="\/exam-tests\/(styles|_astro)\/"/g, 'src="/exam-tests/styles/"'))
     .pipe(gulp.dest('./'));
 });
 

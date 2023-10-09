@@ -1,0 +1,27 @@
+---
+let { title, subtitle, description, list } = Astro.props;
+
+---
+
+<div class="ui basic modal">
+    <div class="ui icon header">
+      
+      <span class="material-symbols-outlined">
+        account_circle
+        </span>
+        
+    </div>
+    <div class="content">
+      <p>Your inbox is getting full, would you like us to enable automatic archiving of old messages?</p>
+    </div>
+    <div class="actions">
+      <div class="ui red basic cancel inverted button">
+        <i class="remove icon"></i>
+        No
+      </div>
+      <div class="ui green ok inverted button">
+        <i class="checkmark icon"></i>
+        Yes
+      </div>
+    </div>
+  </div>

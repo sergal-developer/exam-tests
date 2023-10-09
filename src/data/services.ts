@@ -1,5 +1,5 @@
 export class Services {
-  fileData = '/exam-test/data/questions-db.md';
+  fileData = '/exam-tests/data/questions-db.md';
 
     constructor() {}
   
