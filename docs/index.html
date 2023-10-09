@@ -9,12 +9,13 @@
 		<link rel="icon" type="image/png" sizes="32x32" href="/exam-test/favicon-32x32.png">
 		<link rel="icon" type="image/png" sizes="16x16" href="/exam-test/favicon-16x16.png">
 		<link rel="manifest" href="/exam-test/site.webmanifest">
-		<link rel="stylesheet" href="/exam-test/css/animate.min.css">
+		<!-- <link rel="stylesheet" href="/exam-test/css/animate.min.css"> -->
 		<!-- <link rel="stylesheet" href="/exam-test/main.css"> -->
 		<meta name="generator" content="Astro v2.10.15">
 		
 		<title>exam-test</title>
-	<link rel="stylesheet" href="/exam-test/main.css" /><script type="module">let n=()=>new Promise((e,a)=>{fetch("./exam-tests/data/questions-db.md").then(t=>t.json()).then(t=>e(t)).catch(t=>{console.log("err: ",t),e(null)})});const o=async()=>{const e=await n();console.log("data: ",e)};window.onload=e=>{o()};
+	<link rel="stylesheet" href="/exam-test/main.css" />
+	<script type="module">class l{constructor(){this.fileData="/exam-test/data/questions-db.md"}async getRawData(t){const e=await this.getDataFromFile();return t&&t(e),e}getDataFromFile(){return new Promise((t,e)=>{fetch(this.fileData).then(a=>a.text()).then(a=>t(a)).catch(a=>{console.log("err: ",a),t(null)})})}}class o{constructor(t){this.CONTEXT="exam",t&&(this.CONTEXT=t)}get(){const t=localStorage.getItem(this.CONTEXT);return t?JSON.parse(t):null}save(t,e){e=e||this.CONTEXT,localStorage.setItem(e,JSON.stringify(t))}clear(t){t=t||this.CONTEXT,localStorage.removeItem(t)}clearAll(){localStorage.clear()}}class r{constructor(){this.storage=new o("exam"),this.services=new l}init(){let t=this.storage.get();console.log("val: ",t),t||(this.storage.save({user:"test",role:"test"}),t=this.storage.get(),console.log("val: ",t)),this.services.getRawData(e=>{console.log("data: ",e)})}}const i=new r;window.onload=s=>{i.init(),console.log("loaded!")};
 </script></head>
 	<body class="astro-HSP6OTUF">
 		
