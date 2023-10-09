@@ -17,12 +17,32 @@
 		<meta name="generator" content="Astro v2.10.15">
 		
 		<title>exam-tests</title>
-	<link rel="stylesheet" href="/exam-tests/main.css" /><script type="module">class l{constructor(){this.fileData="/exam-tests/data/questions-db.md"}async getRawData(t){const e=await this.getDataFromFile();return t&&t(e),e}getDataFromFile(){return new Promise((t,e)=>{fetch(this.fileData).then(a=>a.text()).then(a=>t(a)).catch(a=>{console.log("err: ",a),t(null)})})}}class o{constructor(t){this.CONTEXT="exam",t&&(this.CONTEXT=t)}get(){const t=localStorage.getItem(this.CONTEXT);return t?JSON.parse(t):null}save(t,e){e=e||this.CONTEXT,localStorage.setItem(e,JSON.stringify(t))}clear(t){t=t||this.CONTEXT,localStorage.removeItem(t)}clearAll(){localStorage.clear()}}class r{constructor(){this.storage=new o("exam"),this.services=new l}init(){let t=this.storage.get();console.log("val: ",t),t||(this.storage.save({user:"test",role:"test"}),t=this.storage.get(),console.log("val: ",t)),this.services.getRawData(e=>{}),$(".ui.modal").modal("setting","closable",!1).modal("show")}}const i=new r;window.onload=s=>{i.init(),console.log("loaded!")};
+	<link rel="stylesheet" href="/exam-tests/main.css" /><script type="module">class l{constructor(){this.fileData="/exam-tests/data/questions-db.md"}async getRawData(t){const e=await this.getDataFromFile();return t&&t(e),e}getDataFromFile(){return new Promise((t,e)=>{fetch(this.fileData).then(a=>a.text()).then(a=>t(a)).catch(a=>{console.log("err: ",a),t(null)})})}}class o{constructor(t){this.CONTEXT="exam",t&&(this.CONTEXT=t)}get(){const t=localStorage.getItem(this.CONTEXT);return t?JSON.parse(t):null}save(t,e){e=e||this.CONTEXT,localStorage.setItem(e,JSON.stringify(t))}clear(t){t=t||this.CONTEXT,localStorage.removeItem(t)}clearAll(){localStorage.clear()}}class r{constructor(){this.storage=new o("exam"),this.services=new l}init(){let t=this.storage.get();console.log("val: ",t),t||(this.storage.save({user:"test",role:"test"}),t=this.storage.get(),console.log("val: ",t)),this.services.getRawData(e=>{}),$(".ui.modal").modal("setting","closable",!1).modal("show")}}const i=new r;window.onload=s=>{i.init()};
 </script></head>
 	<body class="astro-HSP6OTUF">
 		
-  <h1>404</h1>
-<p>Hey captain! Looks like you're heading to a wrong planet!</p>
+  <div class="ui basic modal">
+    <div class="ui icon header">
+      
+      <span class="material-symbols-outlined">
+        account_circle
+        </span>
+        
+    </div>
+    <div class="content">
+      <p>Your inbox is getting full, would you like us to enable automatic archiving of old messages?</p>
+    </div>
+    <div class="actions">
+      <div class="ui red basic cancel inverted button">
+        <i class="remove icon"></i>
+        No
+      </div>
+      <div class="ui green ok inverted button">
+        <i class="checkmark icon"></i>
+        Yes
+      </div>
+    </div>
+  </div>
 
 
 	</body></html>
