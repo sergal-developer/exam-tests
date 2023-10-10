@@ -1,0 +1,32 @@
+---
+import { slide } from "astro:transitions";
+import Main from "../../layouts/Main.astro";
+
+export async function getStaticPaths() {
+  const posts = [
+    {id: '1', category: "astro", title: "API Reference"},
+    {id: '2', category: "react", title: "Creating a React Counter!"},
+    {id: 'test', category: "react", title: "Creating a React Counter!"},
+    {id: 'question1', category: "react", title: "Creating a React Counter!"},
+    {id: 'test2', category: "react", title: "Creating a React Counter!"},
+    {id: 'tst', category: "react", title: "Creating a React Counter!"},
+    {id: 't', category: "react", title: "Creating a React Counter!"},
+  ];
+  return posts.map((post) => {
+    return {
+      params: { id: post.id },
+      props: { post }
+    };
+  });
+}
+const {id} = Astro.params;
+const {post} = Astro.props;
+---
+
+<Main title="exam-tests">
+  
+    <div class="app-page bordered">
+        question ID  { JSON.stringify(post) }
+    </div>
+
+</Main>

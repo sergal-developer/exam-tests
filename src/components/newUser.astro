@@ -1,18 +1,17 @@
 ---
 let { title, subtitle, description, list } = Astro.props;
-
 ---
 
-<div class="ui basic modal">
+<div class="app-page bordered">
+  <div class="ui basic modal">
     <div class="ui icon header">
-      
-      <span class="material-symbols-outlined">
-        account_circle
-        </span>
-        
+      <span class="material-symbols-outlined"> account_circle</span>
     </div>
     <div class="content">
-      <p>Your inbox is getting full, would you like us to enable automatic archiving of old messages?</p>
+      <p>
+        Your inbox is getting full, would you like us to enable automatic
+        archiving of old messages?
+      </p>
     </div>
     <div class="actions">
       <div class="ui red basic cancel inverted button">
@@ -25,3 +24,4 @@ let { title, subtitle, description, list } = Astro.props;
       </div>
     </div>
   </div>
+</div>

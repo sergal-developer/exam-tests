@@ -27,7 +27,8 @@ export class APP {
         })
 
 
-        $('.ui.modal').modal('setting', 'closable', false)
+        const modalRef: any = $('.ui.modal');
+        modalRef.modal('setting', 'closable', false)
             .modal('show');
     }
 }
