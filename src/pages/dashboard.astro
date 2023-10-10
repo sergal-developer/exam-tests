@@ -1,0 +1,16 @@
+---
+import Main from "../layouts/Main.astro";
+import DashboardComponent from "../components/dashboard.astro";
+---
+
+<Main title="exam-tests">
+  <div class="section" id="dashboardView"> <DashboardComponent /> </div>
+</Main>
+
+<script>
+  import { DashboardApp } from "../data/dashboard";
+  const app = new DashboardApp();
+  window.onload = (e) => {
+    app.init();
+  };
+</script>

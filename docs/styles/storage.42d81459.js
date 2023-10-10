@@ -1,0 +1,1 @@
+class e{constructor(a){this.CONTEXT="exam",a&&(this.CONTEXT=a)}get(a){a=a||this.CONTEXT;const l=localStorage.getItem(a);return l?JSON.parse(l):null}save(a,l){l=l||this.CONTEXT,localStorage.setItem(l,JSON.stringify(a))}clear(a){a=a||this.CONTEXT,localStorage.removeItem(a)}clearAll(){localStorage.clear()}}export{e as S};

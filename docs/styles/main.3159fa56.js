@@ -1,0 +1,1 @@
+import{S as t}from"./storage.42d81459.js";import{U as s}from"./utils.115e600c.js";class o{constructor(){this.storage=new t("exam"),this.utils=new s}init(){this.storage.get("profile")?this.utils.redirect("/exam-tests/dashboard"):this.utils.redirect("/exam-tests/profile")}}export{o as A};

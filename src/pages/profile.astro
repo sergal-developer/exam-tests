@@ -1,0 +1,50 @@
+---
+import Main from "../layouts/Main.astro";
+import UserDetails from "../components/userDetails.astro";
+---
+
+<Main title="exam-tests">
+  <div id="userDetails" style="display: none;"> <UserDetails /> </div>
+
+
+  <div class="ui basic modal">
+
+    <div class="content">
+
+      <h1>Hola, ¿Cual es tu nombre?</h1>
+      <p>
+        Este paso es necesario para crear tu perfil
+      </p>
+
+      <div class="ui labeled input">
+        <div class="ui label">
+          <span class="icon material-symbols-outlined"> account_circle</span>
+        </div>
+        <input type="text" id="username" placeholder="Cual es tu nombre? ...">
+      </div>
+
+      <div class="ui green ok inverted button" id="buttonCreateUser">
+        <i class="checkmark icon"></i>
+        Continuar
+      </div>
+
+    </div>
+  </div>
+
+</Main>
+
+<script>
+  import { ProfileApp } from "../data/profile";
+  const app = new ProfileApp();
+  window.onload = (e) => {
+    app.init();
+    actions();
+  };
+
+  function actions() {
+    const buttonCreateUser = document.querySelector('#buttonCreateUser');
+    buttonCreateUser.addEventListener('click', () => {
+      app.createUser();
+    });
+  }
+</script>

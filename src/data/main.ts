@@ -1,35 +1,31 @@
-import { Services } from './services';
+// import { Services } from './services';
 import { Storage } from './storage';
+import { Utils } from './utils';
 
 // let $: any;
 
 export class APP {
-
     storage = new Storage('exam');
-    services = new Services();
+    utils = new Utils();
 
     constructor() { }
     init() {
-        //this.setupIntro();
-        // this.setupEvents();
-
-        let val = this.storage.get();
-        console.log('val: ', val);
+        let val = this.storage.get('profile');
 
         if (!val) {
-            this.storage.save({ user: 'test', role: 'test' });
-            val = this.storage.get();
-            console.log('val: ', val);
+            this.utils.redirect('/exam-tests/profile');
+        } else {
+            this.utils.redirect('/exam-tests/dashboard');
         }
 
-        this.services.getRawData((data) => {
-            // console.log('data: ', data);
-        })
+        // this.services.getRawData((data) => {
+        //     // console.log('data: ', data);
+        // })
 
 
-        const modalRef: any = $('.ui.modal');
-        modalRef.modal('setting', 'closable', false)
-            .modal('show');
+        // const modalRef: any = $('.ui.modal');
+        // modalRef.modal('setting', 'closable', false)
+        //     .modal('show');
     }
 }
 

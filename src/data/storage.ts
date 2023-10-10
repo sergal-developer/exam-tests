@@ -6,8 +6,9 @@ export class Storage {
       }
     }
   
-    get() {
-      const data = localStorage.getItem(this.CONTEXT);
+    get(context?: string) {
+      context = context || this.CONTEXT;
+      const data = localStorage.getItem(context);
       return data ? JSON.parse(data) : null;
     }
     save(data: any, context?: string) {
