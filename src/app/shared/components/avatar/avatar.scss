@@ -1,0 +1,70 @@
+//@import "../../common/styles/colors";
+
+avatar {
+    .avatar {
+        color: white;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-content: center;
+        align-items: center;
+        justify-content: flex-start;
+
+        .badge {
+            width: 45px;
+            height: 45px;
+            background: #5bbb73;
+            border-radius: 50%;
+        }
+
+        .avatar-description {
+            display: flex;
+            flex-direction: column;
+            margin-left: 10px;
+        }
+
+        .userName {
+            font-size: 20px;
+        }
+
+        .stats {
+            font-size: 18px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            align-content: center;
+            flex-wrap: nowrap;
+
+            .icon {
+                width: 20px;
+                img {
+                    width: inherit;
+                    height: inherit;
+                }
+            }
+            .value {
+                margin-left: 10px;
+                margin-top: -6px;
+                // font-weight: bold;
+            }
+        }
+
+        &.right {
+            flex-flow: row-reverse;
+
+            .avatar-description {
+                margin-right: 10px;
+                align-content: center;
+                align-items: flex-end;
+            }
+
+            .stats {
+                flex-direction: row-reverse;
+                .value {
+                    margin-right: 10px;
+                }
+            }
+        }
+    }
+}

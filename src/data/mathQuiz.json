@@ -1,0 +1,1645 @@
+{
+    "quiz": [
+        {
+            "id": 1,
+            "value": "Cálculo",
+            "difficulty": [
+                {
+                    "id": 1,
+                    "value": "facil",
+                    "timer": 0,
+                    "questions": [
+                        {
+                            "term": "2 + 1",
+                            "result": "3"
+                        },
+                        {
+                            "term": "2 + 2",
+                            "result": "4"
+                        },
+                        {
+                            "term": "2 + 3",
+                            "result": "5"
+                        }
+                    ]
+                },
+                {
+                    "id": 2,
+                    "value": "medio",
+                    "timer": 20,
+                    "questions": [
+                        {
+                            "term": "2 + 1",
+                            "result": "3"
+                        },
+                        {
+                            "term": "2 + 2",
+                            "result": "4"
+                        },
+                        {
+                            "term": "2 + 3",
+                            "result": "5"
+                        },
+                        {
+                            "term": "2 + 4",
+                            "result": "6"
+                        },
+                        {
+                            "term": "2 + 5",
+                            "result": "7"
+                        },
+                        {
+                            "term": "2 + 6",
+                            "result": "8"
+                        },
+                        {
+                            "term": "2 + 7",
+                            "result": "9"
+                        },
+                        {
+                            "term": "2 + 8",
+                            "result": "10"
+                        },
+                        {
+                            "term": "2 + 9",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 + 1",
+                            "result": "4"
+                        },
+                        {
+                            "term": "3 + 2",
+                            "result": "5"
+                        },
+                        {
+                            "term": "3 + 3",
+                            "result": "6"
+                        },
+                        {
+                            "term": "3 + 4",
+                            "result": "7"
+                        },
+                        {
+                            "term": "3 + 5",
+                            "result": "8"
+                        },
+                        {
+                            "term": "3 + 6",
+                            "result": "9"
+                        },
+                        {
+                            "term": "3 + 7",
+                            "result": "10"
+                        },
+                        {
+                            "term": "3 + 8",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 + 9",
+                            "result": "12"
+                        }
+                    ]
+                },
+                {
+                    "id": 3,
+                    "value": "dificil",
+                    "timer": 20,
+                    "questions": [
+                        {
+                            "term": "2 + 1",
+                            "result": "3"
+                        },
+                        {
+                            "term": "2 + 2",
+                            "result": "4"
+                        },
+                        {
+                            "term": "2 + 3",
+                            "result": "5"
+                        },
+                        {
+                            "term": "2 + 4",
+                            "result": "6"
+                        },
+                        {
+                            "term": "2 + 5",
+                            "result": "7"
+                        },
+                        {
+                            "term": "2 + 6",
+                            "result": "8"
+                        },
+                        {
+                            "term": "2 + 7",
+                            "result": "9"
+                        },
+                        {
+                            "term": "2 + 8",
+                            "result": "10"
+                        },
+                        {
+                            "term": "2 + 9",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 + 1",
+                            "result": "4"
+                        },
+                        {
+                            "term": "3 + 2",
+                            "result": "5"
+                        },
+                        {
+                            "term": "3 + 3",
+                            "result": "6"
+                        },
+                        {
+                            "term": "3 + 4",
+                            "result": "7"
+                        },
+                        {
+                            "term": "3 + 5",
+                            "result": "8"
+                        },
+                        {
+                            "term": "3 + 6",
+                            "result": "9"
+                        },
+                        {
+                            "term": "3 + 7",
+                            "result": "10"
+                        },
+                        {
+                            "term": "3 + 8",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 + 9",
+                            "result": "12"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "value": "Suma",
+            "difficulty": [
+                {
+                    "id": 1,
+                    "value": "facil",
+                    "timer": 20,
+                    "questions": [
+                        {
+                            "term": "2 + 1",
+                            "result": "3"
+                        },
+                        {
+                            "term": "2 + 2",
+                            "result": "4"
+                        },
+                        {
+                            "term": "2 + 3",
+                            "result": "5"
+                        },
+                        {
+                            "term": "2 + 4",
+                            "result": "6"
+                        },
+                        {
+                            "term": "2 + 5",
+                            "result": "7"
+                        },
+                        {
+                            "term": "2 + 6",
+                            "result": "8"
+                        },
+                        {
+                            "term": "2 + 7",
+                            "result": "9"
+                        },
+                        {
+                            "term": "2 + 8",
+                            "result": "10"
+                        },
+                        {
+                            "term": "2 + 9",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 + 1",
+                            "result": "4"
+                        },
+                        {
+                            "term": "3 + 2",
+                            "result": "5"
+                        },
+                        {
+                            "term": "3 + 3",
+                            "result": "6"
+                        },
+                        {
+                            "term": "3 + 4",
+                            "result": "7"
+                        },
+                        {
+                            "term": "3 + 5",
+                            "result": "8"
+                        },
+                        {
+                            "term": "3 + 6",
+                            "result": "9"
+                        },
+                        {
+                            "term": "3 + 7",
+                            "result": "10"
+                        },
+                        {
+                            "term": "3 + 8",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 + 9",
+                            "result": "12"
+                        }
+                    ]
+                },
+                {
+                    "id": 2,
+                    "value": "medio",
+                    "timer": 15,
+                    "questions": [
+                        {
+                            "term": "2 + 1",
+                            "result": "3"
+                        },
+                        {
+                            "term": "2 + 2",
+                            "result": "4"
+                        },
+                        {
+                            "term": "2 + 3",
+                            "result": "5"
+                        },
+                        {
+                            "term": "2 + 4",
+                            "result": "6"
+                        },
+                        {
+                            "term": "2 + 5",
+                            "result": "7"
+                        },
+                        {
+                            "term": "2 + 6",
+                            "result": "8"
+                        },
+                        {
+                            "term": "2 + 7",
+                            "result": "9"
+                        },
+                        {
+                            "term": "2 + 8",
+                            "result": "10"
+                        },
+                        {
+                            "term": "2 + 9",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 + 1",
+                            "result": "4"
+                        },
+                        {
+                            "term": "3 + 2",
+                            "result": "5"
+                        },
+                        {
+                            "term": "3 + 3",
+                            "result": "6"
+                        },
+                        {
+                            "term": "3 + 4",
+                            "result": "7"
+                        },
+                        {
+                            "term": "3 + 5",
+                            "result": "8"
+                        },
+                        {
+                            "term": "3 + 6",
+                            "result": "9"
+                        },
+                        {
+                            "term": "3 + 7",
+                            "result": "10"
+                        },
+                        {
+                            "term": "3 + 8",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 + 9",
+                            "result": "12"
+                        }
+                    ]
+                },
+                {
+                    "id": 3,
+                    "value": "dificil",
+                    "timer": 10,
+                    "questions": [
+                        {
+                            "term": "2 + 1",
+                            "result": "3"
+                        },
+                        {
+                            "term": "2 + 2",
+                            "result": "4"
+                        },
+                        {
+                            "term": "2 + 3",
+                            "result": "5"
+                        },
+                        {
+                            "term": "2 + 4",
+                            "result": "6"
+                        },
+                        {
+                            "term": "2 + 5",
+                            "result": "7"
+                        },
+                        {
+                            "term": "2 + 6",
+                            "result": "8"
+                        },
+                        {
+                            "term": "2 + 7",
+                            "result": "9"
+                        },
+                        {
+                            "term": "2 + 8",
+                            "result": "10"
+                        },
+                        {
+                            "term": "2 + 9",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 + 1",
+                            "result": "4"
+                        },
+                        {
+                            "term": "3 + 2",
+                            "result": "5"
+                        },
+                        {
+                            "term": "3 + 3",
+                            "result": "6"
+                        },
+                        {
+                            "term": "3 + 4",
+                            "result": "7"
+                        },
+                        {
+                            "term": "3 + 5",
+                            "result": "8"
+                        },
+                        {
+                            "term": "3 + 6",
+                            "result": "9"
+                        },
+                        {
+                            "term": "3 + 7",
+                            "result": "10"
+                        },
+                        {
+                            "term": "3 + 8",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 + 9",
+                            "result": "12"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "value": "Resta",
+            "difficulty": [
+                {
+                    "id": 1,
+                    "value": "facil",
+                    "timer": 20,
+                    "questions": [
+                        {
+                            "term": "2 - 1",
+                            "result": "3"
+                        },
+                        {
+                            "term": "2 - 2",
+                            "result": "4"
+                        },
+                        {
+                            "term": "2 - 3",
+                            "result": "5"
+                        },
+                        {
+                            "term": "2 - 4",
+                            "result": "6"
+                        },
+                        {
+                            "term": "2 - 5",
+                            "result": "7"
+                        },
+                        {
+                            "term": "2 - 6",
+                            "result": "8"
+                        },
+                        {
+                            "term": "2 - 7",
+                            "result": "9"
+                        },
+                        {
+                            "term": "2 - 8",
+                            "result": "10"
+                        },
+                        {
+                            "term": "2 - 9",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 - 1",
+                            "result": "4"
+                        },
+                        {
+                            "term": "3 - 2",
+                            "result": "5"
+                        },
+                        {
+                            "term": "3 - 3",
+                            "result": "6"
+                        },
+                        {
+                            "term": "3 - 4",
+                            "result": "7"
+                        },
+                        {
+                            "term": "3 - 5",
+                            "result": "8"
+                        },
+                        {
+                            "term": "3 - 6",
+                            "result": "9"
+                        },
+                        {
+                            "term": "3 - 7",
+                            "result": "10"
+                        },
+                        {
+                            "term": "3 - 8",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 - 9",
+                            "result": "12"
+                        }
+                    ]
+                },
+                {
+                    "id": 2,
+                    "value": "medio",
+                    "timer": 15,
+                    "questions": [
+                        {
+                            "term": "2 - 1",
+                            "result": "3"
+                        },
+                        {
+                            "term": "2 - 2",
+                            "result": "4"
+                        },
+                        {
+                            "term": "2 - 3",
+                            "result": "5"
+                        },
+                        {
+                            "term": "2 - 4",
+                            "result": "6"
+                        },
+                        {
+                            "term": "2 - 5",
+                            "result": "7"
+                        },
+                        {
+                            "term": "2 - 6",
+                            "result": "8"
+                        },
+                        {
+                            "term": "2 - 7",
+                            "result": "9"
+                        },
+                        {
+                            "term": "2 - 8",
+                            "result": "10"
+                        },
+                        {
+                            "term": "2 - 9",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 - 1",
+                            "result": "4"
+                        },
+                        {
+                            "term": "3 - 2",
+                            "result": "5"
+                        },
+                        {
+                            "term": "3 - 3",
+                            "result": "6"
+                        },
+                        {
+                            "term": "3 - 4",
+                            "result": "7"
+                        },
+                        {
+                            "term": "3 - 5",
+                            "result": "8"
+                        },
+                        {
+                            "term": "3 - 6",
+                            "result": "9"
+                        },
+                        {
+                            "term": "3 - 7",
+                            "result": "10"
+                        },
+                        {
+                            "term": "3 - 8",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 - 9",
+                            "result": "12"
+                        }
+                    ]
+                },
+                {
+                    "id": 3,
+                    "value": "dificil",
+                    "timer": 10,
+                    "questions": [
+                        {
+                            "term": "2 - 1",
+                            "result": "3"
+                        },
+                        {
+                            "term": "2 - 2",
+                            "result": "4"
+                        },
+                        {
+                            "term": "2 - 3",
+                            "result": "5"
+                        },
+                        {
+                            "term": "2 - 4",
+                            "result": "6"
+                        },
+                        {
+                            "term": "2 - 5",
+                            "result": "7"
+                        },
+                        {
+                            "term": "2 - 6",
+                            "result": "8"
+                        },
+                        {
+                            "term": "2 - 7",
+                            "result": "9"
+                        },
+                        {
+                            "term": "2 - 8",
+                            "result": "10"
+                        },
+                        {
+                            "term": "2 - 9",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 - 1",
+                            "result": "4"
+                        },
+                        {
+                            "term": "3 - 2",
+                            "result": "5"
+                        },
+                        {
+                            "term": "3 - 3",
+                            "result": "6"
+                        },
+                        {
+                            "term": "3 - 4",
+                            "result": "7"
+                        },
+                        {
+                            "term": "3 - 5",
+                            "result": "8"
+                        },
+                        {
+                            "term": "3 - 6",
+                            "result": "9"
+                        },
+                        {
+                            "term": "3 - 7",
+                            "result": "10"
+                        },
+                        {
+                            "term": "3 - 8",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 - 9",
+                            "result": "12"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "value": "Multiplicación",
+            "difficulty": [
+                {
+                    "id": 1,
+                    "value": "facil",
+                    "timer": 20,
+                    "questions": [
+                        {
+                            "term": "2 * 1",
+                            "result": "3"
+                        },
+                        {
+                            "term": "2 * 2",
+                            "result": "4"
+                        },
+                        {
+                            "term": "2 * 3",
+                            "result": "5"
+                        },
+                        {
+                            "term": "2 * 4",
+                            "result": "6"
+                        },
+                        {
+                            "term": "2 * 5",
+                            "result": "7"
+                        },
+                        {
+                            "term": "2 * 6",
+                            "result": "8"
+                        },
+                        {
+                            "term": "2 * 7",
+                            "result": "9"
+                        },
+                        {
+                            "term": "2 * 8",
+                            "result": "10"
+                        },
+                        {
+                            "term": "2 * 9",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 * 1",
+                            "result": "4"
+                        },
+                        {
+                            "term": "3 * 2",
+                            "result": "5"
+                        },
+                        {
+                            "term": "3 * 3",
+                            "result": "6"
+                        },
+                        {
+                            "term": "3 * 4",
+                            "result": "7"
+                        },
+                        {
+                            "term": "3 * 5",
+                            "result": "8"
+                        },
+                        {
+                            "term": "3 * 6",
+                            "result": "9"
+                        },
+                        {
+                            "term": "3 * 7",
+                            "result": "10"
+                        },
+                        {
+                            "term": "3 * 8",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 * 9",
+                            "result": "12"
+                        }
+                    ]
+                },
+                {
+                    "id": 2,
+                    "value": "medio",
+                    "timer": 15,
+                    "questions": [
+                        {
+                            "term": "2 * 1",
+                            "result": "3"
+                        },
+                        {
+                            "term": "2 * 2",
+                            "result": "4"
+                        },
+                        {
+                            "term": "2 * 3",
+                            "result": "5"
+                        },
+                        {
+                            "term": "2 * 4",
+                            "result": "6"
+                        },
+                        {
+                            "term": "2 * 5",
+                            "result": "7"
+                        },
+                        {
+                            "term": "2 * 6",
+                            "result": "8"
+                        },
+                        {
+                            "term": "2 * 7",
+                            "result": "9"
+                        },
+                        {
+                            "term": "2 * 8",
+                            "result": "10"
+                        },
+                        {
+                            "term": "2 * 9",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 * 1",
+                            "result": "4"
+                        },
+                        {
+                            "term": "3 * 2",
+                            "result": "5"
+                        },
+                        {
+                            "term": "3 * 3",
+                            "result": "6"
+                        },
+                        {
+                            "term": "3 * 4",
+                            "result": "7"
+                        },
+                        {
+                            "term": "3 * 5",
+                            "result": "8"
+                        },
+                        {
+                            "term": "3 * 6",
+                            "result": "9"
+                        },
+                        {
+                            "term": "3 * 7",
+                            "result": "10"
+                        },
+                        {
+                            "term": "3 * 8",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 * 9",
+                            "result": "12"
+                        }
+                    ]
+                },
+                {
+                    "id": 3,
+                    "value": "dificil",
+                    "timer": 10,
+                    "questions": [
+                        {
+                            "term": "2 * 1",
+                            "result": "3"
+                        },
+                        {
+                            "term": "2 * 2",
+                            "result": "4"
+                        },
+                        {
+                            "term": "2 * 3",
+                            "result": "5"
+                        },
+                        {
+                            "term": "2 * 4",
+                            "result": "6"
+                        },
+                        {
+                            "term": "2 * 5",
+                            "result": "7"
+                        },
+                        {
+                            "term": "2 * 6",
+                            "result": "8"
+                        },
+                        {
+                            "term": "2 * 7",
+                            "result": "9"
+                        },
+                        {
+                            "term": "2 * 8",
+                            "result": "10"
+                        },
+                        {
+                            "term": "2 * 9",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 * 1",
+                            "result": "4"
+                        },
+                        {
+                            "term": "3 * 2",
+                            "result": "5"
+                        },
+                        {
+                            "term": "3 * 3",
+                            "result": "6"
+                        },
+                        {
+                            "term": "3 * 4",
+                            "result": "7"
+                        },
+                        {
+                            "term": "3 * 5",
+                            "result": "8"
+                        },
+                        {
+                            "term": "3 * 6",
+                            "result": "9"
+                        },
+                        {
+                            "term": "3 * 7",
+                            "result": "10"
+                        },
+                        {
+                            "term": "3 * 8",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 * 9",
+                            "result": "12"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "value": "Divición",
+            "difficulty": [
+                {
+                    "id": 1,
+                    "value": "facil",
+                    "timer": 20,
+                    "questions": [
+                        {
+                            "term": "2 / 1",
+                            "result": "3"
+                        },
+                        {
+                            "term": "2 / 2",
+                            "result": "4"
+                        },
+                        {
+                            "term": "2 / 3",
+                            "result": "5"
+                        },
+                        {
+                            "term": "2 / 4",
+                            "result": "6"
+                        },
+                        {
+                            "term": "2 / 5",
+                            "result": "7"
+                        },
+                        {
+                            "term": "2 / 6",
+                            "result": "8"
+                        },
+                        {
+                            "term": "2 / 7",
+                            "result": "9"
+                        },
+                        {
+                            "term": "2 / 8",
+                            "result": "10"
+                        },
+                        {
+                            "term": "2 / 9",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 / 1",
+                            "result": "4"
+                        },
+                        {
+                            "term": "3 / 2",
+                            "result": "5"
+                        },
+                        {
+                            "term": "3 / 3",
+                            "result": "6"
+                        },
+                        {
+                            "term": "3 / 4",
+                            "result": "7"
+                        },
+                        {
+                            "term": "3 / 5",
+                            "result": "8"
+                        },
+                        {
+                            "term": "3 / 6",
+                            "result": "9"
+                        },
+                        {
+                            "term": "3 / 7",
+                            "result": "10"
+                        },
+                        {
+                            "term": "3 / 8",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 / 9",
+                            "result": "12"
+                        }
+                    ]
+                },
+                {
+                    "id": 2,
+                    "value": "medio",
+                    "timer": 15,
+                    "questions": [
+                        {
+                            "term": "2 / 1",
+                            "result": "3"
+                        },
+                        {
+                            "term": "2 / 2",
+                            "result": "4"
+                        },
+                        {
+                            "term": "2 / 3",
+                            "result": "5"
+                        },
+                        {
+                            "term": "2 / 4",
+                            "result": "6"
+                        },
+                        {
+                            "term": "2 / 5",
+                            "result": "7"
+                        },
+                        {
+                            "term": "2 / 6",
+                            "result": "8"
+                        },
+                        {
+                            "term": "2 / 7",
+                            "result": "9"
+                        },
+                        {
+                            "term": "2 / 8",
+                            "result": "10"
+                        },
+                        {
+                            "term": "2 / 9",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 / 1",
+                            "result": "4"
+                        },
+                        {
+                            "term": "3 / 2",
+                            "result": "5"
+                        },
+                        {
+                            "term": "3 / 3",
+                            "result": "6"
+                        },
+                        {
+                            "term": "3 / 4",
+                            "result": "7"
+                        },
+                        {
+                            "term": "3 / 5",
+                            "result": "8"
+                        },
+                        {
+                            "term": "3 / 6",
+                            "result": "9"
+                        },
+                        {
+                            "term": "3 / 7",
+                            "result": "10"
+                        },
+                        {
+                            "term": "3 / 8",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 / 9",
+                            "result": "12"
+                        }
+                    ]
+                },
+                {
+                    "id": 3,
+                    "value": "dificil",
+                    "timer": 10,
+                    "questions": [
+                        {
+                            "term": "2 / 1",
+                            "result": "3"
+                        },
+                        {
+                            "term": "2 / 2",
+                            "result": "4"
+                        },
+                        {
+                            "term": "2 / 3",
+                            "result": "5"
+                        },
+                        {
+                            "term": "2 / 4",
+                            "result": "6"
+                        },
+                        {
+                            "term": "2 / 5",
+                            "result": "7"
+                        },
+                        {
+                            "term": "2 / 6",
+                            "result": "8"
+                        },
+                        {
+                            "term": "2 / 7",
+                            "result": "9"
+                        },
+                        {
+                            "term": "2 / 8",
+                            "result": "10"
+                        },
+                        {
+                            "term": "2 / 9",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 / 1",
+                            "result": "4"
+                        },
+                        {
+                            "term": "3 / 2",
+                            "result": "5"
+                        },
+                        {
+                            "term": "3 / 3",
+                            "result": "6"
+                        },
+                        {
+                            "term": "3 / 4",
+                            "result": "7"
+                        },
+                        {
+                            "term": "3 / 5",
+                            "result": "8"
+                        },
+                        {
+                            "term": "3 / 6",
+                            "result": "9"
+                        },
+                        {
+                            "term": "3 / 7",
+                            "result": "10"
+                        },
+                        {
+                            "term": "3 / 8",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 / 9",
+                            "result": "12"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "value": "Geometria",
+            "difficulty": [
+                {
+                    "id": 1,
+                    "value": "facil",
+                    "timer": 20,
+                    "questions": [
+                        {
+                            "term": "2 + 1",
+                            "result": "3"
+                        },
+                        {
+                            "term": "2 + 2",
+                            "result": "4"
+                        },
+                        {
+                            "term": "2 + 3",
+                            "result": "5"
+                        },
+                        {
+                            "term": "2 + 4",
+                            "result": "6"
+                        },
+                        {
+                            "term": "2 + 5",
+                            "result": "7"
+                        },
+                        {
+                            "term": "2 + 6",
+                            "result": "8"
+                        },
+                        {
+                            "term": "2 + 7",
+                            "result": "9"
+                        },
+                        {
+                            "term": "2 + 8",
+                            "result": "10"
+                        },
+                        {
+                            "term": "2 + 9",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 + 1",
+                            "result": "4"
+                        },
+                        {
+                            "term": "3 + 2",
+                            "result": "5"
+                        },
+                        {
+                            "term": "3 + 3",
+                            "result": "6"
+                        },
+                        {
+                            "term": "3 + 4",
+                            "result": "7"
+                        },
+                        {
+                            "term": "3 + 5",
+                            "result": "8"
+                        },
+                        {
+                            "term": "3 + 6",
+                            "result": "9"
+                        },
+                        {
+                            "term": "3 + 7",
+                            "result": "10"
+                        },
+                        {
+                            "term": "3 + 8",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 + 9",
+                            "result": "12"
+                        }
+                    ]
+                },
+                {
+                    "id": 2,
+                    "value": "medio",
+                    "timer": 20,
+                    "questions": [
+                        {
+                            "term": "2 + 1",
+                            "result": "3"
+                        },
+                        {
+                            "term": "2 + 2",
+                            "result": "4"
+                        },
+                        {
+                            "term": "2 + 3",
+                            "result": "5"
+                        },
+                        {
+                            "term": "2 + 4",
+                            "result": "6"
+                        },
+                        {
+                            "term": "2 + 5",
+                            "result": "7"
+                        },
+                        {
+                            "term": "2 + 6",
+                            "result": "8"
+                        },
+                        {
+                            "term": "2 + 7",
+                            "result": "9"
+                        },
+                        {
+                            "term": "2 + 8",
+                            "result": "10"
+                        },
+                        {
+                            "term": "2 + 9",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 + 1",
+                            "result": "4"
+                        },
+                        {
+                            "term": "3 + 2",
+                            "result": "5"
+                        },
+                        {
+                            "term": "3 + 3",
+                            "result": "6"
+                        },
+                        {
+                            "term": "3 + 4",
+                            "result": "7"
+                        },
+                        {
+                            "term": "3 + 5",
+                            "result": "8"
+                        },
+                        {
+                            "term": "3 + 6",
+                            "result": "9"
+                        },
+                        {
+                            "term": "3 + 7",
+                            "result": "10"
+                        },
+                        {
+                            "term": "3 + 8",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 + 9",
+                            "result": "12"
+                        }
+                    ]
+                },
+                {
+                    "id": 3,
+                    "value": "dificil",
+                    "timer": 20,
+                    "questions": [
+                        {
+                            "term": "2 + 1",
+                            "result": "3"
+                        },
+                        {
+                            "term": "2 + 2",
+                            "result": "4"
+                        },
+                        {
+                            "term": "2 + 3",
+                            "result": "5"
+                        },
+                        {
+                            "term": "2 + 4",
+                            "result": "6"
+                        },
+                        {
+                            "term": "2 + 5",
+                            "result": "7"
+                        },
+                        {
+                            "term": "2 + 6",
+                            "result": "8"
+                        },
+                        {
+                            "term": "2 + 7",
+                            "result": "9"
+                        },
+                        {
+                            "term": "2 + 8",
+                            "result": "10"
+                        },
+                        {
+                            "term": "2 + 9",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 + 1",
+                            "result": "4"
+                        },
+                        {
+                            "term": "3 + 2",
+                            "result": "5"
+                        },
+                        {
+                            "term": "3 + 3",
+                            "result": "6"
+                        },
+                        {
+                            "term": "3 + 4",
+                            "result": "7"
+                        },
+                        {
+                            "term": "3 + 5",
+                            "result": "8"
+                        },
+                        {
+                            "term": "3 + 6",
+                            "result": "9"
+                        },
+                        {
+                            "term": "3 + 7",
+                            "result": "10"
+                        },
+                        {
+                            "term": "3 + 8",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 + 9",
+                            "result": "12"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 7,
+            "value": "Hora",
+            "difficulty": [
+                {
+                    "id": 1,
+                    "value": "facil",
+                    "timer": 20,
+                    "questions": [
+                        {
+                            "term": "2 + 1",
+                            "result": "3"
+                        },
+                        {
+                            "term": "2 + 2",
+                            "result": "4"
+                        },
+                        {
+                            "term": "2 + 3",
+                            "result": "5"
+                        },
+                        {
+                            "term": "2 + 4",
+                            "result": "6"
+                        },
+                        {
+                            "term": "2 + 5",
+                            "result": "7"
+                        },
+                        {
+                            "term": "2 + 6",
+                            "result": "8"
+                        },
+                        {
+                            "term": "2 + 7",
+                            "result": "9"
+                        },
+                        {
+                            "term": "2 + 8",
+                            "result": "10"
+                        },
+                        {
+                            "term": "2 + 9",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 + 1",
+                            "result": "4"
+                        },
+                        {
+                            "term": "3 + 2",
+                            "result": "5"
+                        },
+                        {
+                            "term": "3 + 3",
+                            "result": "6"
+                        },
+                        {
+                            "term": "3 + 4",
+                            "result": "7"
+                        },
+                        {
+                            "term": "3 + 5",
+                            "result": "8"
+                        },
+                        {
+                            "term": "3 + 6",
+                            "result": "9"
+                        },
+                        {
+                            "term": "3 + 7",
+                            "result": "10"
+                        },
+                        {
+                            "term": "3 + 8",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 + 9",
+                            "result": "12"
+                        }
+                    ]
+                },
+                {
+                    "id": 2,
+                    "value": "medio",
+                    "timer": 20,
+                    "questions": [
+                        {
+                            "term": "2 + 1",
+                            "result": "3"
+                        },
+                        {
+                            "term": "2 + 2",
+                            "result": "4"
+                        },
+                        {
+                            "term": "2 + 3",
+                            "result": "5"
+                        },
+                        {
+                            "term": "2 + 4",
+                            "result": "6"
+                        },
+                        {
+                            "term": "2 + 5",
+                            "result": "7"
+                        },
+                        {
+                            "term": "2 + 6",
+                            "result": "8"
+                        },
+                        {
+                            "term": "2 + 7",
+                            "result": "9"
+                        },
+                        {
+                            "term": "2 + 8",
+                            "result": "10"
+                        },
+                        {
+                            "term": "2 + 9",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 + 1",
+                            "result": "4"
+                        },
+                        {
+                            "term": "3 + 2",
+                            "result": "5"
+                        },
+                        {
+                            "term": "3 + 3",
+                            "result": "6"
+                        },
+                        {
+                            "term": "3 + 4",
+                            "result": "7"
+                        },
+                        {
+                            "term": "3 + 5",
+                            "result": "8"
+                        },
+                        {
+                            "term": "3 + 6",
+                            "result": "9"
+                        },
+                        {
+                            "term": "3 + 7",
+                            "result": "10"
+                        },
+                        {
+                            "term": "3 + 8",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 + 9",
+                            "result": "12"
+                        }
+                    ]
+                },
+                {
+                    "id": 3,
+                    "value": "dificil",
+                    "timer": 20,
+                    "questions": [
+                        {
+                            "term": "2 + 1",
+                            "result": "3"
+                        },
+                        {
+                            "term": "2 + 2",
+                            "result": "4"
+                        },
+                        {
+                            "term": "2 + 3",
+                            "result": "5"
+                        },
+                        {
+                            "term": "2 + 4",
+                            "result": "6"
+                        },
+                        {
+                            "term": "2 + 5",
+                            "result": "7"
+                        },
+                        {
+                            "term": "2 + 6",
+                            "result": "8"
+                        },
+                        {
+                            "term": "2 + 7",
+                            "result": "9"
+                        },
+                        {
+                            "term": "2 + 8",
+                            "result": "10"
+                        },
+                        {
+                            "term": "2 + 9",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 + 1",
+                            "result": "4"
+                        },
+                        {
+                            "term": "3 + 2",
+                            "result": "5"
+                        },
+                        {
+                            "term": "3 + 3",
+                            "result": "6"
+                        },
+                        {
+                            "term": "3 + 4",
+                            "result": "7"
+                        },
+                        {
+                            "term": "3 + 5",
+                            "result": "8"
+                        },
+                        {
+                            "term": "3 + 6",
+                            "result": "9"
+                        },
+                        {
+                            "term": "3 + 7",
+                            "result": "10"
+                        },
+                        {
+                            "term": "3 + 8",
+                            "result": "11"
+                        },
+                        {
+                            "term": "3 + 9",
+                            "result": "12"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
