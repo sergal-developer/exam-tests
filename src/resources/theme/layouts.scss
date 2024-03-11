@@ -1,9 +1,10 @@
-@import './core/reset';
+// 
 @import './core/colors';
 @import './core/typography';
 @import './core/mixins';
 
-html, body {
+html,
+body {
     background: rgb(255, 255, 255);
     margin: 0;
     padding: 0;
@@ -23,40 +24,176 @@ html, body {
     }
 }
 
-.section {
-    width: 100vw;
-    height: 100vh;
-    position: relative;
+
+.row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+
+    &.column {
+        flex-direction: column;
+    }
+
+    .item {}
+
+    .label {}
 }
 
-.frame {
+.container {
+    padding: 0px 30px;
     display: flex;
+    flex-direction: row;
     width: inherit;
-    height: inherit;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.main-component {
+    background: rgb(185, 222, 226);
+    background: linear-gradient(30deg, rgba(185, 222, 226, 1) 0%, rgba(242, 247, 237, 1) 100%);
+    width: 100vw;
+    height: 100vh;
+
+    .main-header {
+        height: 60px;
+        align-items: center;
+
+        .container {
+            align-items: center;
+        }
+
+        .item.logo {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .item.avatar {
+            margin-left: auto;
+        }
+    }
+
+}
+
+.quiz-component {
+    display: flex;
+    flex-direction: row;
+    width: 100vw;
+    height: calc(100vh - 120px);
     align-items: center;
     justify-content: center;
-    flex-direction: row;
 
-    .inner-frame {
-        min-width: 10%;
-        padding: 20px;
-        &.centred {
-            text-align: center;
+    .quiz-body {
+        box-shadow: 0 0 10px gray;
+        width: 80vw;
+        max-height: calc(100vh - 150px);
+        overflow: auto;
+        display: unset;
+        padding: 30px;
+        border-radius: 11px;
+        background: white;
+
+        .row {
+            margin-bottom: 30px;
+            &.whioutMargin {
+                margin-bottom: 0;
+            }
         }
+
+        .column {
+            .question-section {
+                margin-bottom: 40px;
+            }
+        }
+    }
+
+    .label {
+        &.time {
+            font-weight: bold;
+        }
+    }
+
+    .submit {
+        margin-left: auto;
+    }
+
+    .question-number {
+        font-size: 16px;
+    }
+
+    .question {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    .question-options {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: stretch;
+        justify-content: center;
+        align-content: center;
+        gap: 15px;
+
+        .option {
+            max-width: 32%; 
+            width: 32%;
+            background: white;
+            border: 1px solid #ababab;
+            margin: 0px 0px 10px 0;
+            border-radius: 10px;
+            padding: 5px 10px;
+            transition: all 300ms;
+            display: flex;
+            position: relative;
+            padding-left: 35px;
+            align-items: center;
+            justify-content: flex-start;
+
+            .index {
+                background: #b3b3b3;
+                color: black;
+                padding: 4px;
+                position: absolute;
+                left: 3px;
+                top: 3px;
+                height: 25px;
+                width: 25px;
+                border-radius: 9px;
+                font-weight: bold;
+                font-size: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            &:hover {
+                background: #f5f5f5;
+                box-shadow: 0 0 5px gray;
+            }
+
+            &.selected {
+                background: #dfdfdf;
+            }
+
+            &.correct {
+                background: #d0f1d4;
+                border-color: #8bc34a;
+            }
+            &.incorrect {
+                background: #f5cfcf;
+                border-color: #f58686;
+            }
+        }
+        
     }
 }
 
-.header {
-    width: 100%;
-    height: 60px;
-}
 
-.list-container {
-    width: 100%;
-    height: 100%;
-}
 
-.footer {
-    width: 100%;
-    height: 60px;
+
+
+* * {
+    outline: 1px dotted rgba(238, 130, 238, 0.2);
 }
