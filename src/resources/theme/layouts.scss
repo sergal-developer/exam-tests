@@ -74,6 +74,25 @@ body {
         }
     }
 
+    .interactive-bg {
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+        left: 0;
+        top: 0;
+
+        .circle-bg {
+            position: absolute;
+            width: 30%;
+            height: 30%;
+            left: 0;
+            top: 20%;
+            border: 3px solid #D0D5CD;
+            border-radius: 50%;
+        }
+    }
+   
+
 }
 
 .quiz-component {
@@ -190,10 +209,6 @@ body {
     }
 }
 
-
-
-
-
-* * {
+.debugger * * {
     outline: 1px dotted rgba(238, 130, 238, 0.2);
 }
