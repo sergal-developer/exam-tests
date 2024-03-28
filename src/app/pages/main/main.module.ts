@@ -5,12 +5,19 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MainComponent } from './main.component';
 import { EventBusService } from 'src/app/shared/data/utils/event.services';
 import { QuizComponent } from './components/quiz/quiz.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { ScoreComponent } from './components/score/score.component';
+import { ComponentsModule } from 'src/app/shared/components/components.module';
+import { SplashComponent } from './components/splash/splash.component';
+import { ExamComponent } from './components/exam/exam.component';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+
+    ComponentsModule,
     RouterModule.forChild([
       {
         path: '',
@@ -21,10 +28,20 @@ import { QuizComponent } from './components/quiz/quiz.component';
   ],
   declarations: [
     MainComponent,
+    SplashComponent,
+    DashboardComponent,
+    ExamComponent,
+
+    ScoreComponent,
     QuizComponent
   ],
   exports: [
     MainComponent,
+    SplashComponent,
+    DashboardComponent,
+    ExamComponent,
+
+    ScoreComponent,
     QuizComponent
   ],
   providers: [EventBusService],

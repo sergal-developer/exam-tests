@@ -1,13 +1,6 @@
-import {
-  AfterViewInit,
-  Component,
-  OnInit,
-  ViewEncapsulation,
-} from '@angular/core';
-import { EVENTS } from 'src/app/shared/data/constants/constants';
-import { ScreenEnum } from 'src/app/shared/data/enumerables/enumerables';
+import { Component, OnInit, ViewEncapsulation, } from '@angular/core';
+import { EVENTS, ScreenEnum } from 'src/app/shared/data/enumerables/enumerables';
 import { EventBusService } from 'src/app/shared/data/utils/event.services';
-import { GamesService } from 'src/app/shared/services/games.service';
 import { ProfileService } from 'src/app/shared/services/profile.service';
 
 @Component({
@@ -18,7 +11,7 @@ import { ProfileService } from 'src/app/shared/services/profile.service';
 })
 export class SplashComponent implements OnInit {
   service = new ProfileService();
-  gamesService = new GamesService();
+  timeDelay = 0;
 
   constructor(private eventService: EventBusService) {}
 
@@ -27,19 +20,8 @@ export class SplashComponent implements OnInit {
   }
 
   async checkData() {
-
-    if(!this.gamesService.getGames()) {
-      this.gamesService.bulkDefaultGames();
-    }
-
     setTimeout(() => {
-      const profile = this.service.getCurrentProfile();
-      
-      if (!profile) {
-        this.eventService.emit({ name: EVENTS.SCREEN, value: ScreenEnum.profile });
-      } else {
-        this.eventService.emit({ name: EVENTS.SCREEN, value: ScreenEnum.home });
-      }
-    }, 2500);
+      this.eventService.emit({ name: EVENTS.SCREENS,  value: ScreenEnum.dashboard });  
+    }, this.timeDelay);
   }
 }

@@ -1,24 +1,40 @@
-<div class="main-component">
-    <div class="row main-header">
+
+<div class="main-component" 
+    [ngClass]="{ 'subheader-active': subheader && !subheader.completed,
+                 'subheader-completed': subheader && subheader.completed }">
+    <div class="row main-header" *ngIf="header && !subheader">
         <div class="container">
-            <div class="item logo">
-                verif.
+            <div class="item title" [innerHTML]="header.title"></div>
+
+            <div class="item avatar" *ngIf="header.image">
+                <img [attr.src]="header.image" [attr.alt]="header.title">
+            </div>
+        </div>
+    </div>
+    <div class="row main-subheader" *ngIf="subheader">
+        <div class="container">
+            <div class="item" >
+                <div class="return" (click)="returnHome()">
+                    <button class="link"><span class="material-icons">arrow_back</span></button>
+                </div>
+
+                <div class="title" [innerHTML]="subheader.title"></div>
             </div>
 
-            <div class="item avatar">
-                avatar
+            <div class="item counter">
+                <div class="bar-counter">
+                    <div class="bar-counter-current" [attr.style]="'width:'+subheader.progress+';'"></div>
+                </div>
+
+                <div class="pill-counter">
+                    {{ subheader.current }} / {{ subheader.questions }}
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <quiz-component></quiz-component>
-    </div>
+    <splash *ngIf="screen === _screen.splash"></splash> 
+    <dashboard  *ngIf="screen === _screen.dashboard"></dashboard>
+    <exam *ngIf="screen === _screen.exam" [data]="data"></exam>
 
-
-    <!-- <splash *ngIf="screen === 'splash'"></splash> -->
-    <div class="interactive-bg">
-        <div class="circle-bg one"></div>
-        <div class="circle-bg one"></div>
-    </div>
 </div>

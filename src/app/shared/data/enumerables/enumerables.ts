@@ -1,11 +1,21 @@
+export enum EVENTS {
+    CONFIG = 'config',
+    SCREENS = 'screen'
+}
+
 export enum ScreenEnum {
     splash = 'splash',
+    dashboard = 'dashboard',
+    exam = 'exam',
+    examCreate = 'examCreate',
+    
     profile = 'profile',
     settings = 'settings',
     home = 'home',
     game = 'game',
     admin = 'admin'
 }
+
 
 export enum GamesEnum {
     ColorNumbers = 'ColorNumbers',

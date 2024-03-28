@@ -1,0 +1,24 @@
+<div class="_modal-panel {{ size }} {{ direction }} {{ customClass }}" 
+    [ngClass]="{'open': open }">
+  <ng-container>
+    <div class="_modal-overlap" (click)="closeInOverlap()">
+    </div>
+    <div class="_modal-container">
+      <ng-container *ngIf="open">
+        <div class="_modal-panel-header">
+          <div class="_modal-panel-title">
+            <span [innerHTML]='title'></span>
+            <ng-content select="[header]"></ng-content>
+          </div>
+          
+          <div *ngIf="canClose" class="_modal-panel-close" (click)="close($event)">
+            <span class="material-icons">clear</span>
+          </div>
+        </div>
+        <div class="_modal-panel-content">
+          <ng-content select="[body]"></ng-content>
+        </div>
+      </ng-container>
+    </div>
+  </ng-container>
+</div>

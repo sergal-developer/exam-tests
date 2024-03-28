@@ -3,10 +3,11 @@
 @import './core/mixins';
 
 button, .button {
-    background: #273d30;
-    color: white;
+    background: rgba(255, 255, 255, 0.2);
+    color: rgba(44, 44, 44, 0.6);
     border: 1px solid transparent;
-    transition: background 300ms;
+
+    transition: all 300ms;
     cursor: pointer;
     padding: 10px 25px;
     font-family: $josefinFont;
@@ -15,13 +16,98 @@ button, .button {
     border-radius: 5px;
 
     &:hover, &.hover {
-        background: #57896c;
-        border-color: #57896c;
+        background: rgba(255, 255, 255, 0.6);
+        color: rgba(44, 44, 44, 1);
     }
 
     &:disabled, &.disabled {
-        background: #b0b0b0;
-        border-color: #b0b0b0;
-        color: gray;
+        background: rgba(177, 177, 177, 0.2);
+        border-color: transparent;
+        color: rgba(44, 44, 44, 0.2);
+        text-decoration: none;
+    }
+
+    &.accent { 
+        background: #F1EBFF;
+        color: #7D55CF;
+        
+        &:hover, &.hover {
+            background: #AF8CF8;
+            color: white;
+        }
+
+        &:disabled, &.disabled {
+            background: rgba(177, 177, 177, 0.2);
+            border-color: transparent;
+            color: rgba(44, 44, 44, 0.2);
+        }
+    }
+
+    &.link { 
+        background: transparent;
+        color: #7D55CF;
+        padding: 2px;
+        
+        &:hover, &.hover {
+            background: transparent;
+            color: #310e77;
+            text-decoration: underline;
+        }
+
+        &:disabled, &.disabled {
+            background: transparent;
+            border-color: transparent;
+            color: rgba(44, 44, 44, 0.2);
+            text-decoration: none;
+        }
+    } 
+
+}
+
+
+form, .form {
+    margin-bottom: 20px;
+}
+
+input {
+    padding: 10px;
+    width: 100%;
+    transition: all 300ms;
+    padding: 18px 25px;
+    font-family: $josefinFont;
+    font-weight: 600;
+    font-size: 16px;
+    border-radius: 5px;
+    background: #F1EBFF;
+    border: 2px solid #F1EBFF;
+    color: #7D55CF;
+    outline: none;
+
+    &:hover, &.hover {
+        background: #F1EBFF;
+        color: #7D55CF;
+        border: 2px solid #a483e4;
+    }
+
+    &:disabled, &.disabled {
+        background: rgba(177, 177, 177, 0.2);
+        border-color: transparent;
+        color: rgba(44, 44, 44, 0.2);
+    }
+}
+
+.center {
+    text-align: center;
+}
+
+
+.notification {
+    padding: 15px;
+    background: lightgray;
+    border-radius: 10px;
+
+    &.warning {
+        background: #e1cc5e;
+        color: #656565;
     }
 }

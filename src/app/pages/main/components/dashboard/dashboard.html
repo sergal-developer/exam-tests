@@ -1,0 +1,90 @@
+<div class="row">
+    <div class="dashboard">
+        <div class="frame">
+
+            <div class="section yellow manage">
+                <div class="item category">
+                    <div class="_title">Acciones</div>
+                    <div class="subtitle">Plantillas</div>
+                </div>
+
+                <div class="item">
+                    <button class="link fullbutton">
+                        Crear <span class="material-icons">add</span>
+                    </button>
+                </div>
+                <div class="item">
+                    <button class="link fullbutton">
+                        Cargar <span class="material-icons">cloud_upload</span> 
+                    </button>
+                </div>
+            </div>
+    
+            <div class="section violet progress">
+                <div class="item">
+                    <div class="_title">Examen tema 1</div>
+                    <div class="subtitle">Pregunta 10</div>
+                </div>
+                <div class="item">
+                    <button class="link">Continuar</button>
+                    <button class="link">Reiniciar</button>
+                </div>
+
+                <div class="background-section">
+                    <img src="../../../../../assets/background-resume.svg" alt="">
+                </div>
+            </div>
+    
+        
+            <div class="section white main-list">
+                <div class="item">
+                    <div class="_title">Lista dez examenes</div>
+                </div>
+
+                <div class="collection-list">
+                    <div class="exam" *ngFor="let exam of examsList" (click)="initExam(exam)" >
+                        <div class="num">{{ exam.id }}</div>
+                        <div class="icon {{ exam.color }}">{{ exam.title[0] }}</div>
+                        <div class="title">
+                            <div class="name">{{ exam.title }}</div>
+                            <div class="quiestion-numbers">Preguntas: {{ exam.questions }}</div>
+                        </div>
+                        <div class="time">{{ exam.timeResolution }} min.</div>
+                    </div>
+                </div>
+                
+            </div>
+    
+        </div>
+    </div>
+</div>
+
+<modal [title]="modalCtl.title" [size]="modalCtl.size" [canClose]="modalCtl.canClose"
+        [closeOnClickOverlap]="modalCtl.closeOnClickOverlap"
+        [direction]="modalCtl.direction" [(open)]="modalCtl.open"
+        (afterChange)="modalCtl.afterchange($event)">
+        <ng-container body>
+            <div class="module profile" *ngIf="modalCtl.module == 'profile'">
+                
+                <div class="form">
+                    <input type="text" placeholder="Nombre" [(ngModel)]="profile.userName" >
+                </div>
+
+                <div class="form avatar-collection">
+                    <ng-container *ngFor="let item of defaultAvatars">
+                        <img [ngClass]="{'selected': item.selected}" [attr.src]="item.url" [attr.alt]="item.url" (click)="selectAvatar(item)">
+                    </ng-container>
+                </div>
+
+                <div class="form" *ngIf="validateProfile">
+                    <div class="notification static {{ messages.profileValidation.type }}">
+                        {{ messages.profileValidation.text }}
+                    </div>
+                </div>
+
+                <div class="center" *ngIf="!validateProfile">
+                   <button class="accent" (click)="createProfile()">Listo</button>
+                </div>
+            </div>
+        </ng-container>
+    </modal>
