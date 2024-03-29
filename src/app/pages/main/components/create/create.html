@@ -1,0 +1,66 @@
+<div class="row debugger">
+    <div class="create-exam-component">
+        <div class="frame">
+
+            <div class="section transparent column" *ngIf="currentQuestion">
+                <div class="item-header">
+                    <div class="_title">Pregunta</div>
+                    <div class="_actions">
+                    </div>
+                </div>
+                <div class="item question">
+                    <textarea name="" [(ngModel)]="currentQuestion.questions"></textarea>
+                </div>
+
+                <div class="item question-section">
+                    <div class="item-header">
+                        <div class="_subtitle">Respuestas</div>
+                        <div class="_actions">
+                            <button class="link" (click)="newOption()">
+                                <span class="material-icons">add_circle_outline</span> agregar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="question-options">
+                        <div class="item" 
+                            *ngFor="let option of currentQuestion.options"
+                            [ngClass]="{'correct': currentQuestion.answer && currentQuestion.answer == option.id }">
+                            <div class="actions">
+                                <button class="link" (click)="deleteOption(option)">
+                                    <span class="material-icons">remove_circle_outline</span>
+                                </button>
+                            </div>
+                            <textarea name="" id="" [(ngModel)]="option.text"></textarea>
+                            <div class="actions">
+                                <button class="link" (click)="setCorrectOption(option)">
+                                    <span class="material-icons" *ngIf="!currentQuestion.answer">check_circle</span>
+                                    <ng-container *ngIf="currentQuestion.answer">
+                                        <span class="material-icons" *ngIf="currentQuestion.answer == option.id">check</span>
+                                        <span class="material-icons" *ngIf="currentQuestion.answer != option.id">close</span>
+                                    </ng-container>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section white float-footer">
+                <div class="item paginator">
+                    <button class="link" (click)="prevQuestion()"><span class="material-icons"> chevron_left</span>
+                        Atras </button>
+                    <button class="link" (click)="nextQuestion()"><span class="material-icons"> navigate_next</span>
+                        Siguiente </button>
+                    <button class="accent" (click)="saveExam()">Salvar</button>
+                    <!-- <button (click)="prevQuestion()">Prev</button>
+                    <ng-container *ngIf="currentQuestionIndex < questions.length - 1">
+                        <button (click)="nextQuestion()" [disabled]="!currentQuestion.selectedAnswer">Next</button>
+                    </ng-container>
+                    <ng-container *ngIf="currentQuestionIndex == questions.length - 1">
+                        <button (click)="nextQuestion()">Evaluar</button>
+                    </ng-container> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

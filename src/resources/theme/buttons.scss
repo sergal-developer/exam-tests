@@ -14,6 +14,12 @@ button, .button {
     font-weight: 600;
     font-size: 16px;
     border-radius: 5px;
+    display: inline-block;
+    margin: 2px 5px;
+
+    .material-icons {
+        display: inline-block;
+    }
 
     &:hover, &.hover {
         background: rgba(255, 255, 255, 0.6);
@@ -46,12 +52,19 @@ button, .button {
     &.link { 
         background: transparent;
         color: #7D55CF;
-        padding: 2px;
-        
+        padding: 0px;
+        display: inline-flex;
+        align-items: center;
+
+        .material-icons {
+            border: none !important;
+        }
+
         &:hover, &.hover {
             background: transparent;
             color: #310e77;
             text-decoration: underline;
+            
         }
 
         &:disabled, &.disabled {
@@ -68,7 +81,7 @@ button, .button {
 form, .form {
     margin-bottom: 20px;
 }
-
+textarea,
 input {
     padding: 10px;
     width: 100%;

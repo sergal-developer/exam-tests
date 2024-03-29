@@ -33,8 +33,10 @@
         </div>
     </div>
 
-    <splash *ngIf="screen === _screen.splash"></splash> 
+    <!-- <splash *ngIf="screen === _screen.splash"></splash>  -->
+    <!-- <router-outlet></router-outlet> -->
     <dashboard  *ngIf="screen === _screen.dashboard"></dashboard>
     <exam *ngIf="screen === _screen.exam" [data]="data"></exam>
-
+    <create *ngIf="screen === _screen.create"></create>
+    <upload *ngIf="screen === _screen.upload"></upload>
 </div>

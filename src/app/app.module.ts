@@ -4,7 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { AppRoutes } from './app.routing';
 import { GlobalConstants } from './shared/services/common/globals';
-import { MainModule } from './pages/main/main.module';
+import { MainModule, MainPackage } from './pages/main/main.module';
 
 import { NotFoundModule } from './pages/notFound/notFound.module';
 
@@ -17,10 +17,8 @@ import { NotFoundModule } from './pages/notFound/notFound.module';
     BrowserModule,
 
     //Pages
-    MainModule,
-    NotFoundModule,
-
-  
+    ...MainPackage.modules,
+    NotFoundModule
   ],
   providers: [
     GlobalConstants

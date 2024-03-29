@@ -7,7 +7,9 @@ export enum ScreenEnum {
     splash = 'splash',
     dashboard = 'dashboard',
     exam = 'exam',
-    examCreate = 'examCreate',
+    create = 'create',
+    upload = 'upload',
+
     
     profile = 'profile',
     settings = 'settings',

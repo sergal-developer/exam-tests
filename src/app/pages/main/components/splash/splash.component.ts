@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewEncapsulation, } from '@angular/core';
+import { Router } from '@angular/router';
 import { EVENTS, ScreenEnum } from 'src/app/shared/data/enumerables/enumerables';
 import { EventBusService } from 'src/app/shared/data/utils/event.services';
 import { ProfileService } from 'src/app/shared/services/profile.service';
@@ -11,9 +12,10 @@ import { ProfileService } from 'src/app/shared/services/profile.service';
 })
 export class SplashComponent implements OnInit {
   service = new ProfileService();
-  timeDelay = 0;
+  timeDelay = 1000;
 
-  constructor(private eventService: EventBusService) {}
+  constructor(private _router: Router,
+              private eventService: EventBusService) {}
 
   ngOnInit() {
     this.checkData();
@@ -21,7 +23,7 @@ export class SplashComponent implements OnInit {
 
   async checkData() {
     setTimeout(() => {
-      this.eventService.emit({ name: EVENTS.SCREENS,  value: ScreenEnum.dashboard });  
+      this._router.navigate( [`/dashboard`]);
     }, this.timeDelay);
   }
 }

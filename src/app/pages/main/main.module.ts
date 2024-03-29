@@ -1,26 +1,27 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MainComponent } from './main.component';
 import { EventBusService } from 'src/app/shared/data/utils/event.services';
-import { QuizComponent } from './components/quiz/quiz.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { ScoreComponent } from './components/score/score.component';
 import { ComponentsModule } from 'src/app/shared/components/components.module';
 import { SplashComponent } from './components/splash/splash.component';
 import { ExamComponent } from './components/exam/exam.component';
+import { CreateComponent } from './components/create/create.component';
+import { ModulePackage } from 'src/app/shared/data/interfaces/interfaces';
+import { UploadComponent } from './components/upload/upload.component';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-
     ComponentsModule,
+
     RouterModule.forChild([
       {
-        path: '',
+        path: 'dashboard',
         component: MainComponent,
       },
     ]),
@@ -31,19 +32,27 @@ import { ExamComponent } from './components/exam/exam.component';
     SplashComponent,
     DashboardComponent,
     ExamComponent,
-
-    ScoreComponent,
-    QuizComponent
+    CreateComponent,
+    UploadComponent
   ],
   exports: [
     MainComponent,
     SplashComponent,
     DashboardComponent,
     ExamComponent,
-
-    ScoreComponent,
-    QuizComponent
+    CreateComponent,
+    UploadComponent
   ],
   providers: [EventBusService],
 })
 export class MainModule {}
+
+export let MainPackage: ModulePackage = {
+  modules: [ MainModule ],
+  routes: [
+    { path: '', component: SplashComponent },
+    { path: 'dashboard', component: MainComponent },
+    { path: 'dashboard/:module', component: MainComponent },
+    { path: 'dashboard/:module/:action', component: MainComponent },
+  ]
+};

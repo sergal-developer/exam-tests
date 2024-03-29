@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewEncapsulation, } from '@angular/core';
+import { Router } from '@angular/router';
 import { ProfileEntity } from 'src/app/shared/data/entities/entities';
 import { EVENTS, ScreenEnum } from 'src/app/shared/data/enumerables/enumerables';
 import { EventBusService } from 'src/app/shared/data/utils/event.services';
@@ -60,7 +61,9 @@ export class DashboardComponent implements OnInit {
 
   remaningExamn = null;
 
-  constructor(private eventService: EventBusService) {}
+  constructor(
+    private _router: Router,
+    private eventService: EventBusService) {}
 
   ngOnInit() {
     this.init();
@@ -83,8 +86,7 @@ export class DashboardComponent implements OnInit {
 
   //#region EXAM
   initExam(exam: any) {
-    this.eventService.emit({ name: EVENTS.SCREENS,  value: ScreenEnum.exam, data: exam });
-    // this.eventService.emit({ name: EVENTS.CONFIG, component: 'subheader', value: exam });
+    this._router.navigate( [`/dashboard/${ ScreenEnum.exam }/${ exam.id }`]);
   }
   //#endregion EXAM
 
@@ -126,5 +128,15 @@ export class DashboardComponent implements OnInit {
     this.init();  
   }
   //#endregion PROFILE
+
+  
+  createExam() {
+    this._router.navigate( [`/dashboard/create`]);
+  }
+
+  uploadExam() {
+    this._router.navigate( [`/dashboard/upload`]);
+  }
+
   //#endregion EVENTS
 }
