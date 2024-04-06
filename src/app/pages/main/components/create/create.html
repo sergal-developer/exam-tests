@@ -22,8 +22,7 @@
                         </div>
                     </div>
                     <div class="question-options">
-                        <div class="item" 
-                            *ngFor="let option of currentQuestion.options"
+                        <div class="item" *ngFor="let option of currentQuestion.options"
                             [ngClass]="{'correct': currentQuestion.answer && currentQuestion.answer == option.id }">
                             <div class="actions">
                                 <button class="link" (click)="deleteOption(option)">
@@ -35,8 +34,10 @@
                                 <button class="link" (click)="setCorrectOption(option)">
                                     <span class="material-icons" *ngIf="!currentQuestion.answer">check_circle</span>
                                     <ng-container *ngIf="currentQuestion.answer">
-                                        <span class="material-icons" *ngIf="currentQuestion.answer == option.id">check</span>
-                                        <span class="material-icons" *ngIf="currentQuestion.answer != option.id">close</span>
+                                        <span class="material-icons"
+                                            *ngIf="currentQuestion.answer == option.id">check</span>
+                                        <span class="material-icons"
+                                            *ngIf="currentQuestion.answer != option.id">close</span>
                                     </ng-container>
                                 </button>
                             </div>
@@ -47,18 +48,12 @@
 
             <div class="section white float-footer">
                 <div class="item paginator">
-                    <button class="link" (click)="prevQuestion()"><span class="material-icons"> chevron_left</span>
-                        Atras </button>
-                    <button class="link" (click)="nextQuestion()"><span class="material-icons"> navigate_next</span>
-                        Siguiente </button>
-                    <button class="accent" (click)="saveExam()">Salvar</button>
-                    <!-- <button (click)="prevQuestion()">Prev</button>
-                    <ng-container *ngIf="currentQuestionIndex < questions.length - 1">
-                        <button (click)="nextQuestion()" [disabled]="!currentQuestion.selectedAnswer">Next</button>
-                    </ng-container>
-                    <ng-container *ngIf="currentQuestionIndex == questions.length - 1">
-                        <button (click)="nextQuestion()">Evaluar</button>
-                    </ng-container> -->
+                    <button class="link" (click)="prevQuestion()" *ngIf="currentQuestionIndex != 0">
+                        <span class="material-icons"> chevron_left</span> Atras </button>
+                    <button class="link" [disabled]="!validate()" (click)="nextQuestion()">
+                        Siguiente <span class="material-icons"> navigate_next</span> </button>
+                    <button class="accent" [disabled]="!validate()" (click)="saveExam()">Salvar</button>
+
                 </div>
             </div>
         </div>

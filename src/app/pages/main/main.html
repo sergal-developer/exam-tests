@@ -18,7 +18,10 @@
                     <button class="link"><span class="material-icons">arrow_back</span></button>
                 </div>
 
-                <div class="title" [innerHTML]="subheader.title"></div>
+                <div class="title" [innerHTML]="subheader.title" *ngIf="!subheader.canEditTitle"></div>
+                <div class="title" *ngIf="subheader.canEditTitle">
+                    <input type="text" [(ngModel)]="subheader.title" (change)="editExamTitle(subheader.title)">
+                </div>
             </div>
 
             <div class="item counter">
@@ -37,6 +40,6 @@
     <!-- <router-outlet></router-outlet> -->
     <dashboard  *ngIf="screen === _screen.dashboard"></dashboard>
     <exam *ngIf="screen === _screen.exam" [data]="data"></exam>
-    <create *ngIf="screen === _screen.create"></create>
+    <create *ngIf="screen === _screen.create" [data]="data" [examTitle]="examTitle"></create>
     <upload *ngIf="screen === _screen.upload"></upload>
 </div>

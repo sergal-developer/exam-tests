@@ -27,6 +27,7 @@ export class MainComponent implements OnInit {
 
     this._activatedRoute.params.subscribe((params: any) => {
       console.log('params: ', params);
+      this.data = null;
       // Set initial module
       if (params.module) {
         this.screen = params.module;
@@ -59,7 +60,8 @@ export class MainComponent implements OnInit {
           color: response.value.color,
           current: response.value.current,
           progress: response.value.progress,
-          completed: response.value.completed
+          completed: response.value.completed,
+          canEditTitle: response.value.canEditTitle,
         }
         this.updateSubHeader(data);
       }
@@ -98,5 +100,10 @@ export class MainComponent implements OnInit {
     this.subheader = null;
     this.screen = ScreenEnum.dashboard;
     this._router.navigate( [`/dashboard`]);
+  }
+
+  examTitle = '';
+  editExamTitle(title: string) {
+    this.examTitle = title;
   }
 }

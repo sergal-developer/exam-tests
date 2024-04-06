@@ -12,6 +12,8 @@ export interface IExam {
   questions: Array<IQuestion>,
   startDate?: number;
   lastUpdate?: number;
+
+  _showDetails?: boolean;
 }
 
 export interface IQuestion {

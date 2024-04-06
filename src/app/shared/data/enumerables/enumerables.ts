@@ -9,6 +9,7 @@ export enum ScreenEnum {
     exam = 'exam',
     create = 'create',
     upload = 'upload',
+    edit = 'edit',
 
     
     profile = 'profile',

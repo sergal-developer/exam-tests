@@ -53,12 +53,29 @@
 
             .exam {
                 width: 100%;
+                height: 55px;
                 display: flex;
-                align-items: center;
-                flex-direction: row;
-                flex-wrap: nowrap;
-                justify-content: flex-start;
                 margin-bottom: 10px;
+                transition: all 300ms;
+
+                .list-view {
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    flex-direction: row;
+                    flex-wrap: nowrap;
+                    justify-content: flex-start;
+                    margin-bottom: 10px;
+                    transition: all 300ms;
+                }
+                .card-view {
+                    width: 100%;
+                    position: relative;
+                    min-height: 180px;
+                    overflow: hidden;
+                    padding: 15px;
+                    display: none;
+                }
 
                 .num, .time {
                     font-size: 14px;
@@ -87,6 +104,28 @@
 
                     .name { font-weight: bold;}
                     .quiestion-numbers {}
+                }
+
+                &.showDetails {
+                    height: 200px;
+                    background: #e1e1e1;
+                    border-radius: 15px;
+
+                    .list-view {
+                        display: none;
+                    }
+                    .card-view {
+                        display: flex;
+                    }
+                }
+            }
+
+            &.editModeItems {
+                .list-view {
+                    .icon {
+                        background: #0a60b1;
+                        color: white;
+                    }
                 }
             }
         }

@@ -3,24 +3,35 @@
         <div class="frame">
 
             <div class="section yellow manage">
-                <div class="item category">
+                <!-- <div class="item category">
                     <div class="_title">Acciones</div>
                     <div class="subtitle">Plantillas</div>
-                </div>
-
+                </div> -->
+                <ng-container *ngIf="!editModeActive">
+                    <div class="item">
+                        <button class="link fullbutton" (click)="createExam()">
+                            Crear <span class="material-icons">add</span>
+                        </button>
+                    </div>
+                    <div class="item">
+                        <button class="link fullbutton" (click)="uploadExam()">
+                            Cargar <span class="material-icons">cloud_upload</span>
+                        </button>
+                    </div>
+                </ng-container>
                 <div class="item">
-                    <button class="link fullbutton" (click)="createExam()">
-                        Crear <span class="material-icons">add</span>
-                    </button>
-                </div>
-                <div class="item">
-                    <button class="link fullbutton" (click)="uploadExam()">
-                        Cargar <span class="material-icons">cloud_upload</span> 
+                    <button class="link fullbutton" (click)="editMode()">
+                        <ng-container *ngIf="editModeActive">
+                            Salir de edición<span class="material-icons">cancel</span>
+                        </ng-container>
+                        <ng-container *ngIf="!editModeActive">
+                            Editar<span class="material-icons">edit</span>
+                        </ng-container>
                     </button>
                 </div>
             </div>
-    
-            <div class="section violet progress">
+
+            <div class="section violet progress" *ngIf="examTemporal">
                 <div class="item">
                     <div class="_title">Examen tema 1</div>
                     <div class="subtitle">Pregunta 10</div>
@@ -34,57 +45,77 @@
                     <img src="../../../../../assets/background-resume.svg" alt="">
                 </div>
             </div>
-    
-        
+
+
             <div class="section white main-list">
                 <div class="item">
-                    <div class="_title">Lista dez examenes</div>
+                    <div class="_title">Lista de examenes</div>
                 </div>
 
-                <div class="collection-list">
-                    <div class="exam" *ngFor="let exam of examsList" (click)="initExam(exam)" >
-                        <div class="num">{{ exam.id }}</div>
-                        <div class="icon {{ exam.color }}">{{ exam.title[0] }}</div>
-                        <div class="title">
-                            <div class="name">{{ exam.title }}</div>
-                            <div class="quiestion-numbers">Preguntas: {{ exam.questions }}</div>
+                <div class="collection-list" [ngClass]="{'editModeItems': editModeActive }">
+                    <div class="exam" [ngClass]="{'showDetails': exam._showDetails }"
+                        *ngFor="let exam of examsList; let i = index" >
+                        <div class="list-view" (click)="detailsExam(exam)">
+                            <div class="num">
+                                <span *ngIf="(i+1) < 10">0{{ i + 1 }}</span>
+                                <span *ngIf="(i+1) >= 10">{{ i + 1 }}</span>
+                            </div>
+                            <div class="icon {{ exam.color }}">{{ exam.title[0] }}</div>
+                            <div class="title">
+                                <div class="name">{{ exam.title }}</div>
+                                <div class="quiestion-numbers">Preguntas: {{ exam.questionsLenght }}</div>
+                            </div>
+                            <div class="time">{{ exam.time }} min.</div>
                         </div>
-                        <div class="time">{{ exam.timeResolution }} min.</div>
+                        <div class="card-view">
+                            <div class="item">
+                                <div class="_title">{{ exam.title }}</div>
+                                <div class="subtitle">Preguntas: {{ exam.questionsLenght }}</div>
+                            </div>
+                            <div class="item">
+                                <button class="link" (click)="initExam(exam)">Iniciar</button>
+                            </div>
+            
+                            <div class="background-section">
+                                <img src="../../../../../assets/background-resume.svg" alt="">
+                            </div>
+                        </div>
+
                     </div>
                 </div>
-                
+
             </div>
-    
+
         </div>
     </div>
 </div>
 
 <modal [title]="modalCtl.title" [size]="modalCtl.size" [canClose]="modalCtl.canClose"
-        [closeOnClickOverlap]="modalCtl.closeOnClickOverlap"
-        [direction]="modalCtl.direction" [(open)]="modalCtl.open"
-        (afterChange)="modalCtl.afterchange($event)">
-        <ng-container body>
-            <div class="module profile" *ngIf="modalCtl.module == 'profile'">
-                
-                <div class="form">
-                    <input type="text" placeholder="Nombre" [(ngModel)]="profile.userName" >
-                </div>
+    [closeOnClickOverlap]="modalCtl.closeOnClickOverlap" [direction]="modalCtl.direction" [(open)]="modalCtl.open"
+    (afterChange)="modalCtl.afterchange($event)">
+    <ng-container body>
+        <div class="module profile" *ngIf="modalCtl.module == 'profile'">
 
-                <div class="form avatar-collection">
-                    <ng-container *ngFor="let item of defaultAvatars">
-                        <img [ngClass]="{'selected': item.selected}" [attr.src]="item.url" [attr.alt]="item.url" (click)="selectAvatar(item)">
-                    </ng-container>
-                </div>
+            <div class="form">
+                <input type="text" placeholder="Nombre" [(ngModel)]="profile.userName">
+            </div>
 
-                <div class="form" *ngIf="validateProfile">
-                    <div class="notification static {{ messages.profileValidation.type }}">
-                        {{ messages.profileValidation.text }}
-                    </div>
-                </div>
+            <div class="form avatar-collection">
+                <ng-container *ngFor="let item of defaultAvatars">
+                    <img [ngClass]="{'selected': item.selected}" [attr.src]="item.url" [attr.alt]="item.url"
+                        (click)="selectAvatar(item)">
+                </ng-container>
+            </div>
 
-                <div class="center" *ngIf="!validateProfile">
-                   <button class="accent" (click)="createProfile()">Listo</button>
+            <div class="form" *ngIf="validateProfile">
+                <div class="notification static {{ messages.profileValidation.type }}">
+                    {{ messages.profileValidation.text }}
                 </div>
             </div>
-        </ng-container>
-    </modal>
+
+            <div class="center" *ngIf="!validateProfile">
+                <button class="accent" (click)="createProfile()">Listo</button>
+            </div>
+        </div>
+    </ng-container>
+</modal>

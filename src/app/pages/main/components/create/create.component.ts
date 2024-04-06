@@ -1,4 +1,6 @@
 import { Component, Input, OnInit, ViewEncapsulation, } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Router } from '@angular/router';
 import { EVENTS, ScreenEnum } from 'src/app/shared/data/enumerables/enumerables';
 import { IExam, IOption, IQuestion } from 'src/app/shared/data/interfaces/IExam';
 import { EventBusService } from 'src/app/shared/data/utils/event.services';
@@ -12,11 +14,30 @@ import { ExamsService } from 'src/app/shared/services/exams.service';
   encapsulation: ViewEncapsulation.None,
 })
 export class CreateComponent implements OnInit {
+  @Input() data: any;
+
+  /* This value return any change call into [(ngModel)] */
+  private _examTitle: any;
+  get examTitle(): any { 
+    return this._examTitle;
+  }
+
+  @Input() 
+  set examTitle(v: any) {
+      if (v !== this._examTitle) {
+          this._examTitle = v;
+          this.currentExam.title = v;
+          console.log('this.currentExam: ', this.currentExam);
+      }
+  }
+
   _examService = new ExamsService();
+  isEdit = false;
 
-  constructor(private eventService: EventBusService) { }
+  constructor(private _router: Router, 
+            private eventService: EventBusService) { }
 
-  data: any = {};
+  headerData: any = {};
   currentExam: IExam = {
     title: '',
     color: '',
@@ -34,42 +55,61 @@ export class CreateComponent implements OnInit {
   };
 
   ngOnInit() {
-    this.loadExam();
+    if(this.data) {
+      const examTemp: Array<IExam> = this._examService.getExamById(this.data.id);
+      console.log('examTemp: ', examTemp);
+      this.loadExam(examTemp[0]);
+    } else {
+      this.loadExam();
+    }
   }
 
-  init() {
-    this.loadExam();
-  }
+  loadExam(exam?: IExam) {
+    this.isEdit = false;
 
-  loadExam() {
-    this.currentExam = {
-      title: 'Crear Examen',
-      color: 'gray',
-      questionsLenght: 1,
-      questions: [],
-      time: 0
-    };
-    this.currentExam.questions.push({
-      id: 1,
-      questions: '',
-      answer: null,
-      options: [
-        { id: 1, text: '' }
-      ],
-    });
+    if(exam) {
+      this.currentExam = exam;
+      this.currentQuestion = this.currentExam.questions[0];
+      this.isEdit = true;
+    } else {
+      this.currentExam = {
+        title: 'Crear Examen',
+        color: 'gray',
+        questionsLenght: 1,
+        questions: [],
+        time: 0
+      };
+      this.currentExam.questions.push({
+        id: 1,
+        questions: '',
+        answer: null,
+        options: [
+          { id: 1, text: '' }
+        ],
+      });
+    }
     this.currentQuestionIndex = 0;
     this.updateHeaders();
   }
 
   updateHeaders() {
-    this.data.title = this.currentExam.title;
-    this.data.questions = this.currentExam.questionsLenght;
-    this.data.color = this.currentExam.color;
-    this.data.current = this.currentQuestionIndex + 1;
-    this.data.progress = `${(100 / this.currentExam.questionsLenght) * this.data.current}%`;
-    this.data.completed = false;
+    this.headerData.title = this.currentExam.title;
+    this.headerData.questions = this.currentExam.questionsLenght;
+    this.headerData.color = this.currentExam.color;
+    this.headerData.current = this.currentQuestionIndex + 1;
+    this.headerData.progress = `${(100 / this.currentExam.questionsLenght) * this.headerData.current}%`;
+    this.headerData.completed = false;
+    this.headerData.canEditTitle = true;
 
-    this.eventService.emit({ name: EVENTS.CONFIG, component: 'subheader', value: this.data });
+    this.eventService.emit({ name: EVENTS.CONFIG, component: 'subheader', value: this.headerData });
+  }
+
+  validate() {
+    const question = this.currentQuestion.questions || '';
+    const options = this.currentQuestion.options.length;
+    const answer = this.currentQuestion.answer;
+    
+    return question.trim() && options && answer;
   }
 
   //#region ACTIONS
@@ -114,12 +154,21 @@ export class CreateComponent implements OnInit {
   }
 
   saveExam() {
-    this.currentExam.attempts = 0;
     this.currentExam.questionsLenght = this.currentExam.questions.length;
+
+    if(!this.isEdit) {
+      this.currentExam.attempts = 0;
+    }
+
     this._examService.saveExams(this.currentExam);
 
     const exams = this._examService.getExams();
-    console.log('exams: ', exams);
+
+    this.gotoDashboard();
+  }
+
+  gotoDashboard() {
+    this._router.navigate([`/dashboard`]);
   }
   //#endregion ACTIONS
 }

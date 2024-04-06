@@ -2,7 +2,9 @@ import { Component, OnInit, ViewEncapsulation, } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProfileEntity } from 'src/app/shared/data/entities/entities';
 import { EVENTS, ScreenEnum } from 'src/app/shared/data/enumerables/enumerables';
+import { IExam } from 'src/app/shared/data/interfaces/IExam';
 import { EventBusService } from 'src/app/shared/data/utils/event.services';
+import { ExamsService } from 'src/app/shared/services/exams.service';
 import { ProfileService } from 'src/app/shared/services/profile.service';
 
 @Component({
@@ -13,6 +15,7 @@ import { ProfileService } from 'src/app/shared/services/profile.service';
 })
 export class DashboardComponent implements OnInit {
   _profileService = new ProfileService();
+  _examService = new ExamsService();
 
   modalCtl = {
     title: '',
@@ -44,22 +47,11 @@ export class DashboardComponent implements OnInit {
     { url: "https://cdn4.iconfinder.com/data/icons/avatars-xmas-giveaway/128/female_woman_avatar_portrait-512.png", selected: false }
   ];
 
-  examsList = [
-    { id: 1, title: 'Patologias', questions: 30, timeResolution: 10, color: 'red', score: 0 },
-    { id: 2, title: 'Terminos', questions: 30, timeResolution: 10, color: 'blue', score: 0 },
-    { id: 3, title: 'Procedimientos', questions: 30, timeResolution: 10, color: 'green', score: 0 },
-    { id: 4, title: 'Matematicas', questions: 30, timeResolution: 10, color: 'yellow', score: 0 },
-    { id: 5, title: 'Español', questions: 30, timeResolution: 10, color: 'violet', score: 0 },
-    { id: 6, title: 'Ciencias Naturales', questions: 30, timeResolution: 10, color: 'cyan', score: 0 },
-    { id: 7, title: 'Apuntes', questions: 30, timeResolution: 10, color: 'red', score: 0 },
-    { id: 8, title: 'Corazon', questions: 30, timeResolution: 10, color: 'blue', score: 0 },
-    { id: 9, title: 'Pulmon', questions: 30, timeResolution: 10, color: 'green', score: 0 },
-    { id: 10, title: 'Enfermedades', questions: 30, timeResolution: 10, color: 'yellow', score: 0 },
-    { id: 11, title: 'Geriatrico', questions: 30, timeResolution: 10, color: 'violet', score: 0 },
-    { id: 12, title: 'Elementos', questions: 30, timeResolution: 10, color: 'cyan', score: 0 },
-  ];
+  examsList: Array<IExam> = [];
+  examTemporal: IExam | null = null;
 
   remaningExamn = null;
+  editModeActive = false;
 
   constructor(
     private _router: Router,
@@ -71,6 +63,16 @@ export class DashboardComponent implements OnInit {
 
   async init() {
     const profile = this._profileService.getCurrentProfile();
+    const exams = this._examService.getExamsDashboard();
+    
+    // this._examService.saveExamTemporal(exams[0]);
+    this.examTemporal = this._examService.getExamTemporal();
+    console.log('this.examTemporal: ', this.examTemporal);
+
+    console.log('exams: ', exams);
+
+    this.examsList = exams;
+
     if(!profile) {
       this.openModalProfile();
     } else {
@@ -82,11 +84,27 @@ export class DashboardComponent implements OnInit {
     };
   }
 
+  editMode() {
+    this.editModeActive = !this.editModeActive;
+    this.examsList.map((e: any) => e._showDetails = false);
+  }
+
   //#region EVENTS
 
   //#region EXAM
   initExam(exam: any) {
     this._router.navigate( [`/dashboard/${ ScreenEnum.exam }/${ exam.id }`]);
+  }
+
+  detailsExam(exam: any) {
+    this.examsList.map((e: any) => e._showDetails = false);
+
+    if(this.editModeActive) {
+      this.editExam(exam);
+      return;
+    }
+
+    exam._showDetails = !exam._showDetails;
   }
   //#endregion EXAM
 
@@ -131,7 +149,11 @@ export class DashboardComponent implements OnInit {
 
   
   createExam() {
-    this._router.navigate( [`/dashboard/create`]);
+    this._router.navigate( [`/dashboard/${ ScreenEnum.create }`]);
+  }
+
+  editExam(exam: any) {
+    this._router.navigate( [`/dashboard/${ ScreenEnum.create }/${ exam.id }`]);
   }
 
   uploadExam() {

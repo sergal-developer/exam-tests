@@ -17,10 +17,11 @@ export class LocalStorage {
       storage = [];
     }
 
-    if (primaryKey && data[primaryKey] && storage.length) {
+    if (data[primaryKey] != null && storage.length) {
       let index = storage.findIndex(
         (a: any) => a[primaryKey] === data[primaryKey]
       );
+      console.log('index: ', index);
       if (index >= 0) {
         storage[index] = data;
       } else {
