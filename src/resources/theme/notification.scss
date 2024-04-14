@@ -1,0 +1,59 @@
+.notification {
+    position: fixed;
+    width: 97%;
+    height: auto;
+    bottom: 5px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    background: #4f4f4f;
+    color: white;
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 5px;
+    padding: 5px;
+    border-radius: 10px;
+    transition: all 300ms;
+
+    transform: translatey(150%);
+    .item {
+        padding: 0 5px;
+        &.actions {
+            padding-right: 0;
+
+            display: flex;
+
+            button {
+                width: 30px;
+                height: 30px;
+                padding: 0;
+                background: transparent;
+                color: inherit;
+            }
+        }
+    }
+
+    &.show {
+        transform: translatey(0%);
+    }
+
+    &.success {
+        background: #c0d51c;
+        color: black;
+    }
+    &.warning {
+        background: #edc464;
+        color: black;
+    }
+    &.error {
+        background: #c12323;
+        color: white;
+    }
+    &.info {
+        background: #a6cce3;
+        color: black;
+    }
+}

@@ -5,6 +5,7 @@ import { EVENTS, ScreenEnum } from 'src/app/shared/data/enumerables/enumerables'
 import { IExam, IOption, IQuestion } from 'src/app/shared/data/interfaces/IExam';
 import { EventBusService } from 'src/app/shared/data/utils/event.services';
 import { ExamsService } from 'src/app/shared/services/exams.service';
+import { MainServices } from '../../main.service';
 // import { EventBusService } from 'src/app/shared/data/utils/event.services';
 
 @Component({
@@ -27,7 +28,6 @@ export class CreateComponent implements OnInit {
       if (v !== this._examTitle) {
           this._examTitle = v;
           this.currentExam.title = v;
-          console.log('this.currentExam: ', this.currentExam);
       }
   }
 
@@ -35,7 +35,8 @@ export class CreateComponent implements OnInit {
   isEdit = false;
 
   constructor(private _router: Router, 
-            private eventService: EventBusService) { }
+            private eventService: EventBusService,
+            private _mainServices: MainServices) { }
 
   headerData: any = {};
   currentExam: IExam = {
@@ -57,7 +58,6 @@ export class CreateComponent implements OnInit {
   ngOnInit() {
     if(this.data) {
       const examTemp: Array<IExam> = this._examService.getExamById(this.data.id);
-      console.log('examTemp: ', examTemp);
       this.loadExam(examTemp[0]);
     } else {
       this.loadExam();
@@ -162,9 +162,12 @@ export class CreateComponent implements OnInit {
 
     this._examService.saveExams(this.currentExam);
 
+    this._mainServices.notification('Examen guardado con exito', { type: 'info', closeTimer: 2000 });
     const exams = this._examService.getExams();
 
-    this.gotoDashboard();
+    setTimeout(() => {
+      this.gotoDashboard();
+    }, 2000);
   }
 
   gotoDashboard() {

@@ -12,13 +12,13 @@ import { ProfileService } from 'src/app/shared/services/profile.service';
 })
 export class SplashComponent implements OnInit {
   service = new ProfileService();
-  timeDelay = 1000;
+  timeDelay = 3000;
 
   constructor(private _router: Router,
               private eventService: EventBusService) {}
 
   ngOnInit() {
-    this.checkData();
+   this.checkData();
   }
 
   async checkData() {

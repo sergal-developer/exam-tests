@@ -8,7 +8,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "electron": "ng build --base-href ./ && electron ."
+    "electron": "ng build --base-href ./ && electron .",
+    "android": "ng build && npx cap sync && npx cap open android"
   },
   "private": true,
   "dependencies": {
@@ -29,7 +30,7 @@
     "@angular-devkit/build-angular": "^15.2.6",
     "@angular/cli": "~15.2.6",
     "@angular/compiler-cli": "^15.2.0",
-    "@capacitor/android": "^5.0.2",
+    "@capacitor/android": "^5.7.4",
     "@capacitor/cli": "^5.0.2",
     "@capacitor/core": "^5.0.2",
     "@types/jasmine": "~4.3.0",

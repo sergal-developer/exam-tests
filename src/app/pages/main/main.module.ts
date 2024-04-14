@@ -11,6 +11,7 @@ import { ExamComponent } from './components/exam/exam.component';
 import { CreateComponent } from './components/create/create.component';
 import { ModulePackage } from 'src/app/shared/data/interfaces/interfaces';
 import { UploadComponent } from './components/upload/upload.component';
+import { MainServices } from './main.service';
 
 @NgModule({
   imports: [
@@ -43,7 +44,7 @@ import { UploadComponent } from './components/upload/upload.component';
     CreateComponent,
     UploadComponent
   ],
-  providers: [EventBusService],
+  providers: [EventBusService, MainServices],
 })
 export class MainModule {}
 

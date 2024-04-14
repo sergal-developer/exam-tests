@@ -1,44 +1,11 @@
 <div class="row">
     <div class="exam-component">
         <div class="frame">
-           
-            <div class="section white column">
-                <div class="item question">
-                    <!-- <div class="question-text" [innerHTML]="currentQuestion.questions">
-                    </div> -->
-                </div>
-        
-                <div class="item question-section">
-                    <div class="question-options">
-                        <!-- <div class="option clickable {{ option.id }}" 
-                            (click)="selectOption(option)"
-                            *ngFor="let option of currentQuestion.options"
-                            [ngClass]="{'selected': option.selected,
-                                         'correct': option.correctAnswer,
-                                         'incorrect': option.correctAnswer === false }">
-                            <div class="index">{{ option.id }}</div>
-                            <div [innerHTML]="option.text"></div>
-                        </div> -->
-                    </div>
-                </div>
-            </div>
-        
-            <div class="section white float-footer" >
-                <div class="item paginator">
-                    <!-- <button (click)="prevQuestion()">Prev</button>
-                    <ng-container *ngIf="currentQuestionIndex < questions.length - 1">
-                        <button (click)="nextQuestion()" [disabled]="!currentQuestion.selectedAnswer">Next</button>
-                    </ng-container>
-                    <ng-container *ngIf="currentQuestionIndex == questions.length - 1">
-                        <button (click)="nextQuestion()">Evaluar</button>
-                    </ng-container> -->
-                </div>
-            </div>
 
-            <ng-container >
+   
+            <ng-container>
                 <div class="section score">
-                    <div class="item pill">Resultados</div>
-                    <div class="item exam-title">{{ currentExam.title }}</div>
+                    <div class="item exam-title">Administración de archivos</div>
                     <div class="item">
                         <!-- <div class="progress--circle progress--{{ scoreResume.score }}">
                             <div class="progress__number">
@@ -50,16 +17,27 @@
                     <!-- <div class="item exam-questions">Preguntas correctas: {{ scoreResume.correct }}</div> -->
                 </div>
 
-                <div class="section score-details ">
-                    <div class="item">Intentos {{ currentExam.attempts }}</div>
-                    <div class="item actions">
-                        <!-- <button class="accent" (click)="repeatExam()"> Repetir </button>
-                        <button class="link" (click)="closeExam()"> Cerrar </button> -->
+                <div class="section white">
+                   <div class="item">
+<code>{{ exportData | json }}</code>
+                    </div>
+                    <!-- <div class="item exam-questions">Preguntas correctas: {{ scoreResume.correct }}</div> -->
+                </div>
+
+                <div class="section white float-footer">
+                    <div class="item paginator">
+                        <input class="button link" type="file" id="inputArchivo" (change)="import($event)" />
+
+                        <button class="link" (click)="export()">Exportar Proyecto</button>
                     </div>
                 </div>
+
+                <div class="section">
+
+                </div>
             </ng-container>
-            
-            
+
+
 
         </div>
     </div>

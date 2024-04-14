@@ -2,6 +2,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EVENTS, ScreenEnum } from 'src/app/shared/data/enumerables/enumerables';
 import { EventBusService } from 'src/app/shared/data/utils/event.services';
+import { MainServices } from './main.service';
 
 @Component({
   selector: 'main',
@@ -20,7 +21,8 @@ export class MainComponent implements OnInit {
   constructor(
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
-    private eventService: EventBusService) { }
+    private eventService: EventBusService,
+    public _mainServices: MainServices) { }
 
   ngOnInit() {
     this.header = null;

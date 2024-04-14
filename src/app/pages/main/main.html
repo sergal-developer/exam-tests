@@ -43,3 +43,11 @@
     <create *ngIf="screen === _screen.create" [data]="data" [examTitle]="examTitle"></create>
     <upload *ngIf="screen === _screen.upload"></upload>
 </div>
+
+<div class="notification {{ _mainServices._notification.type }}" [ngClass]="{'show': _mainServices._notification.show }">
+    <div class="item" *ngIf="_mainServices._notification.icon"><span class="material-icons">{{ _mainServices._notification.icon }}</span></div>
+    <div class="item">{{ _mainServices._notification.text }}</div>
+    <div class="item actions">
+        <button (click)="_mainServices.closeNotification()"> <span class="material-icons">close</span> </button>
+    </div>
+</div>

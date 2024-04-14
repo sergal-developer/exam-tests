@@ -38,6 +38,10 @@ export class ExamsService {
     return this.storage.saveInArray(data, 'id', this.context);
   }
 
+  saveExamsBatch(data: any) {
+    return this.storage.saveInObject(data, this.context);
+  }
+
   updateExams(data: IExam) {
     const id = data.id ?? this.utils.createPattern('xxxxxx');
     console.log('id: ', id);

@@ -10,22 +10,22 @@
                 <ng-container *ngIf="!editModeActive">
                     <div class="item">
                         <button class="link fullbutton" (click)="createExam()">
-                            Crear <span class="material-icons">add</span>
+                            <div>Crear</div> <span class="material-icons">add</span>
                         </button>
                     </div>
                     <div class="item">
                         <button class="link fullbutton" (click)="uploadExam()">
-                            Cargar <span class="material-icons">cloud_upload</span>
+                            <div>Admin</div> <span class="material-icons">cloud_upload</span>
                         </button>
                     </div>
                 </ng-container>
                 <div class="item">
                     <button class="link fullbutton" (click)="editMode()">
                         <ng-container *ngIf="editModeActive">
-                            Salir de edición<span class="material-icons">cancel</span>
+                            <div>Salir de edición</div> <span class="material-icons">cancel</span>
                         </ng-container>
                         <ng-container *ngIf="!editModeActive">
-                            Editar<span class="material-icons">edit</span>
+                            <div>Editar</div> <span class="material-icons">edit</span>
                         </ng-container>
                     </button>
                 </div>
@@ -65,15 +65,20 @@
                                 <div class="name">{{ exam.title }}</div>
                                 <div class="quiestion-numbers">Preguntas: {{ exam.questionsLenght }}</div>
                             </div>
-                            <div class="time">{{ exam.time }} min.</div>
+                            <div class="time">
+                                <span *ngIf="!exam.time"><span class="material-icons">all_inclusive</span></span>
+                                <span *ngIf="exam.time">{{ exam.time }} min.</span>
+                            </div>
                         </div>
                         <div class="card-view">
-                            <div class="item">
-                                <div class="_title">{{ exam.title }}</div>
-                                <div class="subtitle">Preguntas: {{ exam.questionsLenght }}</div>
-                            </div>
-                            <div class="item">
-                                <button class="link" (click)="initExam(exam)">Iniciar</button>
+                            <div class="card-view-content">
+                                <div class="item">
+                                    <div class="_title">{{ exam.title }}</div>
+                                    <div class="subtitle">Preguntas: {{ exam.questionsLenght }}</div>
+                                </div>
+                                <div class="item">
+                                    <button class="link" (click)="initExam(exam)">Iniciar</button>
+                                </div>
                             </div>
             
                             <div class="background-section">

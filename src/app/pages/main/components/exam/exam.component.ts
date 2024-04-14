@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import { EVENTS } from 'src/app/shared/data/enumerables/enumerables';
 import { IExam, IOption, IQuestion } from 'src/app/shared/data/interfaces/IExam';
 import { EventBusService } from 'src/app/shared/data/utils/event.services';
+import { ExamsService } from 'src/app/shared/services/exams.service';
+import { MainServices } from '../../main.service';
 
 @Component({
   selector: 'exam',
@@ -13,10 +15,13 @@ import { EventBusService } from 'src/app/shared/data/utils/event.services';
 export class ExamComponent implements OnInit {
   @Input() data: any;
 
+  _examService = new ExamsService();
   constructor(
     private _router: Router,
-    private eventService: EventBusService) { }
+    private eventService: EventBusService,
+    private _mainServices: MainServices) { }
 
+  
   exam: IExam = {
     title: 'Exam-test',
     color: 'cyan',
@@ -186,10 +191,16 @@ export class ExamComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.init();
+    if(this.data) {
+      const examTemp: Array<IExam> = this._examService.getExamById(this.data.id);
+      this.loadExam(examTemp[0]);
+    } else {
+      // this.loadExam();
+      this._mainServices.notification('Examen no se logro cargar', { type: 'warning', closeTimer: 2000 });
+    }
   }
 
-  init() {
+  loadExam(exam: IExam) {
     this.score = null;
     this.scoreResume = {
       correct: 0,
@@ -204,11 +215,8 @@ export class ExamComponent implements OnInit {
       questions: []
     };
 
-    this.loadExam();
-  }
-
-  loadExam() {
-    this.currentExam = JSON.parse(JSON.stringify(this.exam));
+    this.currentExam = JSON.parse(JSON.stringify(exam));
+    this.currentQuestionIndex = 0;
 
     this.currentExam.questions.map((question: IQuestion) => {
       question.selectedAnswer = null;
@@ -372,7 +380,7 @@ export class ExamComponent implements OnInit {
     this.currentExam.completed = false;
     this.questions = [];
     this.completeQuestionarie = false;
-    this.init();
+    this.ngOnInit();
   }
 
   closeExam() {
