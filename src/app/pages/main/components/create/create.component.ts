@@ -160,14 +160,16 @@ export class CreateComponent implements OnInit {
       this.currentExam.attempts = 0;
     }
 
-    this._examService.saveExams(this.currentExam);
+    this.currentExam.questions = this.currentExam.questions.filter((x: IQuestion) => x.answer != null);
+
+    this._examService.saveExam(this.currentExam);
 
     this._mainServices.notification('Examen guardado con exito', { type: 'info', closeTimer: 2000 });
     const exams = this._examService.getExams();
 
     setTimeout(() => {
       this.gotoDashboard();
-    }, 2000);
+    }, 1000);
   }
 
   gotoDashboard() {

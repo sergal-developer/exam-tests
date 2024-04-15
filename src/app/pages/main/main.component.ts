@@ -70,7 +70,6 @@ export class MainComponent implements OnInit {
 
       if (response.component === 'reset') {
         this.subheader = null;
-        this.screen = response.value;
       }
     });
 

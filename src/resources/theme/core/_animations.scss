@@ -1,0 +1,53 @@
+@keyframes scale-up-center {
+    0% {
+      transform: scale(0.5);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes enter-splash {
+    0% {
+      background: black;
+      color: black;
+    }
+    100% {
+      background: #D26DB2;
+      color: black;
+    }
+  }
+  
+  @keyframes exit-splash {
+    0% {
+      background: #D26DB2;
+      color: black;
+    }
+    100% {
+      background: white;
+      color: white;
+    }
+  }
+  
+  @keyframes _ripple {
+    0% {
+      transform: scale(0);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes _rippleInfinite {
+    0% {
+      transform: scale(0);
+    }
+    70% {
+      transform: scale(1);
+    }
+
+    100% {
+        transform: scale(1.2);
+        opacity: 0;
+    }
+  }

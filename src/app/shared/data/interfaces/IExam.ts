@@ -7,6 +7,7 @@ export interface IExam {
   score?: number,
   attempts?: number,
   time?: number,
+  timeEnlapsed?: number,
   completed?: boolean,
   questionsLenght: number,
   questions: Array<IQuestion>,

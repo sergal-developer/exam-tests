@@ -6,6 +6,7 @@ import { IExam } from 'src/app/shared/data/interfaces/IExam';
 import { EventBusService } from 'src/app/shared/data/utils/event.services';
 import { ExamsService } from 'src/app/shared/services/exams.service';
 import { ProfileService } from 'src/app/shared/services/profile.service';
+import { MainServices } from '../../main.service';
 
 @Component({
   selector: 'dashboard',
@@ -55,7 +56,8 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private _router: Router,
-    private eventService: EventBusService) {}
+    private eventService: EventBusService,
+    private _mainServices: MainServices) {}
 
   ngOnInit() {
     this.init();
@@ -63,7 +65,7 @@ export class DashboardComponent implements OnInit {
 
   async init() {
     const profile = this._profileService.getCurrentProfile();
-    const exams = this._examService.getExamsDashboard();
+    const exams = this._examService.getExams();
     
     // this._examService.saveExamTemporal(exams[0]);
     this.examTemporal = this._examService.getExamTemporal();
@@ -76,6 +78,7 @@ export class DashboardComponent implements OnInit {
     if(!profile) {
       this.openModalProfile();
     } else {
+      profile.userName = `Hola, ${ profile.userName }`;
       this.eventService.emit({ name: EVENTS.CONFIG,  component: 'header', value: profile });
     }
 
@@ -98,12 +101,6 @@ export class DashboardComponent implements OnInit {
 
   detailsExam(exam: any) {
     this.examsList.map((e: any) => e._showDetails = false);
-
-    if(this.editModeActive) {
-      this.editExam(exam);
-      return;
-    }
-
     exam._showDetails = !exam._showDetails;
   }
   //#endregion EXAM
@@ -156,8 +153,30 @@ export class DashboardComponent implements OnInit {
     this._router.navigate( [`/dashboard/${ ScreenEnum.create }/${ exam.id }`]);
   }
 
-  uploadExam() {
-    this._router.navigate( [`/dashboard/upload`]);
+  duplicateExam(exam: any) {
+    const newExam: IExam = JSON.parse(JSON.stringify(exam));
+    newExam.id = undefined;
+    newExam.attempts = 0;
+    newExam.completed = false;
+    newExam.score = 0;
+    newExam.timeEnlapsed = 0;
+    delete newExam._showDetails;
+    
+    this._examService.saveExam(newExam);
+    this._mainServices.notification(`Se ha duplicado <b>${ exam.title }</b> correctamente.`, { type: 'info', closeTimer: 3000 });
+    this.init();
+  }
+
+  deleteExam(exam: IExam) {
+    let exams = this._examService.getExams();
+    exams = exams.filter((x: IExam) => x.id !== exam.id);
+    this._examService.saveExamCollection(exams);
+    this._mainServices.notification(`Se elimino el examen <b>${ exam.title }</b>, ¿estas seguro?`, { type: 'warning', closeTimer: 3000 });
+    this.init();
+  }
+
+  adminExam() {
+    this._router.navigate( [`/dashboard/admin`]);
   }
 
   //#endregion EVENTS

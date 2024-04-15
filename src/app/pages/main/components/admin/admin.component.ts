@@ -3,30 +3,25 @@ import { EVENTS, ScreenEnum } from 'src/app/shared/data/enumerables/enumerables'
 import { IExam } from 'src/app/shared/data/interfaces/IExam';
 import { EventBusService } from 'src/app/shared/data/utils/event.services';
 import { ExamsService } from 'src/app/shared/services/exams.service';
+import { MainServices } from '../../main.service';
 // import { EventBusService } from 'src/app/shared/data/utils/event.services';
 
 @Component({
-  selector: 'upload',
-  templateUrl: './upload.html',
-  styleUrls: ['./upload.scss'],
+  selector: 'admin',
+  templateUrl: './admin.html',
+  styleUrls: ['./admin.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class UploadComponent implements OnInit {
+export class AdminComponent implements OnInit {
 
   _examService = new ExamsService();
 
-  constructor(private eventService: EventBusService) { }
+  constructor(private eventService: EventBusService,
+            private _mainServices: MainServices
+  ) { }
 
   data: any = {};
-
-  examsList = [];
-
-  currentExam: IExam = {
-    title: '',
-    color: '',
-    questionsLenght: 0,
-    questions: []
-  };
+  exportData: any = null;
 
   ngOnInit() {
     this.init();
@@ -39,32 +34,23 @@ export class UploadComponent implements OnInit {
   loadExam() {
     const exams = this._examService.getExams();
     console.log('exams: ', exams);
-    this.currentExam = {
-      title: 'Admin',
-      color: 'gray',
-      questionsLenght: 0,
-      questions: [],
-      time: 0
-    };
-
     this.updateHeaders();
   }
 
   updateHeaders() {
-    this.data.title = this.currentExam.title;
-    this.data.questions = this.currentExam.questionsLenght;
-    this.data.color = this.currentExam.color;
-    this.data.current = 0;
-    this.data.progress = `${(100 / this.currentExam.questionsLenght) * this.data.current}%`;
-    this.data.completed = this.currentExam.completed;
+    this.data.title = 'Administración';
+    this.data.questions = null;
+    this.data.color = '';
+    this.data.current = null;
+    this.data.progress = null;
+    this.data.completed = null;
 
     this.eventService.emit({ name: EVENTS.CONFIG, component: 'subheader', value: this.data });
   }
 
-  exportData = {};
   export() {
     const exams = this._examService.getExams();
-    this.exportData = exams;
+    // this.exportData = exams;
     this.copyClipboard(JSON.stringify(exams));
     this.downloadJSON(exams, 'collection-exam.json');
   }
@@ -76,24 +62,31 @@ export class UploadComponent implements OnInit {
 
     try {
       const json = JSON.parse(data);
-      this._examService.saveExamsBatch(json);
+      this._examService.saveExamCollection(json);
+      this._mainServices.notification('Plantilla importada exitosamente', { type: 'success', closeTimer: 5000 });
     } catch (error) {
-      console.log('error al importar')
+      console.log(error);
+      this._mainServices.notification('Error al importar plantilla', { type: 'warning', closeTimer: 5000 });
     }
   }
 
   downloadJSON(data: any, name: string) {
-    var blob = new Blob([data], { type: 'application/json' });
-    var url = URL.createObjectURL(blob);
+    try {
+      var blob = new Blob([data], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
 
-    var enlaceDescarga = document.createElement("a");
-    enlaceDescarga.href = url;
-    enlaceDescarga.download = name;
+      var downloadElement = document.createElement("a");
+      downloadElement.href = url;
+      downloadElement.download = name;
 
-    document.body.appendChild(enlaceDescarga);
-    enlaceDescarga.click();
-    document.body.removeChild(enlaceDescarga);
-    URL.revokeObjectURL(url);
+      document.body.appendChild(downloadElement);
+      downloadElement.click();
+      document.body.removeChild(downloadElement);
+      URL.revokeObjectURL(url);
+      this._mainServices.notification('Exportación exitosa', { type: 'info', closeTimer: 3000 });
+    } catch (error: any) {
+      this._mainServices.notification(error, { type: 'warning', closeTimer: 5000 });
+    }
   }
 
   readFile(archivo: any): Promise<string> {
@@ -107,6 +100,7 @@ export class UploadComponent implements OnInit {
   
       lector.onerror = (evento: any) => {
         console.warn("Error al leer el archivo:", evento.target.error);
+        this._mainServices.notification('Error al leer el archivo', { type: 'warning', closeTimer: 5000 });
         resolve('');
       };
   

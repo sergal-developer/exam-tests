@@ -10,7 +10,7 @@ import { SplashComponent } from './components/splash/splash.component';
 import { ExamComponent } from './components/exam/exam.component';
 import { CreateComponent } from './components/create/create.component';
 import { ModulePackage } from 'src/app/shared/data/interfaces/interfaces';
-import { UploadComponent } from './components/upload/upload.component';
+import { AdminComponent } from './components/admin/admin.component';
 import { MainServices } from './main.service';
 
 @NgModule({
@@ -34,7 +34,7 @@ import { MainServices } from './main.service';
     DashboardComponent,
     ExamComponent,
     CreateComponent,
-    UploadComponent
+    AdminComponent
   ],
   exports: [
     MainComponent,
@@ -42,7 +42,7 @@ import { MainServices } from './main.service';
     DashboardComponent,
     ExamComponent,
     CreateComponent,
-    UploadComponent
+    AdminComponent
   ],
   providers: [EventBusService, MainServices],
 })

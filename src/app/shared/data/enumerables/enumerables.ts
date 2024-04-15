@@ -8,7 +8,7 @@ export enum ScreenEnum {
     dashboard = 'dashboard',
     exam = 'exam',
     create = 'create',
-    upload = 'upload',
+    admin = 'admin',
     edit = 'edit',
 
     
@@ -16,7 +16,6 @@ export enum ScreenEnum {
     settings = 'settings',
     home = 'home',
     game = 'game',
-    admin = 'admin'
 }
 
 

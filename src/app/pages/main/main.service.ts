@@ -1,7 +1,10 @@
 import { Injectable } from "@angular/core";
+import { Helpers } from "src/app/shared/services/common/helpers";
 
 @Injectable()
 export class MainServices {
+
+    _helper = new Helpers();
 
     activeTimer: any;
     public _notification: any = {
@@ -26,10 +29,10 @@ export class MainServices {
             icon: ''
         };
 
-        this._notification.text = text;
+        this._notification.text = this._helper.formatText(text);
         if (options) {
             this._notification.type = options?.type || 'info';
-            this._notification.closeTimer = options?.closeTimer || 3000;
+            this._notification.closeTimer = options?.closeTimer != undefined ? options?.closeTimer : 3000;
         }
         this._notification.show = true;
         this.onCloseTimer();

@@ -1,7 +1,6 @@
-
-<div class="main-component" 
-    [ngClass]="{ 'subheader-active': subheader && !subheader.completed,
+<div class="main-component" [ngClass]="{ 'subheader-active': subheader && !subheader.completed,
                  'subheader-completed': subheader && subheader.completed }">
+
     <div class="row main-header" *ngIf="header && !subheader">
         <div class="container">
             <div class="item title" [innerHTML]="header.title"></div>
@@ -11,9 +10,10 @@
             </div>
         </div>
     </div>
+
     <div class="row main-subheader" *ngIf="subheader">
         <div class="container">
-            <div class="item" >
+            <div class="item">
                 <div class="return" (click)="returnHome()">
                     <button class="link"><span class="material-icons">arrow_back</span></button>
                 </div>
@@ -24,7 +24,7 @@
                 </div>
             </div>
 
-            <div class="item counter">
+            <div class="item counter" *ngIf="subheader.questions">
                 <div class="bar-counter">
                     <div class="bar-counter-current" [attr.style]="'width:'+subheader.progress+';'"></div>
                 </div>
@@ -38,15 +38,17 @@
 
     <!-- <splash *ngIf="screen === _screen.splash"></splash>  -->
     <!-- <router-outlet></router-outlet> -->
-    <dashboard  *ngIf="screen === _screen.dashboard"></dashboard>
+    <dashboard *ngIf="screen === _screen.dashboard"></dashboard>
     <exam *ngIf="screen === _screen.exam" [data]="data"></exam>
     <create *ngIf="screen === _screen.create" [data]="data" [examTitle]="examTitle"></create>
-    <upload *ngIf="screen === _screen.upload"></upload>
+    <admin *ngIf="screen === _screen.admin"></admin>
 </div>
 
-<div class="notification {{ _mainServices._notification.type }}" [ngClass]="{'show': _mainServices._notification.show }">
-    <div class="item" *ngIf="_mainServices._notification.icon"><span class="material-icons">{{ _mainServices._notification.icon }}</span></div>
-    <div class="item">{{ _mainServices._notification.text }}</div>
+<div class="notification {{ _mainServices._notification.type }}"
+    [ngClass]="{'show': _mainServices._notification.show }">
+    <div class="item" *ngIf="_mainServices._notification.icon"><span class="material-icons">{{
+            _mainServices._notification.icon }}</span></div>
+    <div class="item" [innerHTML]="_mainServices._notification.text"></div>
     <div class="item actions">
         <button (click)="_mainServices.closeNotification()"> <span class="material-icons">close</span> </button>
     </div>

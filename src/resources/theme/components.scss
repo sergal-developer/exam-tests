@@ -1,0 +1,36 @@
+@import './core/animations';
+
+.ripple {
+    background: rgba(255, 255, 255, 0.1);
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    position: absolute;
+    animation-delay: 1000ms;
+    animation: _ripple 1s forwards;
+
+    &:before, &:after {
+      content: '';
+      width: calc(100% - 40%);
+      height: calc(100% - 40%);
+      border-radius: 50%;
+      background: inherit;
+      position: absolute;
+      margin: 20%;
+      animation-delay: 300ms;
+      animation: _ripple 1s forwards;
+    }
+    &:after {
+      width: calc(100% - 70%);
+      height: calc(100% - 70%);
+      margin: 35%;
+      animation-delay: 200ms;
+    }
+
+    &.infinite {
+        animation: _rippleInfinite 2s infinite;
+        &:before, &:after {
+            animation: _rippleInfinite 2s infinite;
+        }
+    }
+}

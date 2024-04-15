@@ -3,32 +3,28 @@
         <div class="frame">
 
             <div class="section yellow manage">
-                <!-- <div class="item category">
-                    <div class="_title">Acciones</div>
-                    <div class="subtitle">Plantillas</div>
-                </div> -->
                 <ng-container *ngIf="!editModeActive">
                     <div class="item">
-                        <button class="link fullbutton" (click)="createExam()">
-                            <div>Crear</div> <span class="material-icons">add</span>
+                        <button class="nav-button" (click)="createExam()">
+                            <span class="material-icons">add</span> <div class="text">Crear</div>
                         </button>
                     </div>
                     <div class="item">
-                        <button class="link fullbutton" (click)="uploadExam()">
-                            <div>Admin</div> <span class="material-icons">cloud_upload</span>
+                        <button class="nav-button" (click)="adminExam()">
+                            <span class="material-icons">tune</span> <div class="text">Configuración</div>
                         </button>
                     </div>
                 </ng-container>
-                <div class="item">
-                    <button class="link fullbutton" (click)="editMode()">
+                <!-- <div class="item">
+                    <button class="nav-button" (click)="editMode()">
                         <ng-container *ngIf="editModeActive">
-                            <div>Salir de edición</div> <span class="material-icons">cancel</span>
+                            <span class="material-icons">cancel</span> <div >Salir de edición</div>
                         </ng-container>
                         <ng-container *ngIf="!editModeActive">
-                            <div>Editar</div> <span class="material-icons">edit</span>
+                            <span class="material-icons">edit</span> <div class="text">Editar</div>
                         </ng-container>
                     </button>
-                </div>
+                </div> -->
             </div>
 
             <div class="section violet progress" *ngIf="examTemporal">
@@ -60,7 +56,10 @@
                                 <span *ngIf="(i+1) < 10">0{{ i + 1 }}</span>
                                 <span *ngIf="(i+1) >= 10">{{ i + 1 }}</span>
                             </div>
-                            <div class="icon {{ exam.color }}">{{ exam.title[0] }}</div>
+                            <div class="icon {{ exam.color }}">
+                                <span class="material-icons" *ngIf="!exam.attempts">history_edu</span>
+                                <span class="score" *ngIf="exam.attempts">{{ exam.score }}</span>
+                            </div>
                             <div class="title">
                                 <div class="name">{{ exam.title }}</div>
                                 <div class="quiestion-numbers">Preguntas: {{ exam.questionsLenght }}</div>
@@ -70,14 +69,41 @@
                                 <span *ngIf="exam.time">{{ exam.time }} min.</span>
                             </div>
                         </div>
-                        <div class="card-view">
+                        <div class="card-view {{ exam.color }}">
                             <div class="card-view-content">
-                                <div class="item">
+                                <div class="item info" >
+                                    <div class="action-delete">
+                                        <button class="link" (click)="deleteExam(exam)"><span class="material-icons">delete_outline</span> Eliminar</button>
+                                        <button class="link" (click)="editExam(exam)"><span class="material-icons">edit</span> Editar</button>
+                                        <button class="link" (click)="duplicateExam(exam)"><span class="material-icons">content_copy</span> Duplicar</button>
+                                        <button class="link close" (click)="exam._showDetails = false"><span class="material-icons">close</span> Cerrar</button>
+                                    </div>
                                     <div class="_title">{{ exam.title }}</div>
-                                    <div class="subtitle">Preguntas: {{ exam.questionsLenght }}</div>
+                                    <div class="subtitle">Estadísticas</div>
+                                    <div class="stadistics">
+                                        <div class="stadistic">
+                                            <span>Reactivos: </span> <b>{{ exam.questionsLenght }}</b>
+                                        </div>
+                                        <div class="stadistic">
+                                            <span>Intentos: </span>
+                                            <span *ngIf="!exam.attempts"><b>sin evaluar</b></span>
+                                            <span class="score" *ngIf="exam.attempts"><b>{{ exam.attempts }}</b></span>
+                                        </div>
+                                        <div class="stadistic">
+                                            <span>Aciertos: </span>
+                                            <span *ngIf="!exam.score"><b>sin evaluar</b></span>
+                                            <span class="score" *ngIf="exam.score"><b>{{ exam.score }}</b></span>
+                                        </div>
+                                        <div class="stadistic">
+                                            <span>Tiempo Limite: </span>
+                                            <span *ngIf="!exam.time"><span class="material-icons">all_inclusive</span></span>
+                                            <b *ngIf="exam.time">{{ exam.time }} min.</b>
+                                        </div>
+                                        
+                                    </div>
                                 </div>
-                                <div class="item">
-                                    <button class="link" (click)="initExam(exam)">Iniciar</button>
+                                <div class="item action">
+                                    <button class="accent" (click)="initExam(exam)">Iniciar</button>
                                 </div>
                             </div>
             
@@ -112,13 +138,13 @@
                 </ng-container>
             </div>
 
-            <div class="form" *ngIf="validateProfile">
+            <div *ngIf="validateProfile">
                 <div class="notification static {{ messages.profileValidation.type }}">
                     {{ messages.profileValidation.text }}
                 </div>
             </div>
 
-            <div class="center" *ngIf="!validateProfile">
+            <div class="text-direction center" *ngIf="!validateProfile">
                 <button class="accent" (click)="createProfile()">Listo</button>
             </div>
         </div>

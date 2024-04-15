@@ -1,11 +1,12 @@
 .notification {
     position: fixed;
-    width: 97%;
+    width: 100%;
+    max-width: calc(100vw - 8%);
     height: auto;
     bottom: 5px;
     left: 0;
     right: 0;
-    margin: 0 auto;
+    margin: 0 4%;
     background: #4f4f4f;
     color: white;
     display: flex;
@@ -14,11 +15,16 @@
     justify-content: space-between;
     align-items: center;
     gap: 5px;
-    padding: 5px;
+    padding: 15px;
     border-radius: 10px;
     transition: all 300ms;
-
     transform: translatey(150%);
+    font-size: 1.2rem;
+
+    @include mobile-tablet {
+        font-size: 1rem;
+    }
+
     .item {
         padding: 0 5px;
         &.actions {
@@ -41,7 +47,7 @@
     }
 
     &.success {
-        background: #c0d51c;
+        background: #8e9f0f;
         color: black;
     }
     &.warning {
@@ -55,5 +61,10 @@
     &.info {
         background: #a6cce3;
         color: black;
+    }
+
+    &.static {
+        transform: translatey(0%);
+        position: relative;
     }
 }
