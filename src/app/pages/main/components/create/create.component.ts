@@ -154,14 +154,15 @@ export class CreateComponent implements OnInit {
   }
 
   saveExam() {
-    this.currentExam.questionsLenght = this.currentExam.questions.length;
+   
 
     if(!this.isEdit) {
       this.currentExam.attempts = 0;
     }
 
     this.currentExam.questions = this.currentExam.questions.filter((x: IQuestion) => x.answer != null);
-
+    this.currentExam.questionsLenght = this.currentExam.questions.length;
+    
     this._examService.saveExam(this.currentExam);
 
     this._mainServices.notification('Examen guardado con exito', { type: 'info', closeTimer: 2000 });

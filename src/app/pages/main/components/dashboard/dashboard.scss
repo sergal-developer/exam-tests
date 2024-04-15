@@ -1,6 +1,18 @@
 @import '../../../../../resources/theme/core/mixins';
 
 dashboard {
+    .exitExamState {
+        background: rgb(214, 214, 214);
+        transform: scale(3);
+        height: 100vh;
+        width: 100vw;
+
+        .frame {
+            transition: opacity 300ms;
+            opacity: 0;
+        }
+    }
+
     .module {
         .avatar-collection {
             display: flex;
@@ -247,6 +259,25 @@ dashboard {
                         .card-view {
                             display: flex;
                             min-height: inherit;
+                        }
+                    }
+
+                    &.enterExam {
+                        transition: all 500ms;
+                        // transform: scale(5);
+                        position: absolute;
+                        top: 0;
+                        height: 100vh;
+                        width: 100vw;
+                        left: -30px;
+
+                        .card-view {
+
+                            .card-view-content,
+                            .background-section {
+                                transition: all 300ms;
+                                // opacity: 0;
+                            }
                         }
                     }
                 }

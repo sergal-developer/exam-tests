@@ -5,7 +5,7 @@ import { IExam, IOption, IQuestion } from 'src/app/shared/data/interfaces/IExam'
 import { EventBusService } from 'src/app/shared/data/utils/event.services';
 import { ExamsService } from 'src/app/shared/services/exams.service';
 import { MainServices } from '../../main.service';
-import { Helpers } from 'src/app/shared/services/common/helpers';
+import { Utils } from 'src/app/shared/data/utils/utils';
 
 @Component({
   selector: 'exam',
@@ -17,7 +17,7 @@ export class ExamComponent implements OnInit {
   @Input() data: any;
 
   _examService = new ExamsService();
-  _helper = new Helpers();
+  _helper = new Utils();
   
   constructor(
     private _router: Router,
@@ -50,6 +50,8 @@ export class ExamComponent implements OnInit {
     score: 0,
     time: '0',
   }
+
+  pageState = 'enterAnim';
 
   ngOnInit() {
     if(this.data) {
@@ -97,9 +99,7 @@ export class ExamComponent implements OnInit {
     this.currentExam.questionsLenght = this.currentExam.questions.length;
 
     this.currentQuestionIndex = 0;
-    console.log('this.currentQuestionIndex: ', this.currentQuestionIndex);
     this.currentQuestion = this.questions[this.currentQuestionIndex];
-    console.log('this.currentQuestion: ', this.currentQuestion);
 
     this.startTimers();
     this.updateHeaders();
@@ -112,7 +112,10 @@ export class ExamComponent implements OnInit {
     //   this.completeQuiz();
     // }, 5000);
 
-    
+
+    setTimeout(() => {
+      this.pageState = '';
+    }, 1500);
   }
 
   updateHeaders() {
@@ -122,6 +125,10 @@ export class ExamComponent implements OnInit {
     this.data.current = this.currentQuestionIndex + 1;
     this.data.progress = `${(100 / this.currentExam.questionsLenght) * this.data.current}%`;
     this.data.completed = this.currentExam.completed;
+
+    if(this.currentExam.completed) {
+      this.data.classMainState = 'hide-header';
+    }
 
     this.eventService.emit({ name: EVENTS.CONFIG, component: 'subheader', value: this.data });
   }
@@ -154,8 +161,6 @@ export class ExamComponent implements OnInit {
       let _seconds = ((miliseconds % 60000) / 1000);
       this.timerFormated = `${_minutes < 10 ? '0' + _minutes : _minutes}:${_seconds < 10 ? '0' + _seconds.toFixed(0) : _seconds}`;
     }, 1000);
-
-    // console.log('this.interval: ', this.interval);
   }
 
   nextQuestion() {
@@ -241,8 +246,6 @@ export class ExamComponent implements OnInit {
     this._examService.saveExam(this.currentExam);
 
     const exams = this._examService.getExams();
-
-    console.log('this.exams: ', exams);
   }
 
   getScoreExam() {

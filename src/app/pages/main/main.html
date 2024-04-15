@@ -1,4 +1,4 @@
-<div class="main-component" [ngClass]="{ 'subheader-active': subheader && !subheader.completed,
+<div class="main-component {{ classMainState }}" [ngClass]="{ 'subheader-active': subheader && !subheader.completed,
                  'subheader-completed': subheader && subheader.completed }">
 
     <div class="row main-header" *ngIf="header && !subheader">

@@ -33,7 +33,6 @@ export class AdminComponent implements OnInit {
 
   loadExam() {
     const exams = this._examService.getExams();
-    console.log('exams: ', exams);
     this.updateHeaders();
   }
 
@@ -58,14 +57,12 @@ export class AdminComponent implements OnInit {
   async import(evt: any) {
     var file = evt.target.files[0];
     const data = await this.readFile(file);
-    console.log('data: ', data);
 
     try {
       const json = JSON.parse(data);
       this._examService.saveExamCollection(json);
       this._mainServices.notification('Plantilla importada exitosamente', { type: 'success', closeTimer: 5000 });
     } catch (error) {
-      console.log(error);
       this._mainServices.notification('Error al importar plantilla', { type: 'warning', closeTimer: 5000 });
     }
   }

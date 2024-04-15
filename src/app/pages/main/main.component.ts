@@ -18,6 +18,8 @@ export class MainComponent implements OnInit {
   header: any = null;
   subheader: any = null;
 
+  classMainState = '';
+
   constructor(
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
@@ -28,7 +30,6 @@ export class MainComponent implements OnInit {
     this.header = null;
 
     this._activatedRoute.params.subscribe((params: any) => {
-      console.log('params: ', params);
       this.data = null;
       // Set initial module
       if (params.module) {
@@ -52,6 +53,7 @@ export class MainComponent implements OnInit {
           title: profile.userName,
           image: profile.avatar ? profile.avatar.url : null
         }
+        this.classMainState = response.value.classMainState;
         this.updateHeader(data);
       }
 
@@ -65,7 +67,12 @@ export class MainComponent implements OnInit {
           completed: response.value.completed,
           canEditTitle: response.value.canEditTitle,
         }
+        this.classMainState = response.value.classMainState;
         this.updateSubHeader(data);
+      }
+
+      if(response.component === 'classApply') {
+        this.classMainState =  response.value;
       }
 
       if (response.component === 'reset') {
@@ -86,14 +93,12 @@ export class MainComponent implements OnInit {
   async updateHeader(data: any) {
     setTimeout(() => {
       this.header = {...data};
-      console.log('this.header: ', this.header);
     }, 200);
   }
 
   async updateSubHeader(data: any) {
     setTimeout(() => {
       this.subheader = {...data};
-      console.log('this.subheader: ', this.subheader);
     }, 200);
   }
 

@@ -1,10 +1,10 @@
 import { Injectable } from "@angular/core";
-import { Helpers } from "src/app/shared/services/common/helpers";
+import { Utils } from "src/app/shared/data/utils/utils";
 
 @Injectable()
 export class MainServices {
 
-    _helper = new Helpers();
+    _helper = new Utils();
 
     activeTimer: any;
     public _notification: any = {

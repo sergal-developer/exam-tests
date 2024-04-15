@@ -1,4 +1,4 @@
-<div class="row score-screen" [ngClass]="{'score-screen': score != null }">
+<div class="row {{ pageState }}" [ngClass]="{'score-screen': score != null }">
     <div class="container" >
 
         <ng-container *ngIf="score == null">
@@ -60,7 +60,7 @@
                     </div>
                 </div> -->
                 <div class="stadistics">
-                    <div class="stadistic">Correctas: <b>{{ scoreResume.correct }}</b></div>
+                    <div class="stadistic">Aciertos: <b>{{ scoreResume.correct }}</b></div>
                     <div class="stadistic">Tiempo: <b>{{ scoreResume.time }}</b></div>
                     <div class="stadistic">intentos: <b>{{ currentExam.attempts }}</b></div>
                 </div>

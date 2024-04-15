@@ -21,7 +21,6 @@ export class LocalStorage {
       let index = storage.findIndex(
         (a: any) => a[primaryKey] === data[primaryKey]
       );
-      console.log('index: ', index);
       if (index >= 0) {
         storage[index] = data;
       } else {

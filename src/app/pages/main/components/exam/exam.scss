@@ -6,10 +6,30 @@ $themeColor: #B696FF;
 $backColor: #DCCFFA;
 $textShadow: rgba(black, 0.35) 1px 1px 1px;
 
+@keyframes enter-screen {
+    0% {
+      transform: scale(3);
+      opacity: 0;
+      width: 0%;
+    }
+
+    80% {
+        width: 50%;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+        width: 100%;
+    }
+  }
+
 exam {
+    
     .row {
         position: relative;
         height: 100%;
+        margin: 0 auto;
+        transition: all 1000ms;
 
         .container {
             display: flex;
@@ -23,6 +43,13 @@ exam {
             position: relative;
             padding: 0;
         }
+    }
+
+    .enterAnim {
+        transform: scale(5);
+        opacity: 0;
+        animation: enter-screen 1s forwards;
+        animation-delay: 0.3s;
     }
 
     .navbar-questions {

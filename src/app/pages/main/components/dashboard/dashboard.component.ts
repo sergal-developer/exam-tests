@@ -71,8 +71,6 @@ export class DashboardComponent implements OnInit {
     this.examTemporal = this._examService.getExamTemporal();
     console.log('this.examTemporal: ', this.examTemporal);
 
-    console.log('exams: ', exams);
-
     this.examsList = exams;
 
     if(!profile) {
@@ -82,9 +80,7 @@ export class DashboardComponent implements OnInit {
       this.eventService.emit({ name: EVENTS.CONFIG,  component: 'header', value: profile });
     }
 
-    this.modalCtl.afterchange = (evt: any) => {
-      console.log('evt: ', evt);
-    };
+    this.modalCtl.afterchange = (evt: any) => { };
   }
 
   editMode() {
@@ -95,8 +91,14 @@ export class DashboardComponent implements OnInit {
   //#region EVENTS
 
   //#region EXAM
+  _loadExamState = false
   initExam(exam: any) {
-    this._router.navigate( [`/dashboard/${ ScreenEnum.exam }/${ exam.id }`]);
+    
+    this._loadExamState = true
+    setTimeout(() => {
+      this._router.navigate( [`/dashboard/${ ScreenEnum.exam }/${ exam.id }`]);
+      this._loadExamState = false
+    }, 1000);
   }
 
   detailsExam(exam: any) {
