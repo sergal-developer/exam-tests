@@ -34,7 +34,7 @@ export class LocalStorage {
     return this.getData(ctx);
   }
 
-  saveInObject(data: string, context?: string) {
+  saveInObject(data: any, context?: string) {
     const ctx = context ?? this.context;
     let storage = this.getData(ctx);
     if (!storage) {

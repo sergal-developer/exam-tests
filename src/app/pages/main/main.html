@@ -1,47 +1,48 @@
-<div class="main-component {{ classMainState }}" [ngClass]="{ 'subheader-active': subheader && !subheader.completed,
-                 'subheader-completed': subheader && subheader.completed }">
+<div class="main {{ header.mainClass }}" [attr.style]="header.mainStyle">
+    <div class="main-header {{ header.headerClass }} {{ header.type }}">
 
-    <div class="row main-header" *ngIf="header && !subheader">
-        <div class="container">
-            <div class="item title" [innerHTML]="header.title"></div>
+        <ng-container *ngIf="header && header.type === 'profile'">
+            <div class="main-header-container">
+                <div class="item title" [innerHTML]="header.title"></div>
 
-            <div class="item avatar" *ngIf="header.image">
-                <img [attr.src]="header.image" [attr.alt]="header.title">
-            </div>
-        </div>
-    </div>
-
-    <div class="row main-subheader" *ngIf="subheader">
-        <div class="container">
-            <div class="item">
-                <div class="return" (click)="returnHome()">
-                    <button class="link"><span class="material-icons">arrow_back</span></button>
-                </div>
-
-                <div class="title" [innerHTML]="subheader.title" *ngIf="!subheader.canEditTitle"></div>
-                <div class="title" *ngIf="subheader.canEditTitle">
-                    <input type="text" [(ngModel)]="subheader.title" (change)="editExamTitle(subheader.title)">
+                <div class="item avatar" *ngIf="header.avatar">
+                    <img [attr.src]="header.avatar" [attr.alt]="header.title">
                 </div>
             </div>
+        </ng-container>
 
-            <div class="item counter" *ngIf="subheader.questions">
+        <ng-container *ngIf="header && header.type === 'progress'">
+            <div class="main-header-container">
+                <div class="item return" (click)="returnHome()">
+                    <span class="material-icons">arrow_back</span>
+                </div>
+
+                <div class="item header-subtitle" [innerHTML]="header.title" *ngIf="!header.canEditTitle"></div>
+                <div class="item header-subtitle" *ngIf="header.canEditTitle">
+                    <input type="text" [(ngModel)]="header.title" (change)="editExamTitle(header.title)">
+                </div>
+
+                <div class="item return">
+                </div>
+            </div>
+            <div class="main-header-container progress" *ngIf="header.exam?.questionsLenght">
                 <div class="bar-counter">
-                    <div class="bar-counter-current" [attr.style]="'width:'+subheader.progress+';'"></div>
+                    <div class="bar-counter-current" [attr.style]="'width:'+header.exam?.progress+';'"></div>
                 </div>
-
                 <div class="pill-counter">
-                    {{ subheader.current }} / {{ subheader.questions }}
+                    {{ header.exam?.current }} / {{ header.exam?.questionsLenght }}
                 </div>
             </div>
-        </div>
-    </div>
+        </ng-container>
 
-    <!-- <splash *ngIf="screen === _screen.splash"></splash>  -->
-    <!-- <router-outlet></router-outlet> -->
-    <dashboard *ngIf="screen === _screen.dashboard"></dashboard>
-    <exam *ngIf="screen === _screen.exam" [data]="data"></exam>
-    <create *ngIf="screen === _screen.create" [data]="data" [examTitle]="examTitle"></create>
-    <admin *ngIf="screen === _screen.admin"></admin>
+    </div>
+    <div class="main-body">
+        <dashboard *ngIf="screen === _screen.dashboard"></dashboard>
+        <exam *ngIf="screen === _screen.exam" [data]="data"></exam>
+        <create *ngIf="screen === _screen.create" [data]="data" [examTitle]="examTitle"></create>
+        <admin *ngIf="screen === _screen.admin"></admin>
+        <settings *ngIf="screen === _screen.settings"></settings>
+    </div>
 </div>
 
 <div class="notification {{ _mainServices._notification.type }}"

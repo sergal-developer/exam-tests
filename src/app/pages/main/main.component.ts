@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { EVENTS, ScreenEnum } from 'src/app/shared/data/enumerables/enumerables';
 import { EventBusService } from 'src/app/shared/data/utils/event.services';
 import { MainServices } from './main.service';
+import { IHeader } from 'src/app/shared/data/interfaces/IUI';
 
 @Component({
   selector: 'main',
@@ -15,10 +16,14 @@ export class MainComponent implements OnInit {
   screen: ScreenEnum = ScreenEnum.dashboard;
   data: any;
 
-  header: any = null;
-  subheader: any = null;
-
-  classMainState = '';
+  header: IHeader = {
+    type: 'profile',
+    title: '',
+    avatar: '',
+    headerClass: '',
+    mainClass: '',
+    mainStyle: '',
+  };
 
   constructor(
     private _router: Router,
@@ -27,7 +32,14 @@ export class MainComponent implements OnInit {
     public _mainServices: MainServices) { }
 
   ngOnInit() {
-    this.header = null;
+    this.header = {
+      type: 'profile',
+      title: '',
+      avatar: '',
+      headerClass: '',
+      mainClass: '',
+      mainStyle: '',
+    };
 
     this._activatedRoute.params.subscribe((params: any) => {
       this.data = null;
@@ -46,70 +58,30 @@ export class MainComponent implements OnInit {
     });
 
     this.eventService.on(EVENTS.CONFIG, async (response) => {
-      if(!response) { return; }
+      if (!response) { return; }
       if (response.component === 'header') {
-        const profile = response.value;
-        const data = {
-          title: profile.userName,
-          image: profile.avatar ? profile.avatar.url : null
-        }
-        this.classMainState = response.value.classMainState;
-        this.updateHeader(data);
-      }
-
-      if (response.component === 'subheader') {
-        const data = {
-          title: response.value.title,
-          questions: response.value.questions,
-          color: response.value.color,
-          current: response.value.current,
-          progress: response.value.progress,
-          completed: response.value.completed,
-          canEditTitle: response.value.canEditTitle,
-        }
-        this.classMainState = response.value.classMainState;
-        this.updateSubHeader(data);
-      }
-
-      if(response.component === 'classApply') {
-        this.classMainState =  response.value;
-      }
-
-      if (response.component === 'reset') {
-        this.subheader = null;
-      }
-    });
-
-    this.eventService.on(EVENTS.SCREENS, (response) => {
-      if(!response) { return; }
-      this.screen = response.value;
-
-      if(response.data) {
-        this.data = response.data;
+        this.updateHeader(response.value);
       }
     });
   }
 
-  async updateHeader(data: any) {
+  _updatingHeader = false;
+  async updateHeader(data: IHeader) {
+    if (this._updatingHeader) { return }
+    this._updatingHeader = true;
     setTimeout(() => {
-      this.header = {...data};
-    }, 200);
-  }
-
-  async updateSubHeader(data: any) {
-    setTimeout(() => {
-      this.subheader = {...data};
+      this.header = data;
+      this._updatingHeader = false;
     }, 200);
   }
 
   returnHome() {
-    this.subheader = null;
     this.screen = ScreenEnum.dashboard;
-    this._router.navigate( [`/dashboard`]);
+    this._router.navigate([`/dashboard`]);
   }
 
   examTitle = '';
-  editExamTitle(title: string) {
-    this.examTitle = title;
+  editExamTitle(title?: string) {
+    this.examTitle = title || '';
   }
 }

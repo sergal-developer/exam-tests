@@ -6,6 +6,8 @@ import { EventBusService } from 'src/app/shared/data/utils/event.services';
 import { ExamsService } from 'src/app/shared/services/exams.service';
 import { MainServices } from '../../main.service';
 import { Utils } from 'src/app/shared/data/utils/utils';
+import { IHeader } from 'src/app/shared/data/interfaces/IUI';
+import { ProfileService } from 'src/app/shared/services/profile.service';
 
 @Component({
   selector: 'exam',
@@ -17,6 +19,7 @@ export class ExamComponent implements OnInit {
   @Input() data: any;
 
   _examService = new ExamsService();
+  _profileService = new ProfileService();
   _helper = new Utils();
   
   constructor(
@@ -52,8 +55,14 @@ export class ExamComponent implements OnInit {
   }
 
   pageState = 'enterAnim';
+  backgrounds: Array<any> = [];
+  screen = 'firstScreen';
+  settings: any = null;
 
   ngOnInit() {
+    this.settings = this._profileService.getSettings();
+    this.backgrounds = this.settings.colors;
+
     if(this.data) {
       const examTemp: Array<IExam> = this._examService.getExamById(this.data.id);
       this.loadExam(examTemp[0]);
@@ -74,9 +83,10 @@ export class ExamComponent implements OnInit {
     this.currentQuestion = null;
     this.currentExam = {
       title: '',
-      color: '',
+      color: this.backgrounds[0],
       questionsLenght: 0,
-      questions: []
+      questions: [],
+      time: 0
     };
 
     this.currentExam = JSON.parse(JSON.stringify(exam));
@@ -118,19 +128,30 @@ export class ExamComponent implements OnInit {
     }, 1500);
   }
 
-  updateHeaders() {
-    this.data.title = this.currentExam.title;
-    this.data.questions = this.currentExam.questionsLenght;
-    this.data.color = this.currentExam.color;
-    this.data.current = this.currentQuestionIndex + 1;
-    this.data.progress = `${(100 / this.currentExam.questionsLenght) * this.data.current}%`;
-    this.data.completed = this.currentExam.completed;
+  updateHeaders(props?: { hide: boolean }) {
+    const type = props && props.hide ? 'hide' : 'progress';
 
-    if(this.currentExam.completed) {
-      this.data.classMainState = 'hide-header';
+    const current = this.currentQuestionIndex + 1;
+    const progress = `${(100 / this.currentExam.questionsLenght) * current }%`;
+    const background = `background: ${ this.currentExam.color }`;
+    const header: IHeader = {
+      type: this.currentExam.completed ? 'hide' : 'progress',
+      title: this.currentExam.title,
+      headerClass: '',
+      mainClass: '',
+      mainStyle: background,
+      canEditTitle: false,
+      exam: {
+        color: this.currentExam.color,
+        completed: false,
+        current: current  ,
+        progress: progress,
+        questionsLenght: this.currentExam.questionsLenght,
+        time: this.timerFormated
+      }
     }
 
-    this.eventService.emit({ name: EVENTS.CONFIG, component: 'subheader', value: this.data });
+    this.eventService.emit({ name: EVENTS.CONFIG, component: 'header', value: header });
   }
 
   startTimers() {
@@ -279,7 +300,6 @@ export class ExamComponent implements OnInit {
 
   closeExam() {
     this._router.navigate( [`/dashboard`]);
-    // this.eventService.emit({ name: EVENTS.CONFIG, component: 'reset', value: ScreenEnum.dashboard });
   }
 
 

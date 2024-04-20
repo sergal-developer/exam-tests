@@ -6,5 +6,16 @@ export interface ProfileEntity {
         url: string,
         body?: string,
     }
-    current: boolean
+    current: boolean,
+}
+
+export interface SettingsEntity {
+    language: string,
+    permissions: {
+        create: boolean,
+        duplicate: boolean,
+        edit: boolean,
+        delete: boolean,
+    }
+    colors: Array<any>
 }

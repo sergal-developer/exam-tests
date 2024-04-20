@@ -1,3 +1,112 @@
+create {
+    .row.mask {
+        padding-bottom: 60px;
+        padding-top: 20px;
+    }
+
+    .section {
+        margin: 0;
+    }
+
+    .question-item {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-direction: row;
+        .actions { margin-left: auto;}
+    }
+
+    .question-option {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-direction: row;
+        gap: 10px;
+        padding: 10px 5px;
+
+        &.correct {
+            background: rgb(88, 168, 88);
+        }
+
+        .actions { 
+            background: rgba(255, 255, 255, 0.4);
+            width: 40px;
+            min-width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+        }
+    }
+
+    .colorsCollection {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .color {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 2px solid gray;
+        background: rgb(208, 208, 208);
+        font-size: 0.7rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+
+        .material-icons {
+            font-size: 2rem;
+            position: absolute;
+            left: 0;
+            right: 0;
+            margin: 12px auto;
+            text-align: center;
+        }
+
+        &.new {
+            position: relative;
+            .label {
+                font-size: 0.8rem;
+            }
+        }
+
+        .label {
+            background: white;
+            color: black;
+            margin-top: 60px;
+            border: 2px solid gray;
+            padding: 3px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+    }
+
+
+    .float-footer {
+        width: calc(100% - 20px);
+        position: fixed;
+        bottom: 10px;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        padding: 5px;
+        border-radius: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+
+        .paginator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+}
+
 .create-exam-component {
     display: flex;
     flex-direction: row;
@@ -78,26 +187,4 @@
         margin-left: auto;
     }
 
-    textarea {
-        padding: 10px;
-    }
-
-    .float-footer {
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        margin-left: -30px;
-        margin-right: -30px;
-        margin-bottom: 0;
-        min-height: 60px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        .paginator {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-    }
 }

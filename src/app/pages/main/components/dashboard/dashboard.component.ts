@@ -1,12 +1,13 @@
 import { Component, OnInit, ViewEncapsulation, } from '@angular/core';
 import { Router } from '@angular/router';
-import { ProfileEntity } from 'src/app/shared/data/entities/entities';
+import { ProfileEntity, SettingsEntity } from 'src/app/shared/data/entities/entities';
 import { EVENTS, ScreenEnum } from 'src/app/shared/data/enumerables/enumerables';
 import { IExam } from 'src/app/shared/data/interfaces/IExam';
 import { EventBusService } from 'src/app/shared/data/utils/event.services';
 import { ExamsService } from 'src/app/shared/services/exams.service';
 import { ProfileService } from 'src/app/shared/services/profile.service';
 import { MainServices } from '../../main.service';
+import { IHeader } from 'src/app/shared/data/interfaces/IUI';
 
 @Component({
   selector: 'dashboard',
@@ -33,6 +34,16 @@ export class DashboardComponent implements OnInit {
     userName: '',
     age: 0,
     current: true
+  }
+  settings: SettingsEntity = {
+    colors: [],
+    language: '',
+    permissions: {
+      create: false,
+      delete: false,
+      duplicate: false,
+      edit: false
+    }
   }
 
   messages = {
@@ -65,6 +76,8 @@ export class DashboardComponent implements OnInit {
 
   async init() {
     const profile = this._profileService.getCurrentProfile();
+    this.settings = this._profileService.getSettings();
+    console.log('this.settings: ', this.settings);
     const exams = this._examService.getExams();
     
     // this._examService.saveExamTemporal(exams[0]);
@@ -72,12 +85,20 @@ export class DashboardComponent implements OnInit {
     console.log('this.examTemporal: ', this.examTemporal);
 
     this.examsList = exams;
+    this.examsList.map((e: any) => {e.color = `background: ${ e.color }`});
 
     if(!profile) {
       this.openModalProfile();
     } else {
-      profile.userName = `Hola, ${ profile.userName }`;
-      this.eventService.emit({ name: EVENTS.CONFIG,  component: 'header', value: profile });
+      const header: IHeader = {
+        type: 'profile',
+        title: `Hola, ${ profile.userName }`,
+        avatar: profile.avatar.url,
+        headerClass: '',
+        mainClass: '',
+        mainStyle: 'background: #ffffff',
+      }
+      this.eventService.emit({ name: EVENTS.CONFIG, component: 'header', value: header });
     }
 
     this.modalCtl.afterchange = (evt: any) => { };
@@ -85,7 +106,7 @@ export class DashboardComponent implements OnInit {
 
   editMode() {
     this.editModeActive = !this.editModeActive;
-    this.examsList.map((e: any) => e._showDetails = false);
+    this.examsList.map((e: any) => {e._showDetails = false});
   }
 
   //#region EVENTS
@@ -177,8 +198,8 @@ export class DashboardComponent implements OnInit {
     this.init();
   }
 
-  adminExam() {
-    this._router.navigate( [`/dashboard/admin`]);
+  goToSettings() {
+    this._router.navigate( [`/dashboard/settings`]);
   }
 
   //#endregion EVENTS

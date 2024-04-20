@@ -1,0 +1,294 @@
+<div class="row mask">
+    <div class="row-internal {{ screen }}">
+        <div class="container list">
+            <div class="section white options" *ngIf="profile">
+                <div class="item">
+                    <div class="subtitle">Usuario</div>
+                </div>
+                <div class="item clickable" (click)="editUser()">
+                    <div class="content">
+                        <div class="avatar">
+                            <div class="innerAvatar">
+                                <img [attr.src]="profile.avatar.url" alt="">
+                            </div>
+                            <div class="detailsAvatar">
+                                <div class="avatarName">{{ profile.userName }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="action"><span class="material-icons">chevron_right</span></div>
+                </div>
+            </div>
+
+            <ng-container *ngIf="settings">
+                <div class="section white options">
+                    <div class="item">
+                        <div class="subtitle">Personalización</div>
+                    </div>
+                    <div class="item clickable" (click)="editStyles()">
+                        <div class="content">Fondos</div>
+                        <div class="action">
+                            <div class="action"><span class="material-icons">chevron_right</span></div>
+                        </div>
+                    </div>
+
+                    <input type="file" name="file-1[]" id="file-1" class="hide" (change)="import($event)">
+                    <label class="item clickable" for="file-1">
+                        <div class="content">Importar</div>
+                        <div class="action">
+                            <div class="action"><span class="material-icons">file_upload</span></div>
+                        </div>
+                    </label>
+                    <div class="item clickable" (click)="export()">
+                        <div class="content">Exportar</div>
+                        <div class="action">
+                            <div class="action"><span class="material-icons">file_download</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section white options">
+                    <div class="item">
+                        <div class="subtitle">Permisos</div>
+                    </div>
+                    <div class="item menu clickable"
+                        (click)="settings.permissions.create = !settings.permissions.create; saveSettingsChanges()">
+                        <div class="content">Crear</div>
+                        <div class="action">
+                            <span class="material-icons enableSlide"
+                                *ngIf="settings.permissions.create">toggle_on</span>
+                            <span class="material-icons" *ngIf="!settings.permissions.create">toggle_off</span>
+                        </div>
+                    </div>
+                    <div class="item menu clickable"
+                        (click)="settings.permissions.edit = !settings.permissions.edit; saveSettingsChanges()">
+                        <div class="content">Editar</div>
+                        <div class="action">
+                            <span class="material-icons enableSlide" *ngIf="settings.permissions.edit">toggle_on</span>
+                            <span class="material-icons" *ngIf="!settings.permissions.edit">toggle_off</span>
+                        </div>
+                    </div>
+                    <div class="item menu clickable"
+                        (click)="settings.permissions.delete = !settings.permissions.delete; saveSettingsChanges()">
+                        <div class="content">Eliminar</div>
+                        <div class="action">
+                            <span class="material-icons enableSlide"
+                                *ngIf="settings.permissions.delete">toggle_on</span>
+                            <span class="material-icons" *ngIf="!settings.permissions.delete">toggle_off</span>
+                        </div>
+                    </div>
+                    <div class="item clickable"
+                        (click)="settings.permissions.duplicate = !settings.permissions.duplicate; saveSettingsChanges()">
+                        <div class="content">Duplicar</div>
+                        <div class="action">
+                            <span class="material-icons enableSlide"
+                                *ngIf="settings.permissions.duplicate">toggle_on</span>
+                            <span class="material-icons" *ngIf="!settings.permissions.duplicate">toggle_off</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section white options">
+                    <div class="item">
+                        <div class="subtitle">General</div>
+                    </div>
+                    <div class="item menu clickable" (click)="switchLanguage()">
+                        <div class="content">Lenguaje</div>
+                        <div class="action">
+                            <div class="pill">{{ settings.language }}</div>
+                            <!-- <div class="action"><span class="material-icons">chevron_right</span></div> -->
+                        </div>
+                    </div>
+                    <div class="item menu clickable" (click)="goToModule('faq')">
+                        <div class="content">FAQ</div>
+                        <div class="action">
+                            <div class="action"><span class="material-icons">chevron_right</span></div>
+                        </div>
+                    </div>
+                    <div class="item menu clickable" (click)="goToModule('about')">
+                        <div class="content">Acerda de</div>
+                        <div class="action">
+                            <div class="action"><span class="material-icons">chevron_right</span></div>
+                        </div>
+                    </div>
+                    <div class="item clickable" (click)="goToModule('terms')">
+                        <div class="content">Terminos del servicios</div>
+                        <div class="action">
+                            <div class="action"><span class="material-icons">chevron_right</span></div>
+                        </div>
+                    </div>
+                </div>
+
+            </ng-container>
+        </div>
+
+        <div class="container list">
+
+            <ng-container *ngIf="module === 'user'">
+                <div class="screen-header" (click)="returnMenu()">
+                    <div class="return-main"><span class="material-icons">chevron_left</span></div>
+                    <div class="subtitle">Usuario</div>
+                    <div class="return-main"></div>
+                </div>
+
+                <div class="section white options">
+                    <div class="item">
+                        <div class="subtitle">Nombre</div>
+                    </div>
+                    <div class="item">
+                        <div class="form">
+                            <input name="user" type="text" placeholder="Usuario" [(ngModel)]="profileTemp.userName">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section white options">
+                    <div class="item">
+                        <div class="subtitle">Avatar</div>
+                    </div>
+                    <div class="item avatar-collection">
+                        <ng-container *ngFor="let item of defaultAvatars">
+                            <img [ngClass]="{'selected': item.selected}" [attr.src]="item.url" [attr.alt]="item.url"
+                                (click)="selectAvatar(item)">
+                        </ng-container>
+                    </div>
+                </div>
+
+                <div class="section white options">
+                    <div class="item savechanges">
+                        <button class="accent" (click)="saveChangesProfile()">Guardar Cambios</button>
+                    </div>
+                </div>
+            </ng-container>
+
+            <ng-container *ngIf="module === 'colors'">
+                <div class="screen-header" (click)="returnMenu()">
+                    <div class="return-main"><span class="material-icons">chevron_left</span></div>
+                    <div class="subtitle">Personalización</div>
+                    <div class="return-main"></div>
+                </div>
+
+                <div class="section white options">
+                    <div class="item">
+                        <div class="subtitle">Colores</div>
+                    </div>
+                    <div class="item colorsCollection">
+                        <div class="color" [attr.style]="'background:' + item +';'"
+                            *ngFor="let item of settingsTemp.colors">
+                            <div class="label">{{ item }}</div>
+                        </div>
+
+                        <label for="colorPicker">
+                            <div class="color new">
+                                <input type="color" name="colorPicker" id="colorPicker" class="colorPickerInput"
+                                    (change)="selectColor($event)" value="#ffffff">
+                                <span class="material-icons">add</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="section white options">
+                    <div class="item savechanges">
+                        <button class="accent" (click)="saveChangesStyles()">Guardar Cambios</button>
+                    </div>
+                </div>
+            </ng-container>
+
+            <ng-container *ngIf="module === 'faq'">
+                <div class="screen-header" (click)="returnMenu()">
+                    <div class="return-main"><span class="material-icons">chevron_left</span></div>
+                    <div class="subtitle">FAQ</div>
+                    <div class="return-main"></div>
+                </div>
+
+                <div class="section white options">
+                    <div class="item">
+                        <div class="subtitle">Preguntas Frecuentes</div>
+                    </div>
+                    <div class="item">
+                        <div>¿Se puede dar doble tab para selecionar y confirmar?</div>
+                        <div><b>Si, al dar doble tab o click selecionas y confirmas tu respuesta</b></div>
+                    </div>
+                </div>
+            </ng-container>
+
+            <ng-container *ngIf="module === 'about'">
+                <div class="screen-header" (click)="returnMenu()">
+                    <div class="return-main"><span class="material-icons">chevron_left</span></div>
+                    <div class="subtitle">Acerca de</div>
+                    <div class="return-main"></div>
+                </div>
+
+                <div class="section white options">
+                    <div class="item">
+                        <div class="subtitle">Detalles</div>
+                    </div>
+                    <div class="item">
+                        <div>VERSION: <b>1.0.0</b></div>
+                    </div>
+                    <div class="item">
+                        <div>AUTHOR: <b><a href="#" mailto="sergio.gallegos@live.com">sergio.gallegos@live.com</a></b>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+
+            <ng-container *ngIf="module === 'terms'">
+                <div class="screen-header" (click)="returnMenu()">
+                    <div class="return-main"><span class="material-icons">chevron_left</span></div>
+                    <div class="subtitle">Terminos y condiciones de uso</div>
+                    <div class="return-main"></div>
+                </div>
+
+                <div class="section white options">
+                    <div class="item">
+                        **Términos y Condiciones de Uso**
+
+                        Por favor, lee atentamente los siguientes términos y condiciones antes de utilizar nuestra
+                        aplicación de simulador de exámenes. Al acceder y utilizar esta aplicación, aceptas cumplir con
+                        estos términos y condiciones en su totalidad. Si no estás de acuerdo con alguno de estos
+                        términos, por favor, no utilices la aplicación.
+
+                        1. **Uso Aceptable**: Nuestra aplicación de simulador de exámenes está diseñada para ser
+                        utilizada como una herramienta educativa para la preparación de exámenes. No se permite el uso
+                        de la aplicación para actividades ilegales o que violen los derechos de terceros.
+
+                        2. **Registro y Cuentas de Usuario**: Al utilizar nuestra aplicación, es posible que necesites
+                        crear una cuenta de usuario. Eres responsable de mantener la confidencialidad de tu información
+                        de inicio de sesión y de todas las actividades que ocurran bajo tu cuenta.
+
+                        3. **Propiedad Intelectual**: Todos los derechos de propiedad intelectual relacionados con la
+                        aplicación, incluyendo, pero no limitado a, derechos de autor, marcas comerciales y patentes,
+                        son propiedad de nuestra empresa o de terceros que nos han otorgado licencias para utilizar
+                        dicha propiedad intelectual.
+
+                        4. **Contenido del Usuario**: Al utilizar nuestra aplicación, puedes proporcionar cierto
+                        contenido, como comentarios o respuestas a preguntas de examen. Mantienes la propiedad de
+                        cualquier contenido que proporciones, pero nos otorgas una licencia no exclusiva para utilizar,
+                        mostrar y distribuir dicho contenido en relación con la operación y promoción de la aplicación.
+
+                        5. **Actualizaciones y Modificaciones**: Nos reservamos el derecho de actualizar, modificar o
+                        descontinuar la aplicación, o cualquier parte de ella, en cualquier momento y sin previo aviso.
+
+                        6. **Limitación de Responsabilidad**: En la medida máxima permitida por la ley aplicable, no
+                        seremos responsables por daños directos, indirectos, incidentales, especiales o consecuentes que
+                        surjan del uso de nuestra aplicación.
+
+                        7. **Jurisdicción y Ley Aplicable**: Estos términos y condiciones se rigen por las leyes del
+                        país donde está registrada nuestra empresa, y cualquier disputa relacionada con estos términos y
+                        condiciones estará sujeta a la jurisdicción exclusiva de los tribunales de esa jurisdicción.
+
+                        8. **Modificaciones de los Términos y Condiciones**: Nos reservamos el derecho de modificar
+                        estos términos y condiciones en cualquier momento. Las modificaciones entrarán en vigencia
+                        inmediatamente después de su publicación en esta página.
+
+                        Al utilizar nuestra aplicación de simulador de exámenes, reconoces que has leído, entendido y
+                        aceptado estos términos y condiciones en su totalidad. Si tienes alguna pregunta sobre estos
+                        términos y condiciones, por favor contáctanos.
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</div>

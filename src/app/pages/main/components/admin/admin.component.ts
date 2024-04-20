@@ -17,7 +17,7 @@ export class AdminComponent implements OnInit {
   _examService = new ExamsService();
 
   constructor(private eventService: EventBusService,
-            private _mainServices: MainServices
+    private _mainServices: MainServices
   ) { }
 
   data: any = {};
@@ -94,13 +94,13 @@ export class AdminComponent implements OnInit {
         var contenido = evento.target.result;
         resolve(contenido);
       };
-  
+
       lector.onerror = (evento: any) => {
         console.warn("Error al leer el archivo:", evento.target.error);
         this._mainServices.notification('Error al leer el archivo', { type: 'warning', closeTimer: 5000 });
         resolve('');
       };
-  
+
       lector.readAsText(archivo);
     });
   }
@@ -113,5 +113,5 @@ export class AdminComponent implements OnInit {
     var success = document.execCommand("copy");
     document.body.removeChild(temp);
     return success;
-}
+  }
 }

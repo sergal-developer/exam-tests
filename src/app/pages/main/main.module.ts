@@ -12,6 +12,7 @@ import { CreateComponent } from './components/create/create.component';
 import { ModulePackage } from 'src/app/shared/data/interfaces/interfaces';
 import { AdminComponent } from './components/admin/admin.component';
 import { MainServices } from './main.service';
+import { SettingsComponent } from './components/settings/settings.component';
 
 @NgModule({
   imports: [
@@ -34,7 +35,8 @@ import { MainServices } from './main.service';
     DashboardComponent,
     ExamComponent,
     CreateComponent,
-    AdminComponent
+    AdminComponent,
+    SettingsComponent
   ],
   exports: [
     MainComponent,
@@ -42,7 +44,8 @@ import { MainServices } from './main.service';
     DashboardComponent,
     ExamComponent,
     CreateComponent,
-    AdminComponent
+    AdminComponent,
+    SettingsComponent
   ],
   providers: [EventBusService, MainServices],
 })
