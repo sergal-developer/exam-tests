@@ -18,5 +18,5 @@ export interface SettingsEntity {
         delete: boolean,
     }
     colors: Array<any>;
-    theme: string;
+    theme?: string;
 }
