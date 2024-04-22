@@ -10,12 +10,13 @@ export interface ProfileEntity {
 }
 
 export interface SettingsEntity {
-    language: string,
+    language: string;
     permissions: {
         create: boolean,
         duplicate: boolean,
         edit: boolean,
         delete: boolean,
     }
-    colors: Array<any>
+    colors: Array<any>;
+    theme: string;
 }

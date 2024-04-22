@@ -46,7 +46,8 @@ export class ProfileService {
         delete: false,
         duplicate: true,
         edit: false
-      }
+      },
+      theme: 'white'
     }
     this.saveSettings(data);
   }
