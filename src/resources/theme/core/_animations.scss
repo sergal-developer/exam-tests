@@ -10,22 +10,27 @@
   @keyframes enter-splash {
     0% {
       background: black;
+      background: linear-gradient(45deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 100%);
       color: black;
     }
     100% {
-      background: #D26DB2;
+      background: black;
+      background: linear-gradient(45deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 100%);
       color: black;
     }
+    
   }
   
   @keyframes exit-splash {
     0% {
-      background: #D26DB2;
+      background: rgba(215,121,186,1);
+      background: linear-gradient(45deg, rgba(215,121,186,1) 0%, rgba(159,118,219,1) 100%);
       color: black;
     }
     100% {
-      background: white;
-      color: white;
+      background: rgba(215,121,186,1);
+      background: linear-gradient(45deg, rgba(215,121,186,1) 0%, rgba(159,118,219,1) 100%);
+      color: black;
     }
   }
   

@@ -1,4 +1,4 @@
-<div class="main {{ header.mainClass }}" [attr.style]="header.mainStyle">
+<div class="main {{ mainState }} {{ header.mainClass }}" [attr.style]="header.mainStyle">
     <div class="main-header {{ header.headerClass }} {{ header.type }}">
 
         <ng-container *ngIf="header && header.type === 'profile'">
@@ -18,14 +18,17 @@
                 </div>
 
                 <div class="item header-subtitle" [innerHTML]="header.title" *ngIf="!header.canEditTitle"></div>
-                <div class="item header-subtitle" *ngIf="header.canEditTitle">
+                <div class="item header-subtitle-edit" *ngIf="header.canEditTitle">
                     <input type="text" [(ngModel)]="header.title" (change)="editExamTitle(header.title)">
                 </div>
 
-                <div class="item return">
+                <div class="item return" *ngIf="!header.canEditTitle">
                 </div>
             </div>
             <div class="main-header-container progress" *ngIf="header.exam?.questionsLenght">
+                <div class="pill-counter" *ngIf="header.exam?.time">
+                    <timer [minutes]="header.exam?.time" [autostart]="header.exam?.autoStartTimer || false"></timer>
+                </div>
                 <div class="bar-counter">
                     <div class="bar-counter-current" [attr.style]="'width:'+header.exam?.progress+';'"></div>
                 </div>
@@ -36,7 +39,7 @@
         </ng-container>
 
     </div>
-    <div class="main-body">
+    <div class="main-body {{ header.type }}">
         <dashboard *ngIf="screen === _screen.dashboard"></dashboard>
         <exam *ngIf="screen === _screen.exam" [data]="data"></exam>
         <create *ngIf="screen === _screen.create" [data]="data" [examTitle]="examTitle"></create>

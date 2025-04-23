@@ -133,7 +133,11 @@ export class ExamComponent implements OnInit {
 
     const current = this.currentQuestionIndex + 1;
     const progress = `${(100 / this.currentExam.questionsLenght) * current }%`;
-    const background = `background: ${ this.currentExam.color }`;
+    // const background = `background: ${ this.currentExam.color }`;
+    const background = this.currentExam.completed ? `background: rgb(50, 168, 84);` : `background: #fff`;
+    // const autoStartTimer = this.currentExam.completed ? false : true;
+    const autoStartTimer = this.startTimer;
+
     const header: IHeader = {
       type: this.currentExam.completed ? 'hide' : 'progress',
       title: this.currentExam.title,
@@ -147,7 +151,8 @@ export class ExamComponent implements OnInit {
         current: current  ,
         progress: progress,
         questionsLenght: this.currentExam.questionsLenght,
-        time: this.timerFormated
+        time: this.currentExam.time,
+        autoStartTimer: autoStartTimer
       }
     }
 
@@ -181,9 +186,15 @@ export class ExamComponent implements OnInit {
       let _minutes = Math.floor(miliseconds / 60000);
       let _seconds = ((miliseconds % 60000) / 1000);
       this.timerFormated = `${_minutes < 10 ? '0' + _minutes : _minutes}:${_seconds < 10 ? '0' + _seconds.toFixed(0) : _seconds}`;
+
+      // if(this.currentExam.time && !this.currentExam.completed){
+      //   this.updateHeaders();
+      // }
     }, 1000);
   }
 
+
+  startTimer = true;
   nextQuestion() {
     if (this.currentQuestionIndex >= this.questions.length) {
       return;
@@ -194,11 +205,12 @@ export class ExamComponent implements OnInit {
       this.currentQuestionIndex = this.currentQuestionIndex + 1;
       this.currentQuestion = this.questions[this.currentQuestionIndex];
 
+      this.startTimer = !this.startTimer;
       if (this.currentQuestionIndex > this.questions.length - 1) {
         this.completeQuiz();
+      } else {
+        this.updateHeaders();
       }
-
-      this.updateHeaders();
     });
   }
 
@@ -253,8 +265,7 @@ export class ExamComponent implements OnInit {
 
   completeQuiz() {
     this.currentExam.completed = true;
-    clearInterval(this.interval);
-    this.interval = null;
+   
     const score = this.getScoreExam();
 
     // this._examService.saveExams(this.currentExam)

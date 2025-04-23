@@ -14,8 +14,9 @@ export interface IHeader {
     questionsLenght?: number;
     progress?: string;
     current?: number;
-    time?: string;
+    time?: any;
     completed?: boolean,
-    color?: string
+    color?: string,
+    autoStartTimer?: boolean
   }
 }

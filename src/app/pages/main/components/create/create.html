@@ -2,16 +2,14 @@
     <div class="row-internal {{ screen }}">
         <div class="container list">
             <ng-container *ngIf="currentQuestion">
-                <div class="section white column">
-                    <div class="item">
-                        <div class="subtitle">Pregunta</div>
-                    </div>
+
+                <div class="section transparent column box">
                     <div class="item question">
-                        <textarea name="" [(ngModel)]="currentQuestion.questions"></textarea>
+                        <textbox [(ngModel)]="currentQuestion.questions" [placeholder]="'Escribe tu pregunta ...'"></textbox>
                     </div>
                 </div>
 
-                <div class="section transparent column">
+                <div class="section transparent column box">
                     <div class="item question-item">
                         <div class="subtitle">Respuestas</div>
                         <div class="actions">
@@ -26,7 +24,9 @@
                         <div class="actions" (click)="deleteOption(option)">
                             <span class="material-icons">remove_circle_outline</span>
                         </div>
-                        <textarea name="" id="" [(ngModel)]="option.text"></textarea>
+
+                        <textbox [(ngModel)]="option.text" [placeholder]="'Respuesta'+ option.id +' ...'"></textbox>
+
                         <div class="actions" (click)="setCorrectOption(option)">
                             <span class="material-icons" *ngIf="!currentQuestion.answer">check_circle</span>
                             <ng-container *ngIf="currentQuestion.answer">
@@ -63,7 +63,7 @@
                     <div class="subtitle">Tiempo Limite</div>
                 </div>
                 <div class="item colorsCollection">
-                    <input type="text" [(ngModel)]="currentExam.time" placeholder="tiempo limite">
+                    <textbox [(ngModel)]="currentExam.time" [placeholder]="'tiempo limite'"></textbox>
                 </div>
             </div>
         </div>

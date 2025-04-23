@@ -8,12 +8,25 @@ create {
         margin: 0;
     }
 
+    .question {
+        margin-bottom: 20px;
+        display: inline-grid;
+        vertical-align: top;
+        align-items: center;
+        position: relative;
+        width: 100%;
+        align-items: stretch;
+    }
+
     .question-item {
         display: flex;
         align-items: center;
         justify-content: flex-start;
         flex-direction: row;
-        .actions { margin-left: auto;}
+
+        .actions {
+            margin-left: auto;
+        }
     }
 
     .question-option {
@@ -26,9 +39,11 @@ create {
 
         &.correct {
             background: rgb(88, 168, 88);
+            margin: 0 -20px;
+            padding: 10px 25px;
         }
 
-        .actions { 
+        .actions {
             background: rgba(255, 255, 255, 0.4);
             width: 40px;
             min-width: 40px;
@@ -37,6 +52,10 @@ create {
             align-items: center;
             justify-content: center;
             border-radius: 20px;
+        }
+
+        textbox {
+            width: 100%;
         }
     }
 
@@ -68,6 +87,7 @@ create {
 
         &.new {
             position: relative;
+
             .label {
                 font-size: 0.8rem;
             }
@@ -84,6 +104,51 @@ create {
         }
     }
 
+
+    .box {
+        padding: 0;
+
+        input,
+        textarea {
+            background: transparent;
+            border-color: transparent;
+            padding: 0;
+            border-radius: 0;
+            font-size: 1.4rem;
+
+            &:hover {
+                padding: 10px 15px;
+                border-radius: 10px;
+                background: inherit;
+                border-color: inherit;
+                font-size: 1rem;
+            }
+        }
+
+        .textbox {
+            font-size: 1.4rem;
+            &:hover {
+                font-size: 1rem;
+                &::after {
+                padding: 10px 15px;
+                }
+            }
+        }
+
+ 
+
+        .question-option {
+
+            input,
+            textarea {
+                font-size: 1rem;
+
+                &:hover {
+                    font-size: 1rem;
+                }
+            }
+        }
+    }
 
     .float-footer {
         width: calc(100% - 20px);
@@ -105,86 +170,4 @@ create {
             justify-content: center;
         }
     }
-}
-
-.create-exam-component {
-    display: flex;
-    flex-direction: row;
-    width: 100vw;
-    height: auto;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 20px;
-    font-size: 16px;
-    transition: all 300ms;
-
-    .frame {
-        width: 100%;
-    }
-
-    .section {
-        padding: 0;
-
-        .item {
-            font-size: inherit;
-
-            &.question {
-                margin-bottom: 20px;
-            }
-
-            &.question-section {
-                .item {
-                    width: 100%;
-                    display: flex;
-                    align-items: center;
-                    margin-bottom: 10px;
-
-                    textarea { 
-                        height: 40px;
-                        margin-right: 10px;
-                    }
-
-                    &.correct {
-                        background: #9be58a;
-                        textarea { 
-                            background: rgba(255, 255, 255, 0.1);
-                            border-color: #549a44;
-                        }
-                    }
-                }
-            }
-
-            &.exam-title {
-                color: #250080;
-                font-size: 24px;
-                margin-bottom: 10px;
-            }
-
-            &.exam-questions {
-                margin-top: 10px;
-            }
-        }
-    }
-
-    .item-header {
-        height: 30px;
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-
-        ._title,
-        ._subtitle {
-            font-size: 20px;
-            font-weight: 100;
-        }
-
-        ._subtitle {
-            font-size: 16px;
-        }
-    }
-
-    ._actions {
-        margin-left: auto;
-    }
-
 }

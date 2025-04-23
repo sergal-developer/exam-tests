@@ -35,12 +35,12 @@ export class SettingsComponent implements OnInit {
   moduleTitle = '';
 
   defaultAvatars = [
-    { url: "https://cdn4.iconfinder.com/data/icons/avatars-xmas-giveaway/128/girl_avatar_child_kid-512.png", selected: false },
-    { url: "https://cdn4.iconfinder.com/data/icons/avatars-xmas-giveaway/128/coffee_zorro_avatar_cup-512.png", selected: false },
-    { url: "https://cdn4.iconfinder.com/data/icons/avatars-xmas-giveaway/128/girl_female_woman_avatar-512.png", selected: false },
-    { url: "https://cdn4.iconfinder.com/data/icons/avatars-xmas-giveaway/128/man_male_avatar_portrait-512.png", selected: false },
-    { url: "https://cdn4.iconfinder.com/data/icons/avatars-xmas-giveaway/128/boy_male_avatar_portrait-512.png", selected: false },
-    { url: "https://cdn4.iconfinder.com/data/icons/avatars-xmas-giveaway/128/female_woman_avatar_portrait-512.png", selected: false }
+    { url: "/assets/avatar1.svg", selected: false },
+    { url: "/assets/avatar2.svg", selected: false },
+    { url: "/assets/avatar3.svg", selected: false },
+    { url: "/assets/avatar4.svg", selected: false },
+    { url: "/assets/avatar5.svg", selected: false },
+    { url: "/assets/avatar6.svg", selected: false },
   ];
 
   ngOnInit() {

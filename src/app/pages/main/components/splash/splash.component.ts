@@ -11,7 +11,7 @@ import { ProfileService } from 'src/app/shared/services/profile.service';
 })
 export class SplashComponent implements OnInit {
   service = new ProfileService();
-  timeDelay = 2000;
+  timeDelay = 1500;
   state = 'enter'
 
   constructor(private _router: Router) { }
@@ -27,10 +27,7 @@ export class SplashComponent implements OnInit {
       
       setTimeout(() => {
         this._router.navigate( [`/dashboard`]);
-        
-      }, this.timeDelay / 2);
+      }, this.timeDelay * 1.5);
     }, this.timeDelay);
-    
-    
   }
 }

@@ -86,7 +86,7 @@ export class CreateComponent implements OnInit {
       this.isEdit = true;
     } else {
       this.currentExam = {
-        title: 'Crear Examen',
+        title: 'Titulo',
         color: this.backgrounds[0],
         questionsLenght: 1,
         questions: [],
@@ -110,7 +110,9 @@ export class CreateComponent implements OnInit {
 
     const current = this.currentQuestionIndex + 1;
     const progress = `${(100 / this.currentExam.questionsLenght) * current }%`;
-    const background = `background: ${ this.currentExam.color }`;
+    // const background = `background: ${ this.currentExam.color }`;
+    const background = `background: #fff`;
+    const time = this.currentExam.time ? `${ this.currentExam.time } min.` : '';
     const header: IHeader = {
       type: type,
       title: this.currentExam.title,
@@ -124,7 +126,8 @@ export class CreateComponent implements OnInit {
         current: current  ,
         progress: progress,
         questionsLenght: this.currentExam.questionsLenght,
-        time: ''
+        time: this.currentExam.time,
+        autoStartTimer: false
       }
     }
 
@@ -227,4 +230,8 @@ export class CreateComponent implements OnInit {
     }
   }
   //#endregion ACTIONS
+
+  ngChange(evt: any) {
+    this.currentQuestion.questions = evt.target.innerText;
+  }
 }

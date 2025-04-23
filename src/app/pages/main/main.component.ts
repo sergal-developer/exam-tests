@@ -15,6 +15,8 @@ export class MainComponent implements OnInit {
   _screen = ScreenEnum;
   screen: ScreenEnum = ScreenEnum.dashboard;
   data: any;
+  timeDelay = 100;
+  mainState = ''
 
   header: IHeader = {
     type: 'profile',
@@ -33,7 +35,7 @@ export class MainComponent implements OnInit {
 
   ngOnInit() {
     this.header = {
-      type: 'profile',
+      type: '',
       title: '',
       avatar: '',
       headerClass: '',
@@ -55,14 +57,25 @@ export class MainComponent implements OnInit {
           id: params.action
         };
       }
+      
+      this.animStart();
     });
 
     this.eventService.on(EVENTS.CONFIG, async (response) => {
       if (!response) { return; }
       if (response.component === 'header') {
         this.updateHeader(response.value);
+        console.log('response.value: ', response.value);
       }
     });
+
+  }
+
+  async animStart() {
+    this.mainState = '';
+    setTimeout(() => {
+      this.mainState = 'content-loaded-enter';
+    }, this.timeDelay);
   }
 
   _updatingHeader = false;

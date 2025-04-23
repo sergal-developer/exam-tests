@@ -1,0 +1,11 @@
+<div class="textbox" [attr.data-replicated-value]="autosize ? value : ''">
+    <textarea 
+        [attr.id]="id" 
+        [attr.name]="id"
+        [disabled]="disabled"
+        [attr.maxlength]="maxLength"
+        [attr.tabindex]="tabindex"
+        [attr.placeholder]="placeholder"
+        [(ngModel)]="value">
+    </textarea>
+</div>
