@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { v4 as uuidv4 } from 'uuid';
 import { AttemptEntity, ProfileEntity, QuizEntity, SettingsEntity } from '../data/entities/entities';
-import { IExam } from '../data/interfaces/IExam';
 import { Utils } from '../data/utils/utils';
 import { DBLocal } from './storage/db-storage';
-import { Router } from '@angular/router';
 
 @Injectable()
 export class CommonServices {

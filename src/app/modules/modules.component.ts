@@ -4,7 +4,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { ScreenEnum } from 'src/app/shared/data/enumerables/enumerables';
 import { EventBusService } from 'src/app/shared/data/utils/event.services';
 import { CommonServices } from 'src/app/shared/services/common.services';
-import { MainServices } from '../pages/main/main.service';
 import { UiServices } from '../shared/services/ui.services';
 
 @Component({

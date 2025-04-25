@@ -1,9 +1,8 @@
 import { Component, OnInit, ViewEncapsulation, } from '@angular/core';
-import { MainServices } from 'src/app/pages/main/main.service';
 import { AnswerEntity, AttemptEntity, OptionEntity, QuizEntity } from 'src/app/shared/data/entities/entities';
 import { AttemptState } from 'src/app/shared/data/enumerables/enumerables';
-import { IExam } from 'src/app/shared/data/interfaces/IExam';
 import { CommonServices } from 'src/app/shared/services/common.services';
+import { UiServices } from 'src/app/shared/services/ui.services';
 import { v4 as uuidv4 } from 'uuid';
 
 @Component({
@@ -18,7 +17,7 @@ export class DashboardComponent implements OnInit {
   listAttempts: AttemptEntity[] = [];
 
   constructor(private _commonServices: CommonServices,
-    private _uiServices: MainServices) { }
+    private _uiServices: UiServices) { }
 
   ngOnInit() {
     this.init();

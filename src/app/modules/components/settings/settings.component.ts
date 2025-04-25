@@ -49,7 +49,77 @@ export class SettingsComponent implements OnInit {
   //#endregion DATA
 
   //#region EVENTS
-  cha
+  // #region IMPORT/EXPORTS
+  export() {
+    const exams = this._commonServices.getAllQuizs();
+    console.log('exams: ', exams);
+    this.copyClipboard(JSON.stringify(exams));
+    this.downloadJSON(JSON.stringify(exams), 'collection-exam.json');
+  }
+
+  async import(evt: any) {
+    var file = evt.target.files[0];
+    const data = await this.readFile(file);
+
+    try {
+      const json = JSON.parse(data);
+      // crear funcion que agrege el json de un solo paso
+      this._commonServices.saveQuiz(json);
+      this._uiServices.notification('Plantilla importada exitosamente', { type: 'success', closeTimer: 5000 });
+    } catch (error) {
+      this._uiServices.notification('Error al importar plantilla', { type: 'warning', closeTimer: 5000 });
+    }
+  }
+
+  downloadJSON(data: any, name: string) {
+    try {
+      var blob = new Blob([data], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+
+      var downloadElement = document.createElement("a");
+      downloadElement.href = url;
+      downloadElement.download = name;
+
+      document.body.appendChild(downloadElement);
+      downloadElement.click();
+      document.body.removeChild(downloadElement);
+      URL.revokeObjectURL(url);
+      this._uiServices.notification('Exportación exitosa', { type: 'info', closeTimer: 3000 });
+    } catch (error: any) {
+      this._uiServices.notification(error, { type: 'warning', closeTimer: 5000 });
+    }
+  }
+
+  readFile(archivo: any): Promise<string> {
+    return new Promise((resolve) => {
+      var lector = new FileReader();
+
+      lector.onload = (evento: any) => {
+        var contenido = evento.target.result;
+        resolve(contenido);
+      };
+
+      lector.onerror = (evento: any) => {
+        console.warn("Error al leer el archivo:", evento.target.error);
+        this._uiServices.notification('Error al leer el archivo', { type: 'warning', closeTimer: 5000 });
+        resolve('');
+      };
+
+      lector.readAsText(archivo);
+    });
+  }
+
+  copyClipboard(text: string) {
+    var temp = document.createElement("textarea");
+    temp.value = text;
+    document.body.appendChild(temp);
+    temp.select();
+    var success = document.execCommand("copy");
+    document.body.removeChild(temp);
+    return success;
+  }
+  //#endregion
+
   //#endregion EVENTS
 
 }

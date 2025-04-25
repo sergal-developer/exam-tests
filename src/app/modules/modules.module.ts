@@ -4,7 +4,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { CommonServices } from 'src/app/shared/services/common.services';
-import { MainServices } from '../pages/main/main.service';
 import { ComponentsModule } from '../shared/components/components.module';
 import { ModulePackage } from '../shared/data/interfaces/interfaces';
 import { EventBusService } from '../shared/data/utils/event.services';
@@ -55,7 +54,7 @@ import { ModuleComponent } from './modules.component';
     SettingsComponent,
     SplashComponent,
   ],
-  providers: [EventBusService, MainServices, CommonServices, UiServices],
+  providers: [EventBusService, CommonServices, UiServices],
 })
 export class MainModule {}
 
@@ -64,7 +63,6 @@ export let modulePackage: ModulePackage = {
   routes: [
     { path: '', component: SplashComponent },
     { path: ':module', component: ModuleComponent },
-    { path: ':module/:submodule', component: ModuleComponent },
-    { path: ':module/:submodule/:id', component: ModuleComponent },
+    { path: ':module/:submodule', component: ModuleComponent }
   ]
 };

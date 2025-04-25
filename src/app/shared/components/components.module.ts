@@ -5,9 +5,8 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { AvatarModule } from "./avatar/avatar.module";
 import { LogoComponent } from "./logo/logo.component";
 import { MatInputComponent } from "./mat-input/mat-input.component";
-import { ModalModule } from "./modal/modal.module";
-import { TextboxModule } from "./textbox/textbox.module";
 import { TimerModule } from "./timer/timer.module";
+import { ModalComponent } from "./modal/modal.component";
 
 @NgModule ( {
     imports : [
@@ -16,20 +15,18 @@ import { TimerModule } from "./timer/timer.module";
         ReactiveFormsModule,
 
         AvatarModule,
-        ModalModule,
-        TextboxModule,
         TimerModule
     ],
     declarations: [
         LogoComponent,
-        MatInputComponent
+        MatInputComponent,
+        ModalComponent,
     ],
     exports: [
         LogoComponent,
         MatInputComponent,
+        ModalComponent,
         AvatarModule,
-        ModalModule,
-        TextboxModule,
         TimerModule,
     ],
     providers: []
