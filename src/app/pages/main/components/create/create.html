@@ -50,7 +50,7 @@
                 <div class="item">
                     <div class="subtitle">Fondos</div>
                 </div>
-                <div class="item colorsCollection">
+                <div class="item colorsCollection" *ngIf="settings">
                     <div class="color" [attr.style]="'background:' + item +';'" (click)="selectColor(item)"
                         *ngFor="let item of settings.colors">
                         <div class="label">{{ item }}</div>

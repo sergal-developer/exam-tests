@@ -1,0 +1,40 @@
+{
+  "GLOBAL": {
+    "en": "Inglés",
+    "es": "Español",
+    "register_title": "Hola, es un gusto conocerte, ¿como te llamas?",
+    "singup": "Registrarse",
+    "welcome": "Bienvenido",
+    "empty_exam": "Esto se ve muy vacio. vamos a crear un nuevo examen",
+    "list_exam": "Lista de examenes",
+    "new": "Nuevo",
+    "header_settings": "Configuración",
+    "header_results": "Resultados",
+    "form_name": "Nombre",
+    "form_name_required": "El nombre es requerido",
+    "form_image": "Selecciona un Avatar",
+    "form_image_required": "El avatar es requerido",
+    "evaluations": "Evaluaciones",
+    "questions": "Preguntas",
+    "best_time": "Mejor Tiempo",
+    "empty_attempt_text": "Primera evaluación",
+    "new_attempt_text": "Nueva evaluación",
+    "start_attempt": "Iniciar",
+    "complete_attempt": "Completar",
+    "review_attempt": "Revisar",
+
+
+    "profile": "Perfil",
+    "permission": "Permisos",
+    "permission_create": "Crear",
+    "permission_edit": "Editar",
+    "permission_duplicate": "Duplicar",
+    "permission_delete": "Eliminar",
+    "permission_ia": "Inteligencia Artificial",
+    "permission_data": "Datos",
+    "permission_import": "Importar",
+    "permission_export": "Exportar",
+
+    "service_error_attempt": "Ocurrio un error al generar la evaluacion, intente nuevamente"
+  }
+}

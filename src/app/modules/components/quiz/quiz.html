@@ -1,0 +1,178 @@
+<ng-container *ngIf="attempt">
+    <header [mode]="'quiz'" [title]="attempt.title"></header>
+
+    <div class="timer-status" *ngIf="currentSection != 'show_2'">
+        <div class="step-counter">
+            {{ currentAnswerIndex + 1 }} of {{ attempt.validTotalAnswers }}
+        </div>
+        <div class="timer" [ngClass]="{'timer-green':  currentAnswerIndex == attempt.validTotalAnswers - 1 }">
+            <div class="timer-bar" [attr.style]="progresStyle"></div>
+        </div>
+        <div class="remaining-time" *ngIf="!readonly">20:00</div>
+        <div class="status completed" *ngIf="readonly"> completed </div>
+    </div>
+
+    <div class="root_container_collection" *ngIf="attempt">
+        <div class="root_container_mask {{ currentSection }}">
+
+            <div class="root-container">
+                <div class="simple-section" *ngIf="currentAnswer">
+                    <div class="_question">
+                        <div class="_question_text" [innerHTML]="currentAnswer.question">
+                        </div>
+
+                        <div class="_answer_collection">
+                            <ng-container *ngFor="let option of currentAnswer.options">
+                                <div class="_answer" [ngClass]="{   
+                                        'selected': option.selected, 
+                                        'view': readonly,
+                                        'correct': readonly && (option.id == currentAnswer.correctAnswer) }"
+                                    (click)="selectOption(option)">
+                                    <div class="_answer_selection">
+                                        <ng-container *ngIf="readonly">
+                                            <span *ngIf="option.id == currentAnswer.correctAnswer"
+                                            class="material-icons">verified</span>
+                                            <span *ngIf="(option.id != currentAnswer.correctAnswer) && option.selected"
+                                            class="material-icons">check_circle_outline</span>
+                                            <span *ngIf="(option.id != currentAnswer.correctAnswer) && !option.selected"
+                                            class="material-icons">radio_button_unchecked</span>
+                                        </ng-container>
+                                        <ng-container *ngIf="!readonly">
+                                            <span *ngIf="option.selected"
+                                                class="material-icons">check_circle_outline</span>
+                                            <span *ngIf="!option.selected"
+                                                class="material-icons">radio_button_unchecked</span>
+                                        </ng-container>
+
+
+                                    </div>
+                                    <div class="_answer_text" [innerHTML]="option.text">
+                                    </div>
+                                </div>
+                            </ng-container>
+
+                            <!-- <div class="_answer correct">
+                                <div class="_answer_selection">
+        
+                                    <span class="material-icons">
+                                        verified
+                                    </span>
+                                </div>
+                                <div class="_answer_text">
+                                    Think before you act
+                                </div>
+                            </div>
+                            <div class="_answer incorrect">
+                                <div class="_answer_selection">
+                                    <span class="material-icons">
+                                        highlight_off
+                                    </span>
+                                </div>
+                                <div class="_answer_text">
+                                    Think before you act
+                                </div>
+                            </div> -->
+                        </div>
+
+                        <div class="_question_actions">
+                            <button (click)="prevAnswer()" *ngIf="currentAnswerIndex > 0">
+                                <div class="inner">
+                                    <span class="material-icons">
+                                        chevron_left
+                                    </span>
+                                    Prev
+                                </div>
+                            </button>
+                            <button (click)="nextAnswer()" [disabled]="!currentAnswer.selectedAnswer"
+                                *ngIf="currentAnswerIndex < attempt.validTotalAnswers - 1">
+                                <div class="inner">
+                                    Next
+                                    <span class="material-icons">
+                                        chevron_right
+                                    </span>
+
+                                </div>
+                            </button>
+                            <button (click)="finishQuiz()" *ngIf="currentAnswerIndex == attempt.validTotalAnswers - 1">
+                                <div class="inner">
+                                    Complete
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="root-container grade-container {{ attempt.grade }}">
+                <div class="simple-section">
+
+                    <div class="_content transparent section-column grade {{ attempt.grade }}">
+                        <h1 class="">
+                            <ng-container *ngIf="attempt.grade == _gradeState.passed">
+                                <span>Aprobado</span>
+                                <span class="material-icons">
+                                    verified
+                                </span>
+                            </ng-container>
+                            <ng-container *ngIf="attempt.grade == _gradeState.barely_passed">
+                                <span>Aprobaste con el minimo</span>
+                                <span class="material-icons">
+                                    done
+                                </span>
+                            </ng-container>
+                            <ng-container *ngIf="attempt.grade == _gradeState.failed">
+                                <span>Reprobado</span>
+                                <span class="material-icons">
+                                    warning_amber
+                                </span>
+                            </ng-container>
+                        </h1>
+
+                        <div class="_question_text">
+                            Felicidades has completado el examen, a continuacion se muestran algunas estadisticas:
+                        </div>
+
+                        <div class="_collection">
+                            <div class="stadistic">
+                                <h3>Aciertos</h3>
+                                <div>{{ attempt.correctAnswers }} de {{ attempt.validTotalAnswers }}</div>
+                            </div>
+
+                            <div class="stadistic">
+                                <h3>Calificación</h3>
+                                <div>{{ attempt.score }}</div>
+                            </div>
+                        </div>
+
+                        <div class="_collection actions">
+
+                            <button (click)="showQuiz()">
+                                <div class="inner">
+                                    <span class="material-icons">
+                                        grading
+                                    </span>
+                                    Revisar Respuestas
+                                </div>
+                            </button>
+
+                            <button (click)="gotoDashboard()">
+                                <div class="inner">
+                                    <span class="material-icons">
+                                        west
+                                    </span>
+                                    Cerrar
+                                </div>
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</ng-container>
+<ng-container *ngIf="!attempt">
+    <h1>Loading ...</h1>
+</ng-container>

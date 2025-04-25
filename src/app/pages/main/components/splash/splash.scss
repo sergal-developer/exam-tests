@@ -16,6 +16,7 @@ splash {
     font-family: $josefinFont;
     overflow: hidden;
     position: relative;
+    border: none;
     
     &.enter {
       transition: all 300ms;

@@ -1,9 +1,10 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { EVENTS, ScreenEnum } from 'src/app/shared/data/enumerables/enumerables';
 import { EventBusService } from 'src/app/shared/data/utils/event.services';
 import { MainServices } from './main.service';
 import { IHeader } from 'src/app/shared/data/interfaces/IUI';
+import { CommonServices } from 'src/app/shared/services/common.services';
 
 @Component({
   selector: 'main',
@@ -15,8 +16,9 @@ export class MainComponent implements OnInit {
   _screen = ScreenEnum;
   screen: ScreenEnum = ScreenEnum.dashboard;
   data: any;
-  timeDelay = 100;
-  mainState = ''
+  timeDelay = 1000;
+  mainState = '';
+  loading = false;
 
   header: IHeader = {
     type: 'profile',
@@ -31,7 +33,8 @@ export class MainComponent implements OnInit {
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
     private eventService: EventBusService,
-    public _mainServices: MainServices) { }
+    public _mainServices: MainServices,
+    private _commonServices: CommonServices) { }
 
   ngOnInit() {
     this.header = {
@@ -42,6 +45,12 @@ export class MainComponent implements OnInit {
       mainClass: '',
       mainStyle: '',
     };
+
+    this._router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.animStart();
+      }
+    });
 
     this._activatedRoute.params.subscribe((params: any) => {
       this.data = null;
@@ -57,7 +66,7 @@ export class MainComponent implements OnInit {
           id: params.action
         };
       }
-      
+
       this.animStart();
     });
 

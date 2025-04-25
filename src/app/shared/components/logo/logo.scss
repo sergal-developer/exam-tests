@@ -1,0 +1,10 @@
+
+@import '../../../../resources/theme/core/mixins';
+@import '../../../../resources/theme/core/typography';
+
+.logo-app {
+    font-size: rem(65px);
+    font-family: $josefinFont;
+    font-weight: bold;
+    letter-spacing: -5px;
+}

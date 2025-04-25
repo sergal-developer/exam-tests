@@ -1,0 +1,103 @@
+<header [mode]="'settings'"></header>
+
+<div class="root-container">
+
+    <div class="simple-section">
+        <div class="_content" *ngIf="profile">
+            <h3>{{ 'GLOBAL.profile' | translate }}</h3>
+            <div class="_content_inner">
+                <div class="_item_option">
+                    <div class="image">
+                        <img [attr.src]="profile.avatar.url" alt="">
+                    </div>
+                    <div class="description">
+                        <div class="description-title">{{ profile.userName }}</div>
+                    </div>
+                    <div class="action">
+                        <span class="material-icons-outlined">
+                            navigate_next
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="_content" *ngIf="settings" >
+            <h3>{{ 'GLOBAL.permission' | translate }}</h3>
+            <div class="_content_inner">
+                <div class="_item_option">
+                    <div class="description full">
+                        <div class="description-title">{{ 'GLOBAL.permission_create' | translate }}</div>
+                    </div>
+                    <div class="action clickable" (click)="tooglePermission('create')" [ngClass]="{'active': settings.permissions.create }">
+                        <span class="material-icons" *ngIf="settings.permissions.create">toggle_on</span>
+                        <span class="material-icons" *ngIf="!settings.permissions.create">toggle_off</span>
+                    </div>
+                </div>
+                <div class="_item_option">
+                    <div class="description full">
+                        <div class="description-title">{{ 'GLOBAL.permission_edit' | translate }}</div>
+                    </div>
+                    <div class="action clickable" (click)="tooglePermission('edit')" [ngClass]="{'active': settings.permissions.edit }">
+                        <span class="material-icons" *ngIf="settings.permissions.edit">toggle_on</span>
+                        <span class="material-icons" *ngIf="!settings.permissions.edit">toggle_off</span>
+                    </div>
+                </div>
+                <div class="_item_option">
+                    <div class="description full">
+                        <div class="description-title">{{ 'GLOBAL.permission_duplicate' | translate }}</div>
+                    </div>
+                    <div class="action clickable" (click)="tooglePermission('duplicate')" [ngClass]="{'active': settings.permissions.duplicate }">
+                        <span class="material-icons" *ngIf="settings.permissions.duplicate">toggle_on</span>
+                        <span class="material-icons" *ngIf="!settings.permissions.duplicate">toggle_off</span>
+                    </div>
+                </div>
+                <div class="_item_option">
+                    <div class="description full">
+                        <div class="description-title">{{ 'GLOBAL.permission_delete' | translate }}</div>
+                    </div>
+                    <div class="action" (click)="tooglePermission('delete')" [ngClass]="{'active': settings.permissions.delete }">
+                        <span class="material-icons" *ngIf="settings.permissions.delete">toggle_on</span>
+                        <span class="material-icons" *ngIf="!settings.permissions.delete">toggle_off</span>
+                    </div>
+                </div>
+                <div class="_item_option">
+                    <div class="description full">
+                        <div class="description-title">{{ 'GLOBAL.permission_ia' | translate }}</div>
+                    </div>
+                    <div class="action clickable" (click)="tooglePermission('ai')" [ngClass]="{'active': settings.permissions.ai }">
+                        <span class="material-icons" *ngIf="settings.permissions.ai">toggle_on</span>
+                        <span class="material-icons" *ngIf="!settings.permissions.ai">toggle_off</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="_content">
+            <h3>{{ 'GLOBAL.permission_data' | translate }}</h3>
+            <div class="_content_inner">
+                <div class="_item_option">
+                    <div class="description full">
+                        <div class="description-title">{{ 'GLOBAL.permission_import' | translate }}</div>
+                    </div>
+                    <div class="action active clickable" >
+                        <span class="material-icons">
+                            unarchive
+                        </span>
+                    </div>
+                </div>
+                <div class="_item_option">
+                    <div class="description full">
+                        <div class="description-title">{{ 'GLOBAL.permission_export' | translate }}</div>
+                    </div>
+                    <div class="action active clickable">
+                        <span class="material-icons">
+                            assignment_returned
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

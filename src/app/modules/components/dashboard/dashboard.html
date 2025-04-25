@@ -1,0 +1,118 @@
+<header [mode]="'dashboard'"></header>
+
+<div class="root_container_collection">
+    <div class="root_container_mask {{ currentSection }}">
+
+        <div class="root-container">
+            <div class="hero-section">
+                <div class="hero-content">
+                    <div class="hero-item">
+
+                        <div>{{ 'GLOBAL.empty_exam' | translate }}</div>
+
+                        <button (click)="createQuiz()">
+                            <div class="inner">
+                                {{ 'GLOBAL.new' | translate }}
+                                <span class="material-icons-outlined">
+                                    add
+                                </span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="exam-section">
+                <h2>{{ 'GLOBAL.list_exam' | translate }}</h2>
+                <div class="exam-collection">
+                    <ng-container *ngFor="let quiz of listQuiz">
+                        <div class="item">
+                            <div class="image">
+                                <span class="material-icons">
+                                    receipt_long
+                                </span>
+                            </div>
+                            <div class="description">
+                                <div class="description-title">{{ quiz.title }}</div>
+                                <div class="description-status">{{ quiz._status }}</div>
+                            </div>
+                            <div class="action clickable" (click)="showDetails(quiz)">
+                                <span class="material-icons-outlined">
+                                    navigate_next
+                                </span>
+                            </div>
+                        </div>
+                    </ng-container>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="root-container">
+            <div class="_title_quiz" *ngIf="currentQuiz">
+                <h2 class="clickable" (click)="returnMain()">
+                    <span class="material-icons">
+                        keyboard_arrow_left
+                    </span>
+                    {{ currentQuiz.title }}
+                </h2>
+
+                <button (click)="editQuiz(currentQuiz)">Edit</button>
+                <button (click)="deleteQuiz(currentQuiz)">Delete</button>
+            </div>
+            
+
+            <ng-container *ngIf="currentQuiz">
+                <div class="_collection">
+                    <div class="stadistic">
+                        <h4>{{ 'GLOBAL.evaluations' | translate }}</h4>
+                        <div>{{ currentQuiz._attemptsValue }}</div>
+                    </div>
+                    <div class="stadistic">
+                        <h4>{{ 'GLOBAL.questions' | translate }}</h4>
+                        <div>{{ currentQuiz.questions.length }}</div>
+                    </div>
+
+                    <div class="stadistic">
+                        <h4>{{ 'GLOBAL.best_time' | translate }}</h4>
+                        <div>{{ currentQuiz._bestTimeValue }}</div>
+                    </div>
+                </div>
+
+                <div class="exam-section">
+                    <h4>{{ 'GLOBAL.evaluations' | translate }}</h4>
+                    <div class="exam-collection">
+                        <div class="item">
+                            <div class="description">
+                                <div class="description-title" *ngIf="listAttempts.length">{{ 'GLOBAL.new_attempt_text' | translate }}</div>
+                                <div class="description-title" *ngIf="!listAttempts.length">{{ 'GLOBAL.empty_attempt_text' | translate }}</div>
+                            </div>
+                            <div class="action" (click)="createattempt()">
+                                <button>{{ 'GLOBAL.start_attempt' | translate }}</button>
+                            </div>
+                        </div>
+
+                        <ng-container *ngFor="let attempt of listAttempts">
+                            <div class="item">
+                                <div class="description">
+                                    <div class="description-title">{{ attempt.title }}</div>
+                                    <div class="description-status">{{ attempt._date }}</div>
+                                </div>
+                                <div class="action">
+                                    <button (click)="goToReviewAttempt(attempt)">{{ 'GLOBAL.review_attempt' | translate }}</button>
+                                    <button (click)="goToCompleteAttempt(attempt)">{{ 'GLOBAL.complete_attempt' | translate }}</button>
+                                </div>
+                            </div>
+                        </ng-container>
+
+                    </div>
+                </div>
+
+            </ng-container>
+
+
+
+        </div>
+
+    </div>
+</div>

@@ -1,14 +1,13 @@
 import { Component, Input, OnInit, ViewEncapsulation, } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Router } from '@angular/router';
-import { EVENTS, ScreenEnum } from 'src/app/shared/data/enumerables/enumerables';
+import { SettingsEntity } from 'src/app/shared/data/entities/entities';
+import { EVENTS } from 'src/app/shared/data/enumerables/enumerables';
 import { IExam, IOption, IQuestion } from 'src/app/shared/data/interfaces/IExam';
-import { EventBusService } from 'src/app/shared/data/utils/event.services';
-import { ExamsService } from 'src/app/shared/services/exams.service';
-import { MainServices } from '../../main.service';
 import { IHeader } from 'src/app/shared/data/interfaces/IUI';
-import { ProfileService } from 'src/app/shared/services/profile.service';
+import { EventBusService } from 'src/app/shared/data/utils/event.services';
 import { Utils } from 'src/app/shared/data/utils/utils';
+import { CommonServices } from 'src/app/shared/services/common.services';
+import { MainServices } from '../../main.service';
 // import { EventBusService } from 'src/app/shared/data/utils/event.services';
 
 @Component({
@@ -22,20 +21,18 @@ export class CreateComponent implements OnInit {
 
   /* This value return any change call into [(ngModel)] */
   private _examTitle: any;
-  get examTitle(): any { 
+  get examTitle(): any {
     return this._examTitle;
   }
 
-  @Input() 
+  @Input()
   set examTitle(v: any) {
-      if (v !== this._examTitle) {
-          this._examTitle = v;
-          this.currentExam.title = v;
-      }
+    if (v !== this._examTitle) {
+      this._examTitle = v;
+      this.currentExam.title = v;
+    }
   }
 
-  _examService = new ExamsService();
-  _profileService = new ProfileService();
   _helper = new Utils();
 
   isEdit = false;
@@ -58,20 +55,27 @@ export class CreateComponent implements OnInit {
   };
   backgrounds: Array<any> = [];
   screen = 'firstScreen';
-  settings: any = null;
+  settings: SettingsEntity = null;
 
-  constructor(private _router: Router, 
-            private eventService: EventBusService,
-            private _mainServices: MainServices) {}
+  constructor(private _router: Router,
+    private eventService: EventBusService,
+    private _mainServices: MainServices,
+    private _commonServices: CommonServices) { }
 
 
   ngOnInit() {
-    this.settings = this._profileService.getSettings();
-    this.backgrounds = this._helper.shuffleArray(this.settings.colors);
+    this.init();
+  }
 
-    if(this.data) {
-      const examTemp: Array<IExam> = this._examService.getExamById(this.data.id);
-      this.loadExam(examTemp[0]);
+  async init() {
+    this.settings = await this._commonServices.getActiveSettings();
+    console.log('this.settings : ', this.settings );
+    // this.backgrounds = this._helper.shuffleArray(this.settings.colors);
+
+    if (this.data) {
+      const examTemp: IExam = await this._commonServices.searchExamn(this.data.id);
+      console.log('examTemp: ', examTemp);
+      this.loadExam(examTemp);
     } else {
       this.loadExam();
     }
@@ -80,7 +84,7 @@ export class CreateComponent implements OnInit {
   loadExam(exam?: IExam) {
     this.isEdit = false;
 
-    if(exam) {
+    if (exam) {
       this.currentExam = exam;
       this.currentQuestion = this.currentExam.questions[0];
       this.isEdit = true;
@@ -102,6 +106,8 @@ export class CreateComponent implements OnInit {
       });
     }
     this.currentQuestionIndex = 0;
+
+    console.log('this.currentExam: ', this.currentExam);
     this.updateHeaders();
   }
 
@@ -109,10 +115,10 @@ export class CreateComponent implements OnInit {
     const type = props && props.hide ? 'hide' : 'progress'
 
     const current = this.currentQuestionIndex + 1;
-    const progress = `${(100 / this.currentExam.questionsLenght) * current }%`;
+    const progress = `${(100 / this.currentExam.questionsLenght) * current}%`;
     // const background = `background: ${ this.currentExam.color }`;
     const background = `background: #fff`;
-    const time = this.currentExam.time ? `${ this.currentExam.time } min.` : '';
+    const time = this.currentExam.time ? `${this.currentExam.time} min.` : '';
     const header: IHeader = {
       type: type,
       title: this.currentExam.title,
@@ -123,7 +129,7 @@ export class CreateComponent implements OnInit {
       exam: {
         color: this.currentExam.color,
         completed: false,
-        current: current  ,
+        current: current,
         progress: progress,
         questionsLenght: this.currentExam.questionsLenght,
         time: this.currentExam.time,
@@ -138,7 +144,7 @@ export class CreateComponent implements OnInit {
     const question = this.currentQuestion.questions || '';
     const options = this.currentQuestion.options.length;
     const answer = this.currentQuestion.answer;
-    
+
     return question.trim() && options && answer;
   }
 
@@ -150,7 +156,7 @@ export class CreateComponent implements OnInit {
     this.currentExam.questions[this.currentQuestionIndex] = this.currentQuestion;
   }
 
-  deleteOption(option: IOption) {}
+  deleteOption(option: IOption) { }
   setCorrectOption(option: IOption) {
     this.currentQuestion.answer = option.id;
   }
@@ -184,19 +190,17 @@ export class CreateComponent implements OnInit {
   }
 
   saveExam() {
-   
-
-    if(!this.isEdit) {
+    if (!this.isEdit) {
       this.currentExam.attempts = 0;
     }
 
     this.currentExam.questions = this.currentExam.questions.filter((x: IQuestion) => x.answer != null);
     this.currentExam.questionsLenght = this.currentExam.questions.length;
-    
-    this._examService.saveExam(this.currentExam);
+
+    this._commonServices.saveExamn(this.currentExam);
 
     this._mainServices.notification('Examen guardado con exito', { type: 'info', closeTimer: 2000 });
-    const exams = this._examService.getExams();
+    const exams = this._commonServices.getAllExamns();
 
     setTimeout(() => {
       this.gotoDashboard();
@@ -224,9 +228,9 @@ export class CreateComponent implements OnInit {
       this.currentExam.color = color;
       console.log('this.currentExam.color: ', this.currentExam.color);
       this.updateHeaders({ hide: true });
-      
+
     } catch (error) {
-      console.warn('selectColor-error: ', error); 
+      console.warn('selectColor-error: ', error);
     }
   }
   //#endregion ACTIONS

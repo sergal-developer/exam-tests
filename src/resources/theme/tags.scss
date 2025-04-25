@@ -1,4 +1,147 @@
-h1, h2, h3, h4, h5, h6 {
-    line-height: 1;
+@import './core/colors';
+@import './core/typography';
+@import './core/mixins';
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    line-height: inherit;
     font-weight: normal;
+    margin: 10px 0;
+    padding: 0;
+}
+
+form,
+.form {
+    // margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+textarea,
+input {
+    padding: 15px 10px;
+    width: 100%;
+    transition: all 300ms;
+    font-weight: normal;
+    font-size: rem(18px);
+    line-height: 1;
+    border-radius: 10px;
+    outline: none;
+    background: rgba(255, 255, 255, 0.5);
+    border: 2px solid rgba(150, 150, 150, 0.5);
+    color: #292929;
+
+    &:hover,
+    &.hover {
+        // background: #F1EBFF;
+        // color: #7D55CF;
+        // border: 2px solid #a483e4;
+    }
+
+    &:disabled,
+    &.disabled {
+        // background: rgba(177, 177, 177, 0.2);
+        // border-color: transparent;
+        // color: rgba(44, 44, 44, 0.2);
+    }
+
+    @include mobile-tablet {
+        font-size: rem(16px);
+    }
+}
+
+
+button,
+.button {
+    background: rgba(255, 255, 255, 0.2);
+    color: rgba(44, 44, 44, 0.6);
+    border: 1px solid transparent;
+
+    transition: all 300ms;
+    cursor: pointer;
+    padding: 10px 25px;
+    font-family: $josefinFont;
+    font-weight: 600;
+    font-size: 16px;
+    border-radius: 5px;
+    display: inline-block;
+    margin: 2px 5px;
+
+    .inner {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .material-icons {
+        display: inline-block;
+    }
+
+    &:hover,
+    &.hover {
+        background: rgba(255, 255, 255, 0.6);
+        color: rgba(44, 44, 44, 1);
+    }
+
+    &:disabled,
+    &.disabled {
+        background: rgba(177, 177, 177, 0.2);
+        border-color: transparent;
+        color: rgba(44, 44, 44, 0.2);
+        text-decoration: none;
+    }
+
+    &.accent {
+        background: #F1EBFF;
+        color: #7D55CF;
+
+        &:hover,
+        &.hover {
+            background: #AF8CF8;
+            color: white;
+        }
+
+        &:disabled,
+        &.disabled {
+            background: rgba(177, 177, 177, 0.2);
+            border-color: transparent;
+            color: rgba(44, 44, 44, 0.2);
+        }
+    }
+
+    &.link {
+        background: transparent;
+        color: #7D55CF;
+        padding: 0px;
+        display: inline-flex;
+        align-items: center;
+
+        .material-icons {
+            border: none !important;
+        }
+
+        &:hover,
+        &.hover {
+            background: transparent;
+            color: #310e77;
+            text-decoration: underline;
+
+        }
+
+        &:disabled,
+        &.disabled {
+            background: transparent;
+            border-color: transparent;
+            color: rgba(44, 44, 44, 0.2);
+            text-decoration: none;
+        }
+    }
+
 }

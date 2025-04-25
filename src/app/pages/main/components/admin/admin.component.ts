@@ -1,8 +1,7 @@
-import { Component, Input, OnInit, ViewEncapsulation, } from '@angular/core';
-import { EVENTS, ScreenEnum } from 'src/app/shared/data/enumerables/enumerables';
-import { IExam } from 'src/app/shared/data/interfaces/IExam';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { EVENTS } from 'src/app/shared/data/enumerables/enumerables';
 import { EventBusService } from 'src/app/shared/data/utils/event.services';
-import { ExamsService } from 'src/app/shared/services/exams.service';
+import { CommonServices } from 'src/app/shared/services/common.services';
 import { MainServices } from '../../main.service';
 // import { EventBusService } from 'src/app/shared/data/utils/event.services';
 
@@ -14,10 +13,11 @@ import { MainServices } from '../../main.service';
 })
 export class AdminComponent implements OnInit {
 
-  _examService = new ExamsService();
+  // _examService = new ExamsService();
 
   constructor(private eventService: EventBusService,
-    private _mainServices: MainServices
+    private _mainServices: MainServices,
+    private _commonServices: CommonServices
   ) { }
 
   data: any = {};
@@ -32,7 +32,7 @@ export class AdminComponent implements OnInit {
   }
 
   loadExam() {
-    const exams = this._examService.getExams();
+    const exams = this._commonServices.getAllExamns();
     this.updateHeaders();
   }
 
@@ -48,7 +48,7 @@ export class AdminComponent implements OnInit {
   }
 
   export() {
-    const exams = this._examService.getExams();
+    const exams = this._commonServices.getAllExamns();
     // this.exportData = exams;
     this.copyClipboard(JSON.stringify(exams));
     this.downloadJSON(exams, 'collection-exam.json');
@@ -60,7 +60,7 @@ export class AdminComponent implements OnInit {
 
     try {
       const json = JSON.parse(data);
-      this._examService.saveExamCollection(json);
+      this._commonServices.saveExamn(json);
       this._mainServices.notification('Plantilla importada exitosamente', { type: 'success', closeTimer: 5000 });
     } catch (error) {
       this._mainServices.notification('Error al importar plantilla', { type: 'warning', closeTimer: 5000 });

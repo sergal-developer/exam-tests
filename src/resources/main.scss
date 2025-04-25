@@ -1,8 +1,36 @@
 @import './theme/core/reset';
 @import './theme/core/refs';
-@import './theme/buttons.scss';
-@import './theme/forms.scss';
-@import './theme/layouts.scss';
+@import './theme/core/mixins';
+@import './theme/core/colors';
+@import './theme/core/typography';
+
 @import './theme/tags.scss';
+
+@import './theme/structure-app.scss';
+// @import './theme/layouts.scss';
 @import './theme/notification.scss';
-@import './theme/components.scss';
+// @import './theme/components.scss';
+
+html,
+body {
+    background: $background;
+    margin: 0;
+    padding: 0;
+    scroll-behavior: smooth;
+
+    font-family: $openSansFont;
+    color: $black;
+    font-size: rem(16px);
+    font-weight: normal;
+    line-height: 1.3;
+    // letter-spacing: 0.05em;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-width: 100vw;
+    min-height: 100vh;
+
+    * * {
+        box-sizing: border-box;
+    }
+}

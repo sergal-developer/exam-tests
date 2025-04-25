@@ -3,28 +3,6 @@
 @import './core/typography';
 @import './core/mixins';
 
-html,
-body {
-    background: rgb(255, 255, 255);
-    margin: 0;
-    padding: 0;
-    scroll-behavior: smooth;
-
-    font-family: $josefinFont;
-    font-size: 1rem;
-    font-weight: normal;
-    line-height: 1.2;
-    // letter-spacing: 0.05em;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    min-width: 100vw;
-    min-height: 100vh;
-
-    * * {
-        box-sizing: border-box;
-    }
-}
 
 .absolute {
     position: absolute;

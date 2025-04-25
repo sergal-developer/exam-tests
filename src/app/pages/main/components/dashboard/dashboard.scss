@@ -20,13 +20,14 @@ dashboard {
             flex-direction: row;
             align-items: center;
             justify-content: center;
+            gap: 5px;
 
             img {
                 width: calc(100% / 10);
                 cursor: pointer;
 
                 @include mobile {
-                    width: calc(100% / 6);
+                    width: calc(100% / 7);
                 }
 
                 @include tablet {
@@ -40,6 +41,7 @@ dashboard {
         }
 
         .notification {
+            margin: 0;
             @include mobile {
                 font-size: 0.8rem;
             }

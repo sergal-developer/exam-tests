@@ -1,0 +1,46 @@
+.mat-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .mat-label {
+        position: relative;
+        font-size: rem(16px);
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        gap: 5px;
+        align-items: flex-start;
+
+        .mat-label-text {
+            transform: translate(0, 0);
+            font-size: inherit;
+            user-select: none;
+            width: auto;
+            pointer-events: none;
+        }
+
+        .mat-error {
+            font-size: 80%;
+            opacity: 0.8;
+
+            &.error {
+                color: red;
+            }
+        }
+
+        &.empty {
+            .mat-label-text {
+                transform: translate(12px, 44px);
+                font-size: rem(20px);
+            }
+
+            input::placeholder {
+                opacity: 0;
+            }
+            textarea::placeholder {
+                opacity: 0;
+            }
+        }
+    }
+}

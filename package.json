@@ -1,5 +1,5 @@
 {
-  "name": "coach.ex",
+  "name": "simexam.coach",
   "version": "0.0.1",
   "main": "main.js",
   "scripts": {
@@ -22,6 +22,8 @@
     "@angular/platform-browser": "^15.2.0",
     "@angular/platform-browser-dynamic": "^15.2.0",
     "@angular/router": "^15.2.0",
+    "@ngx-translate/core": "^14.0.0",
+    "@ngx-translate/http-loader": "^7.0.0",
     "rxjs": "~7.8.0",
     "three": "^0.153.0",
     "tslib": "^2.3.0",
@@ -43,6 +45,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.0.0",
-    "typescript": "~4.9.4"
+    "typescript": "~4.9.4",
+    "uuid": "^11.1.0"
   }
 }

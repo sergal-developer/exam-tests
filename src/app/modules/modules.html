@@ -1,0 +1,47 @@
+<div class="wrapper">
+    <div class="screen-collection">
+
+        <div class="screen full" [ngClass]="{'open': screen === _screen.register }">
+            <register class="_screen screen_register" *ngIf="screen === _screen.register"></register>
+        </div>
+
+        <div class="screen" [ngClass]="{'open': screen === _screen.dashboard }">
+            <dashboard class="_screen screen_main" *ngIf="screen === _screen.dashboard"></dashboard>
+        </div>
+
+        <div class="screen" [ngClass]="{'open': screen === _screen.settings }">
+            <settings class="_screen screen_settings" *ngIf="screen === _screen.settings"></settings>
+        </div>
+
+        <div class="screen" [ngClass]="{'open': screen === _screen.quizcreate }">
+            <quiz-editable class="_screen screen_quiz" *ngIf="screen === _screen.quizcreate"></quiz-editable>
+        </div>
+
+        <div class="screen" [ngClass]="{'open': screen === _screen.quizedit }">
+            <quiz-editable [quizId]="submodule" class="_screen screen_quiz" *ngIf="screen === _screen.quizedit"></quiz-editable>
+        </div>
+
+        <div class="screen" [ngClass]="{'open': screen === _screen.attemptevalue }">
+            <quiz [id]="submodule" [review]="false" class="_screen screen_quiz" *ngIf="screen === _screen.attemptevalue"></quiz>
+        </div>
+
+        <div class="screen" [ngClass]="{'open': screen === _screen.attemptreview }">
+            <quiz [id]="submodule" [review]="true" class="_screen screen_quiz" *ngIf="screen === _screen.attemptreview"></quiz>
+        </div>
+
+        <div class="screen" [ngClass]="{'open': screen === _screen.quizresults }">
+            <quiz-result class="_screen screen_quiz-results" *ngIf="screen === _screen.quizresults"></quiz-result>
+        </div>
+
+    </div>
+</div>
+
+<div class="notification {{ _uiServices._notification.type }}"
+    [ngClass]="{'show': _uiServices._notification.show }">
+    <div class="item" *ngIf="_uiServices._notification.icon"><span class="material-icons">{{
+            _uiServices._notification.icon }}</span></div>
+    <div class="item" [innerHTML]="_uiServices._notification.text"></div>
+    <div class="item actions">
+        <button (click)="_uiServices.closeNotification()"> <span class="material-icons">close</span> </button>
+    </div>
+</div>

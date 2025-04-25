@@ -2,12 +2,11 @@ import { Component, Input, OnInit, ViewEncapsulation, } from '@angular/core';
 import { Router } from '@angular/router';
 import { EVENTS } from 'src/app/shared/data/enumerables/enumerables';
 import { IExam, IOption, IQuestion } from 'src/app/shared/data/interfaces/IExam';
-import { EventBusService } from 'src/app/shared/data/utils/event.services';
-import { ExamsService } from 'src/app/shared/services/exams.service';
-import { MainServices } from '../../main.service';
-import { Utils } from 'src/app/shared/data/utils/utils';
 import { IHeader } from 'src/app/shared/data/interfaces/IUI';
-import { ProfileService } from 'src/app/shared/services/profile.service';
+import { EventBusService } from 'src/app/shared/data/utils/event.services';
+import { Utils } from 'src/app/shared/data/utils/utils';
+import { CommonServices } from 'src/app/shared/services/common.services';
+import { MainServices } from '../../main.service';
 
 @Component({
   selector: 'exam',
@@ -18,14 +17,13 @@ import { ProfileService } from 'src/app/shared/services/profile.service';
 export class ExamComponent implements OnInit {
   @Input() data: any;
 
-  _examService = new ExamsService();
-  _profileService = new ProfileService();
   _helper = new Utils();
   
   constructor(
     private _router: Router,
     private eventService: EventBusService,
-    private _mainServices: MainServices) { }
+    private _mainServices: MainServices,
+    private _commonServices: CommonServices) { }
 
   timer = 0;
   timeEnlapsed = 0;
@@ -60,12 +58,16 @@ export class ExamComponent implements OnInit {
   settings: any = null;
 
   ngOnInit() {
-    this.settings = this._profileService.getSettings();
+    this.init();
+  }
+
+  async init() {
+    this.settings = await this._commonServices.getActiveSettings();
     this.backgrounds = this.settings.colors;
 
     if(this.data) {
-      const examTemp: Array<IExam> = this._examService.getExamById(this.data.id);
-      this.loadExam(examTemp[0]);
+      const examTemp: IExam = await this._commonServices.searchExamn(this.data.id);
+      this.loadExam(examTemp);
     } else {
       // this.loadExam();
       this._mainServices.notification('Examen no se logro cargar', { type: 'warning', closeTimer: 2000 });
@@ -263,7 +265,7 @@ export class ExamComponent implements OnInit {
     }, this.waitingTimeToNext);
   }
 
-  completeQuiz() {
+  async completeQuiz() {
     this.currentExam.completed = true;
    
     const score = this.getScoreExam();
@@ -275,9 +277,10 @@ export class ExamComponent implements OnInit {
     this.currentExam.attempts = this.currentExam.attempts ? this.currentExam.attempts + 1 : 1;
     this.currentExam.timeEnlapsed = this.timeEnlapsed;
     this.currentExam.completed = false;
-    this._examService.saveExam(this.currentExam);
+    await this._commonServices.updateExamn(this.currentExam.id, this.currentExam);
 
-    const exams = this._examService.getExams();
+    const exams = await this._commonServices.getAllExamns();
+    console.log('exams: ', exams);
   }
 
   getScoreExam() {

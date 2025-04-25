@@ -1,5 +1,5 @@
 <div class="row">
-    <div class="container list" [ngClass]="{'exitExamState': _loadExamState }">
+    <div class="container list" [ngClass]="{'exitExamState': _loadExamState }" *ngIf="isNewSession">
         <div class="section yellow manage">
             <ng-container *ngIf="!editModeActive">
                 <div class="item">
@@ -257,7 +257,7 @@
                 </ng-container>
             </div>
 
-            <div *ngIf="validateProfile">
+            <div class="form" *ngIf="validateProfile">
                 <div class="notification static {{ messages.profileValidation.type }}">
                     {{ messages.profileValidation.text }}
                 </div>

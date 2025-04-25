@@ -1,10 +1,10 @@
-import { Component, Input, OnInit, ViewEncapsulation, } from '@angular/core';
-import { EVENTS, ScreenEnum } from 'src/app/shared/data/enumerables/enumerables';
-import { EventBusService } from 'src/app/shared/data/utils/event.services';
-import { MainServices } from '../../main.service';
-import { ProfileService } from 'src/app/shared/services/profile.service';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { ProfileEntity, SettingsEntity } from 'src/app/shared/data/entities/entities';
+import { EVENTS } from 'src/app/shared/data/enumerables/enumerables';
 import { IHeader } from 'src/app/shared/data/interfaces/IUI';
-import { ExamsService } from 'src/app/shared/services/exams.service';
+import { EventBusService } from 'src/app/shared/data/utils/event.services';
+import { CommonServices } from 'src/app/shared/services/common.services';
+import { MainServices } from '../../main.service';
 
 @Component({
   selector: 'settings',
@@ -13,19 +13,16 @@ import { ExamsService } from 'src/app/shared/services/exams.service';
   encapsulation: ViewEncapsulation.None,
 })
 export class SettingsComponent implements OnInit {
+  profile: ProfileEntity = null;
+  profileTemp: ProfileEntity = null;
 
-  _profileService = new ProfileService();
-  _examService = new ExamsService();
-
-  profile: any = null;
-  profileTemp: any = null;
-
-  settings: any = null;
-  settingsTemp: any = null;
+  settings: SettingsEntity = null;
+  settingsTemp: SettingsEntity = null;
 
   languages = ['ESPAÑOL', 'ENGLISH']
   constructor(private eventService: EventBusService,
-            private _mainServices: MainServices
+            private _mainServices: MainServices,
+            private _commonServices: CommonServices
   ) { }
 
 
@@ -49,8 +46,8 @@ export class SettingsComponent implements OnInit {
   }
 
   async setup() {
-      this.profile = this._profileService.getCurrentProfile();
-      this.settings = this._profileService.getSettings();
+      this.profile = await this._commonServices.getActiveProfile();
+      this.settings = await this._commonServices.getActiveSettings();
   }
 
   updateHeaders(props?: { hide: boolean }) {
@@ -130,7 +127,8 @@ export class SettingsComponent implements OnInit {
 
   saveChangesProfile() {
     this.profile = this.profileTemp;
-    this._profileService.saveProfile(this.profile);
+    console.log('this.profile : ', this.profile );
+    this._commonServices.updateProfile(this.profile.id, this.profile);
     
     this.setup();
     this.returnMenu();
@@ -138,14 +136,16 @@ export class SettingsComponent implements OnInit {
 
   saveChangesStyles() {
     this.settings = this.settingsTemp;
-    this._profileService.saveSettings(this.settings);
+    console.log('this.settings: ', this.settings);
+    this._commonServices.updateSetting(this.settings.id, this.settings);
     
     this.setup();
     this.returnMenu();
   }
 
   saveSettingsChanges() {
-    this._profileService.saveSettings(this.settings);
+    console.log('this.settings: ', this.settings);
+    this._commonServices.updateSetting(this.settings.id, this.settings);
   }
 
   selectColor(evt: any) {
@@ -174,7 +174,7 @@ export class SettingsComponent implements OnInit {
 
   // #region IMPORT/EXPORTS
   export() {
-    const exams = this._examService.getExams();
+    const exams = this._commonServices.getAllExamns();
     console.log('exams: ', exams);
     // this.exportData = exams;
     this.copyClipboard(JSON.stringify(exams));
@@ -187,7 +187,7 @@ export class SettingsComponent implements OnInit {
 
     try {
       const json = JSON.parse(data);
-      this._examService.saveExamCollection(json);
+      this._commonServices.saveExamn(json);
       this._mainServices.notification('Plantilla importada exitosamente', { type: 'success', closeTimer: 5000 });
     } catch (error) {
       this._mainServices.notification('Error al importar plantilla', { type: 'warning', closeTimer: 5000 });

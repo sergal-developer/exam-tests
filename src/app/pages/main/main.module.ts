@@ -13,6 +13,7 @@ import { ModulePackage } from 'src/app/shared/data/interfaces/interfaces';
 import { AdminComponent } from './components/admin/admin.component';
 import { MainServices } from './main.service';
 import { SettingsComponent } from './components/settings/settings.component';
+import { CommonServices } from 'src/app/shared/services/common.services';
 
 @NgModule({
   imports: [
@@ -47,7 +48,7 @@ import { SettingsComponent } from './components/settings/settings.component';
     AdminComponent,
     SettingsComponent
   ],
-  providers: [EventBusService, MainServices],
+  providers: [EventBusService, MainServices, CommonServices],
 })
 export class MainModule {}
 

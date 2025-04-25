@@ -1,0 +1,146 @@
+<!-- <header [mode]="'quizeditable'"></header> -->
+
+<div class="root-header aling-left">
+    <div class="item clickable" (click)="gotoDashboard()">
+        <h1> <span class="material-icons">arrow_back</span></h1>
+    </div>
+    <div class="item" *ngIf="form">
+        <mat-input [title]="'GLOBAL.form_name' | translate"
+                    [mesageError]="'GLOBAL.form_name_required' | translate" 
+                    [formControl]="form.get('title')">
+        </mat-input>
+    </div>
+</div>
+
+<div class="timer-status" *ngIf="quiz">
+    <div>
+        {{ currentAnswerIndex + 1 }} of {{ quiz.questions.length }}
+    </div>
+    <!-- <div class="timer">
+        <div class="timer-bar"></div>
+    </div> -->
+    <div>
+        <input type="number" [formControl]="form.get('time')" placeholder="Tiempo">
+    </div>
+</div>
+
+<div class="root-container">
+
+    <div class="simple-section" *ngIf="formQuestion">
+        <div class="_question">
+            <div class="_question_text">
+                <mat-input [title]="'GLOBAL.form_name' | translate"
+                    [mesageError]="'GLOBAL.form_name_required' | translate" [formControl]="formQuestion.get('question')"
+                    [multiline]="true">
+                </mat-input>
+            </div>
+
+            <div class="_answer_collection">
+                <ng-container *ngFor="let option of formQuestion.get('options').controls">
+                    <div class="_answer" [ngClass]="{'correct': option.get('selected').value }">
+                        <div class="_answer_selection" (click)="selectAnswerCorrect(option)">
+                            <span *ngIf="!option.get('selected').value" class="material-icons">
+                                radio_button_unchecked
+                            </span>
+                            <span *ngIf="option.get('selected').value" class="material-icons">
+                                verified</span>
+                        </div>
+                        <div class="_answer_text">
+                            <mat-input [title]="'GLOBAL.form_name' | translate"
+                                [mesageError]="'GLOBAL.form_name_required' | translate"
+                                [formControl]="option.get('text')" [formName]="'text'" [multiline]="true" (onChange)="onOptionChange($event)">
+                            </mat-input>
+                        </div>
+                    </div>
+                </ng-container>
+
+                <!-- <div class="_answer correct">
+                    <div class="_answer_selection">
+
+                        <span class="material-icons">
+                            verified
+                        </span>
+                    </div>
+                    <div class="_answer_text">
+                        Think before you act
+                    </div>
+                </div>
+                <div class="_answer view">
+                    <div class="_answer_selection">
+                        <span class="material-icons">
+                            radio_button_unchecked
+                        </span>
+                    </div>
+                    <div class="_answer_text">
+                        Think before you act
+                    </div>
+                </div>
+                <div class="_answer selected">
+                    <div class="_answer_selection">
+                        <span class="material-icons">
+                            check_circle_outline
+                        </span>
+                    </div>
+                    <div class="_answer_text">
+                        Think before you act
+                    </div>
+                </div>
+                <div class="_answer hover">
+                    <div class="_answer_selection">
+                        <span class="material-icons">
+                            radio_button_unchecked
+                        </span>
+                    </div>
+                    <div class="_answer_text">
+                        Think before you act
+                    </div>
+                </div>
+                <div class="_answer">
+                    <div class="_answer_selection">
+                        <span class="material-icons">
+                            radio_button_unchecked
+                        </span>
+                    </div>
+                    <div class="_answer_text">
+                        Think before you act
+                    </div>
+                </div>
+                <div class="_answer incorrect">
+                    <div class="_answer_selection">
+                        <span class="material-icons">
+                            highlight_off
+                        </span>
+                    </div>
+                    <div class="_answer_text">
+                        Think before you act
+                    </div>
+                </div> -->
+            </div>
+
+            <div class="_question_actions" *ngIf="form">
+                <button (click)="prevQuestion()" [disabled]="!currentAnswerIndex">
+                    <div class="inner">
+                        <span class="material-icons">
+                            chevron_left
+                        </span>
+                        Prev
+                    </div>
+                </button>
+                <button (click)="nextQuestion()" [disabled]="!validActions">
+                    <div class="inner">
+                        Next
+                        <span class="material-icons">
+                            chevron_right
+                        </span>
+                    </div>
+                </button>
+
+                <button (click)="finishCreation()" [disabled]="!validActions" *ngIf="quiz && quiz.questions.length > 1">
+                    <div class="inner">
+                        Finalizar
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

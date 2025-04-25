@@ -1,7 +1,5 @@
 import { Component, OnInit, ViewEncapsulation, } from '@angular/core';
 import { Router } from '@angular/router';
-import { EventBusService } from 'src/app/shared/data/utils/event.services';
-import { ProfileService } from 'src/app/shared/services/profile.service';
 
 @Component({
   selector: 'splash',
@@ -10,7 +8,6 @@ import { ProfileService } from 'src/app/shared/services/profile.service';
   encapsulation: ViewEncapsulation.None,
 })
 export class SplashComponent implements OnInit {
-  service = new ProfileService();
   timeDelay = 1500;
   state = 'enter'
 
@@ -24,7 +21,6 @@ export class SplashComponent implements OnInit {
     this.state = 'enter';
     setTimeout(() => {
       this.state = 'exit';
-      
       setTimeout(() => {
         this._router.navigate( [`/dashboard`]);
       }, this.timeDelay * 1.5);

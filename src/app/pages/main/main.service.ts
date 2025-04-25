@@ -18,7 +18,7 @@ export class MainServices {
     constructor() {
     }
     //#region NOTIFICATIONS
-    public notification(text: string, options?: { type?: string, closeTimer?: number }) {
+    public notification(text: string, options?: { type?: 'info' | 'success' | 'warning' | 'error', closeTimer?: number }) {
 
         // Reset notification
         this._notification = {
@@ -28,7 +28,7 @@ export class MainServices {
             show: false,
             icon: ''
         };
-
+    
         this._notification.text = this._helper.formatText(text);
         if (options) {
             this._notification.type = options?.type || 'info';

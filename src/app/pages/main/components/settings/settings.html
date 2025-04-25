@@ -172,7 +172,7 @@
                     <div class="item">
                         <div class="subtitle">Colores</div>
                     </div>
-                    <div class="item colorsCollection">
+                    <div class="item colorsCollection" *ngIf="settingsTemp">
                         <div class="color" [attr.style]="'background:' + item +';'"
                             *ngFor="let item of settingsTemp.colors">
                             <div class="label">{{ item }}</div>
