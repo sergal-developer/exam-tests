@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">education</string>
-    <string name="title_activity_main">education</string>
-    <string name="package_name">com.education.app</string>
-    <string name="custom_url_scheme">com.education.app</string>
+    <string name="app_name">simexam.coach</string>
+    <string name="title_activity_main">simexam.coach</string>
+    <string name="package_name">com.simexam.coach.app</string>
+    <string name="custom_url_scheme">com.simexam.coach.app</string>
 </resources>
