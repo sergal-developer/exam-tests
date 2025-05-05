@@ -22,6 +22,8 @@ import { ModuleComponent } from './modules.component';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    TranslateModule,
+    ComponentsModule,
 
     RouterModule.forChild([
       {
@@ -29,10 +31,6 @@ import { ModuleComponent } from './modules.component';
         component: ModuleComponent,
       },
     ]),
-    // Layout Components
-    TranslateModule,
-
-    ComponentsModule
   ],
   declarations: [
     ModuleComponent,

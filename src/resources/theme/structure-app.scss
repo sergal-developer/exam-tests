@@ -8,7 +8,7 @@
 }
 
 .debugger * * {
-    outline: 1px dashed rgba(205, 29, 205, 0.01);
+    outline: 1px solid rgba(255, 3, 255, 0.1);
 }
 
 h1,
@@ -30,31 +30,60 @@ h6 {
     position: relative;
     width: 100vw;
     height: 100vh;
-    // overflow: hidden;
-    // overflow-y: auto;
-    overflow: auto;
-    display: flex;
+    overflow: hidden;
+    overflow-y: auto;
+    // display: flex;
     align-items: flex-start;
     flex-direction: row;
     justify-content: flex-start;
-    @include scroll(5px, #c3c3c3, #115ba0, 0);
+    @include scroll(5px, #c3c3c3, #940d82, 0);
 
     .screen-collection {
         width: calc(10 * 100vw);
-        width: 100%;
+        // width: 100%;
         height: 100%;
         display: flex;
         flex-direction: row;
         align-items: flex-start;
         position: relative;
 
-        align-items: center;
-        justify-content: center;
+        align-items: flex-start;
+        justify-content: flex-start;
+        transition: all 600ms cubic-bezier(0.075, 0.82, 0.165, 1);
+        transition: margin 600ms;
+
+        &.__register {
+            margin-left: 0vw;
+        }
+
+        &.__dashboard {
+            margin-left: -100vw;
+        }
+
+        &.__settings {
+            margin-left: -200vw;
+        }
+
+        &.__quizcreate {
+            margin-left: -300vw;
+        }
+
+        &.__quizedit {
+            margin-left: -400vw;
+        }
+
+        &.__attemptevalue {
+            margin-left: -500vw;
+        }
+
+        &.__attemptreview {
+            margin-left: -600vw;
+        }
     }
 
     .screen {
-        // width: 100vw;
-        width: calc(100vw / 3);
+        width: 100vw;
+        // width: calc(100vw / 3);
         height: 100%;
         // position: absolute;
         left: 0;
@@ -66,13 +95,22 @@ h6 {
         justify-content: flex-start;
         align-items: stretch;
         gap: 20px;
-        padding: 0;
-        width: 0;
-        transition: width 300ms cubic-bezier(0, 1.23, 1, 0.67);
+        padding: 25px;
+
+        // padding: 0; // tempoarl hidden
+        // width: 0;
+        opacity: 0;
+        transition: all 300ms;
+        transform: translate(100%, -0%);
+        pointer-events: none;
 
         &.open {
-            width: 100%;
-            padding: 25px;
+            // width: 100%;
+            // width: 100vw;
+            // padding: 25px;
+            pointer-events: all;
+            opacity: 1;
+            transform: translate(0px, 0%);
         }
 
         &.full {
@@ -80,6 +118,7 @@ h6 {
             height: 100%;
             padding: 0 !important;
         }
+
     }
 }
 
@@ -114,6 +153,17 @@ h6 {
                 ._content {
                     border-bottom-left-radius: 0;
                     border-bottom-right-radius: 0;
+                }
+            }
+        }
+    }
+
+    &.screen_register {
+        .root-hero {
+            .image {
+                img {
+                    width: 350px;
+                    margin-top: 52px;
                 }
             }
         }
@@ -243,6 +293,10 @@ h6 {
         button {
             padding: 5px;
         }
+
+        &.editable-title {
+            width: 100%;
+        }
     }
 
     .avatar {
@@ -304,6 +358,19 @@ h6 {
         &.completed {
             background: #0c770c;
             color: white;
+        }
+    }
+
+    .timer-status-input {
+        width: 120px;
+
+        button {
+            padding: 5px 10px;
+            font-size: 13px;
+        }
+
+        &.buttonmode {
+            width: auto;
         }
     }
 }
@@ -444,6 +511,10 @@ h6 {
             ._answer_text {
                 width: 100%;
             }
+
+            &.flat {
+                padding: 0;
+            }
         }
     }
 
@@ -466,6 +537,25 @@ h6 {
             display: flex;
             flex-direction: column;
             gap: 15px;
+
+            &.fixed {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                padding: 10px 20px;
+                background: rgb(255 255 255 / 38%);
+                backdrop-filter: blur(4px);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-wrap: nowrap;
+                font-size: rem(13px);
+
+                button {
+                    font-size: inherit;
+                }
+            }
         }
 
         ._question_actions {
@@ -526,6 +616,29 @@ h6 {
                     background: unset;
                     color: unset;
                     border-color: inherit;
+                }
+            }
+
+            &.flat {
+                padding: 0;
+
+                ._answer_selection {
+                    padding: 7px;
+                    display: flex;
+
+
+                }
+
+                .mat-form-field {
+                    .mat-label-text {
+                        opacity: 0 !important;
+                    }
+
+                    .empty {
+                        .mat-label-text {
+                            opacity: 1 !important;
+                        }
+                    }
                 }
             }
         }
@@ -714,7 +827,7 @@ h6 {
 
 .grade {
     align-items: center;
-    
+
     &.passed {
         color: #074b07;
     }
@@ -732,8 +845,7 @@ h6 {
     // position: absolute;
     width: 100%;
     height: 80vh;
-    display: flex
-;
+    display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 20px;
@@ -760,6 +872,9 @@ h6 {
 ._title_quiz {
     display: flex;
     flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    h3 { margin-right:  auto ;}
 }
 
 .__test-heing {
@@ -767,3 +882,35 @@ h6 {
     height: 3000px;
     background: blueviolet;
 }
+
+
+[data-tooltip] {
+    position: relative;
+    border-bottom: 1px dashed #000;
+    cursor: help
+  }
+  
+  [data-tooltip]::after {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    content: attr(data-tooltip);
+    left: -50%;
+    top: calc(100% + 10px);
+    border-radius: 3px;
+    box-shadow: 0 0 5px 2px rgba(100, 100, 100, 0.6);
+    background: #b30ecf;
+    color: white;
+    z-index: 10;
+    padding: 8px;
+    width: inherit;
+    transform: translateY(-20px);
+    transition: all 150ms cubic-bezier(.25, .8, .25, 1);
+    font-size: rem(12px);
+  }
+  
+  [data-tooltip]:hover::after {
+    opacity: 1;
+    transform: translateY(0);
+    transition-duration: 300ms;
+  }

@@ -39,6 +39,7 @@ export class QuizComponent implements OnInit {
   async setupComponent() {
     if (this.id) {
       this.attempt = await this.getAttemptData(this.id);
+      console.log('this.attempt: ', this.attempt);
 
       if (!this.attempt) {
         this._uiService.notification('Ocurrio un errro al recuperar los datos', { type: 'error', closeTimer: 3000 });

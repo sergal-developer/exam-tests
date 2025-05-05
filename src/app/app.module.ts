@@ -21,7 +21,6 @@ import { NotFoundModule } from './pages/notFound/notFound.module';
     HttpClientModule,
 
     //Pages
-    // ...MainPackage.modules,
     ...modulePackage.modules,
     NotFoundModule,
 

@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewEncapsulation, } from '@angular/core';
-import { Router } from '@angular/router';
 import { ScreenEnum } from 'src/app/shared/data/enumerables/enumerables';
 import { CommonServices } from 'src/app/shared/services/common.services';
 
@@ -20,11 +19,11 @@ export class SplashComponent implements OnInit {
   }
 
   async checkInit() {
-        const profile = await this._commonServices.getActiveProfile();
-        console.log('profile: ', profile);
-        const module = !profile ? ScreenEnum.register : ScreenEnum.dashboard;
-        setTimeout(() => {
-          this._commonServices.navigate(module);
-        }, this.timeDelay);
-    }
+    const profile = await this._commonServices.getActiveProfile();
+    console.log('profile: ', profile);
+    const module = !profile ? ScreenEnum.register : ScreenEnum.dashboard;
+    setTimeout(() => {
+      this._commonServices.navigate(module);
+    }, this.timeDelay);
+  }
 }

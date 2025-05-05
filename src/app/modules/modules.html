@@ -1,5 +1,5 @@
 <div class="wrapper">
-    <div class="screen-collection">
+    <div class="screen-collection {{ '__' + screen }}">
 
         <div class="screen full" [ngClass]="{'open': screen === _screen.register }">
             <register class="_screen screen_register" *ngIf="screen === _screen.register"></register>
@@ -27,10 +27,6 @@
 
         <div class="screen" [ngClass]="{'open': screen === _screen.attemptreview }">
             <quiz [id]="submodule" [review]="true" class="_screen screen_quiz" *ngIf="screen === _screen.attemptreview"></quiz>
-        </div>
-
-        <div class="screen" [ngClass]="{'open': screen === _screen.quizresults }">
-            <quiz-result class="_screen screen_quiz-results" *ngIf="screen === _screen.quizresults"></quiz-result>
         </div>
 
     </div>

@@ -1,8 +1,9 @@
 import { Component, OnInit, ViewEncapsulation, } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { ProfileEntity } from 'src/app/shared/data/entities/entities';
 import { CommonServices } from 'src/app/shared/services/common.services';
+import { UiServices } from 'src/app/shared/services/ui.services';
 import { v4 as uuidv4 } from 'uuid';
 
 @Component({
@@ -14,16 +15,23 @@ export class RegisterComponent implements OnInit {
 
   form: FormGroup;
   defaultAvatars = [
-    { url: "/assets/avatar1.svg", selected: false },
-    { url: "/assets/avatar2.svg", selected: false },
-    { url: "/assets/avatar3.svg", selected: false },
-    { url: "/assets/avatar4.svg", selected: false },
-    { url: "/assets/avatar5.svg", selected: false },
-    { url: "/assets/avatar6.svg", selected: false },
+    { url: "/assets/avatar-1.svg", selected: false },
+    { url: "/assets/avatar-2.svg", selected: false },
+    { url: "/assets/avatar-3.svg", selected: false },
+    { url: "/assets/avatar-4.svg", selected: false },
+    { url: "/assets/avatar-5.svg", selected: false },
+    { url: "/assets/avatar-6.svg", selected: false },
   ];
 
+  translateLabels = {
+    service_sucess_save: '',
+    service_fail_save: '',
+  };
+
   constructor(private fb: FormBuilder,
-    private _commonServices: CommonServices
+    private _commonServices: CommonServices,
+    private _uiServices: UiServices,
+    private translate: TranslateService
   ) { }
 
   ngOnInit() {
@@ -31,28 +39,29 @@ export class RegisterComponent implements OnInit {
       name: ['', Validators.required],
       image: ['', Validators.required],
     });
-    // this.launcSplash();
+
     this.checkSettings();
+
+    this.translate.get(['service_sucess_save', 'service_fail_save']).subscribe((res) => {
+      this.translateLabels = res;
+    });
   }
 
   //#region INTERNAL
   //#endregion INTERNAL
-  
+
   //#region DATA
-  //#endregion DATA
+  async checkSettings() {
+    let settings: any = await this._commonServices.getAllSettings();
+    if (!settings) {
+      await this._commonServices.initializData();
+      settings = await this._commonServices.getAllSettings();
+    }
 
-  //#region EVENTS
-  //#endregion EVENTS
-
-  //#region CONVERTERS
-  //#endregion CONVERTERS
-
-  selectAvatar(item) {
-    this.defaultAvatars.map(image => {
-      image.selected = image.url == item.url ? true : false;
-    });
-
-    this.form.get('image').setValue(item.url);
+    let profile: any = await this._commonServices.getActiveProfile();
+    if (profile) {
+      this._commonServices.navigate('dashboard');
+    }
   }
 
   async register() {
@@ -71,23 +80,26 @@ export class RegisterComponent implements OnInit {
     await this._commonServices.saveProfile(data);
     let profile = await this._commonServices.getActiveProfile();
     if (profile) {
-      console.log('profile: ', profile);
-      this._commonServices.navigate('dashboard');
+      this._uiServices.notification(this.translateLabels.service_sucess_save, { type: 'success', closeTimer: 1500 });
+      setTimeout(() => {
+        this._commonServices.navigate('dashboard');
+      }, 1500);
+    } else {
+      this._uiServices.notification(this.translateLabels.service_fail_save, { type: 'error', closeTimer: 1500 });
     }
   }
+  //#endregion DATA
 
-  async checkSettings() {
-    let settings: any = await this._commonServices.getAllSettings();
-    if (!settings) {
-      await this._commonServices.initializData();
-      settings = await this._commonServices.getAllSettings();
-      console.log('settings: ', settings);
-    }
-
-    let profile: any = await this._commonServices.getActiveProfile();
-    if (profile) {
-      console.log('profile: ', profile);
-      this._commonServices.navigate('dashboard');
-    }
+  //#region EVENTS
+  selectAvatar(item) {
+    this.defaultAvatars.map(image => {
+      image.selected = image.url == item.url ? true : false;
+    });
+    this.form.get('image').setValue(item.url);
   }
+  //#endregion EVENTS
+
+  //#region CONVERTERS
+  //#endregion CONVERTERS
+
 }

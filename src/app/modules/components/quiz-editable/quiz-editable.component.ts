@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, ViewEncapsulation, } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
 import { AnswerEntity, OptionEntity, QuizEntity } from 'src/app/shared/data/entities/entities';
 import { CommonServices } from 'src/app/shared/services/common.services';
 import { UiServices } from 'src/app/shared/services/ui.services';
@@ -21,12 +22,21 @@ export class QuizEditableComponent implements OnInit {
   quiz: QuizEntity = null;
   currentAnswer: AnswerEntity = null;
   currentAnswerIndex = 0;
+
+  translateLabels = {
+    new_quiz: '',
+    form_time: '',
+  };
+
+  durationFormShow = false;
   //#endregion INTERNAL
 
   constructor(private _commonService: CommonServices,
     private _uiService: UiServices,
-    private fb: FormBuilder
-  ) { }
+    private fb: FormBuilder,
+    private translate: TranslateService
+  ) {
+  }
 
   ngOnInit() {
     this.setupComponent();
@@ -54,17 +64,29 @@ export class QuizEditableComponent implements OnInit {
         answer.options.push(newOption);
       });
       // this.quiz.questions.push(this.getNewQuestion());
-
       this.form = this.fb.group({
         title: [this.quiz.title, Validators.required],
-        time: [this.quiz.time, Validators.required],
+        time: [this.quiz.time],
       });
 
+      if(this.quiz.time != 0) {
+        this.durationFormShow = true;
+      }
+
     } else {
-      this.form = this.fb.group({
-        title: ['', Validators.required],
-        time: [0, Validators.required],
+
+      this.translate.get(['new_quiz', 'form_time']).subscribe((res) => {
+        console.log('res: ', res);
+        
+        this.translateLabels = res;
+
+        this.form = this.fb.group({
+          title: [this.translateLabels.new_quiz, Validators.required],
+          time: [''],
+        });
+        this.durationFormShow = false;
       });
+      
 
       this.quiz = {
         title: '',
@@ -201,7 +223,7 @@ export class QuizEditableComponent implements OnInit {
     this.currentAnswerIndex = this.currentAnswerIndex + 1;
     this.setCurrentAnswer();
 
-    
+
   }
 
   prevQuestion() {
@@ -216,6 +238,21 @@ export class QuizEditableComponent implements OnInit {
   finishCreation() {
     this.updateQuiz(true);
     this.gotoDashboard();
+  }
+
+  editDuration() {
+    this.durationFormShow = !this.durationFormShow;
+    console.log('this.durationFormShow : ', this.durationFormShow );
+    if(this.durationFormShow) {
+      this.form.get('time').setValue([1]);
+    }
+  }
+
+  onChangeDuration(event) {
+    console.log('event: ', event);
+    if (event.value == 0 || event.value == '') {
+      this.editDuration();
+    }
   }
 
   //#endregion EVENTS

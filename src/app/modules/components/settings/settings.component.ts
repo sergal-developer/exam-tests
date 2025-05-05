@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewEncapsulation, } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { ProfileEntity, SettingsEntity } from 'src/app/shared/data/entities/entities';
 import { CommonServices } from 'src/app/shared/services/common.services';
 import { UiServices } from 'src/app/shared/services/ui.services';
@@ -15,7 +16,8 @@ export class SettingsComponent implements OnInit {
   updating = false;
 
   constructor(private _commonServices: CommonServices,
-    private _uiServices: UiServices
+    private _uiServices: UiServices,
+    private translate: TranslateService
   ) { }
 
   ngOnInit() {
@@ -30,13 +32,13 @@ export class SettingsComponent implements OnInit {
     this.profile = await this._commonServices.getActiveProfile();
   }
 
-  tooglePermission(id: 'ai' |'create' |'delete' |'duplicate'| 'edit') {
+  tooglePermission(id: 'ai' | 'create' | 'delete' | 'duplicate' | 'edit') {
     this.settings.permissions[id] = !this.settings.permissions[id];
     this.updatePermission();
   }
 
   async updatePermission() {
-    if(this.updating) { return; }
+    if (this.updating) { return; }
     this.updating = true;
     await this._commonServices.updateSetting(this.settings.id, this.settings);
     const settings = await this._commonServices.getAllSettings();
@@ -45,6 +47,18 @@ export class SettingsComponent implements OnInit {
     // this._uiServices._notification('Permisos actualizados');
     this.updating = false;
 
+  }
+
+  async changeLanguage(language) {
+    const languages = [];
+    this.settings.availableLanguages.map((lan) => {
+      languages.push(lan.value);
+    })
+    this.translate.addLangs(languages);
+    this.settings.language = language;
+
+    this.translate.setDefaultLang(this.settings.language);
+    await this._commonServices.updateSetting(this.settings.id, this.settings);
   }
   //#endregion DATA
 

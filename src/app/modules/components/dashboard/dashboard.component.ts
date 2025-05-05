@@ -26,7 +26,9 @@ export class DashboardComponent implements OnInit {
   //#region DATA
   async init() {
     const list = await this._commonServices.getAllQuizs();
-    this.listQuiz = this.normalizeQuiz(list);
+    if(list) {
+      this.listQuiz = this.normalizeQuiz(list);
+    }
     // console.log('listQuiz: ', listQuiz);
   }
 
