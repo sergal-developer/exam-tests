@@ -6,7 +6,7 @@
         <div class="root-container">
             <div class="hero-section">
                 <div class="hero-content">
-                    <div class="hero-item">
+                    <div class="hero-item" *ngIf="!listQuiz.length">
 
                         <h3>{{ 'empty_exam_title' | translate }}</h3>
                         <div>{{ 'empty_exam_subtitle' | translate }}</div>
@@ -14,6 +14,15 @@
                         <button (click)="createQuiz()" [attr.data-tooltip]="'new' | translate">
                             <div class="inner">
                                 <span class="material-icons-outlined">
+                                    add
+                                </span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="hero-item" *ngIf="listQuiz.length">
+                        <button (click)="createQuiz()">
+                            <div class="inner">
+                                {{ 'new_quiz' | translate }} <span class="material-icons-outlined">
                                     add
                                 </span>
                             </div>

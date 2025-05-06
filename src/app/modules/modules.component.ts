@@ -25,7 +25,7 @@ export class ModuleComponent implements OnInit {
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
     public _uiServices: UiServices,
-    private _commonServicecs: CommonServices,
+    private _commonServices: CommonServices,
     private translate: TranslateService) {
 
     this.setupLanguage();
@@ -47,7 +47,7 @@ export class ModuleComponent implements OnInit {
   }
 
   async setupLanguage() {
-    const settings = await this._commonServicecs.getAllSettings();
+    const settings = await this._commonServices.getAllSettings();
     console.log('settings: ', settings);
     if(settings) {
       

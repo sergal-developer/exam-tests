@@ -40,10 +40,17 @@
             </button>
         </ng-container>
     </div>
+    <div class="timer-status-input" [ngClass]="{'buttonmode': !durationFormShow}">
+        <button (click)="enableIA()">
+            <div class="inner">
+                {{ 'use_ai' | translate }} <span class="material-icons">auto_awesome</span>
+            </div>
+        </button>
+    </div>
 </div>
 
 <div class="root-container">
-
+    <ng-container *ngIf="!showIAForm">
     <div class="simple-section" *ngIf="formQuestion">
         <div class="_question">
             <div class="_question_text">
@@ -100,4 +107,30 @@
             </div>
         </div>
     </div>
+    </ng-container>
+
+    <ng-container *ngIf="showIAForm">
+        <div class="simple-section" *ngIf="formIAGenerated">
+            <div class="_question" [ngClass]="{'loading_noclick': loadingDataAi }">
+                <div class="_question_text">
+                    <mat-input [title]="'form_answer_ia_topic' | translate"
+                        [mesageError]="'form_answer_ia_topic_required' | translate" [formControl]="formIAGenerated.get('topic')">
+                    </mat-input>
+                    
+                    <div class="_question_text_collection">
+                        <mat-input [title]="'form_answer_num' | translate"
+                        [mesageError]="'form_answer_num_required' | translate" [formControl]="formIAGenerated.get('questions')">
+                    </mat-input>
+                    <mat-input [title]="'form_answer_options' | translate"
+                        [mesageError]="'form_answer_options_required' | translate" [formControl]="formIAGenerated.get('options')">
+                    </mat-input>
+                    </div>
+                </div>
+
+                <div>
+                    <button (click)="generateQuiz()">{{ 'generate_questions' | translate }}</button>
+                </div>
+            </div>
+        </div>
+    </ng-container>
 </div>

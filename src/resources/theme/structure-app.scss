@@ -496,6 +496,8 @@ h6 {
             line-height: 1.2;
         }
 
+        
+
         ._answer_collection {
             display: flex;
         }
@@ -526,10 +528,21 @@ h6 {
         gap: 20px;
         cursor: pointer;
 
+        &.loading_noclick {
+            opacity: 0.6;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
         ._question_text {
             line-height: 1.4;
             font-weight: normal;
             font-size: rem(18px);
+        }
+
+        ._question_text_collection {
+            display: flex;
+            gap: 15px;
         }
 
         ._answer_collection,
