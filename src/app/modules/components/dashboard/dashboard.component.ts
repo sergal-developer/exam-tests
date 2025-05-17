@@ -15,11 +15,17 @@ export class DashboardComponent implements OnInit {
   currentQuiz: QuizEntity = null;
   currentSection = 'show';
   listAttempts: AttemptEntity[] = [];
+  uistate = 'init';
 
   constructor(private _commonServices: CommonServices,
     private _uiServices: UiServices) { }
 
   ngOnInit() {
+    
+    setTimeout(() => {
+      this.uistate = '';
+    }, 500);
+
     this.init();
   }
 

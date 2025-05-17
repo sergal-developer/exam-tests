@@ -79,52 +79,50 @@
     }
 }
 
-.flat-form___ {
+.flat-form {
 
-    // font-size: 32px;
-    // font-size: rem(16px);
-    font-size: inherit;
-
-    .mat-form-field {
-        font-size: inherit;
+    // .mat-form-field {
+    //     font-size: inherit;
+    // }
+    .mat-label {
+        background: transparent;
+        margin: 0;
     }
-
-    .mat-form-mat-label { font-size: inherit; }
-
-    .mat-label-text {
-        opacity: 1;
-        position: absolute;
-        transform: translate(5px, -10px) !important;
-        // font-size: rem(12px) !important;
-        font-size: 70% !important;
-    }
-
-    .mat-error {
-        position: absolute;
-        bottom: -20px;
-    }
-
     textarea,
     input {
-        background: transparent;
-        border: none;
-        // font-size: inherit;
-        // border: 1px dotted #adadad;
-    }
-    textarea {
-        // font-size: rem(14px) !important;
-        font-size: inherit !important;
-        // border: 1px dotted #adadad;
+       margin: 0 !important;
     }
 
-    .empty {
-        // font-size: inherit; 
-        .mat-label-text {
-            // font-size: rem(16px) !important;
-            font-size: 100% !important;
-            transform: translate(12px, 50%) !important;
-            opacity: 1;
-        }
+    // .mat-form-mat-label { font-size: inherit; }
+
+    // .mat-label-text {
+    //     opacity: 1;
+    //     position: absolute;
+    //     transform: translate(5px, -10px) !important;
+    //     // font-size: rem(12px) !important;
+    //     font-size: 70% !important;
+    // }
+
+    // .mat-error {
+    //     position: absolute;
+    //     bottom: -20px;
+    // }
+
     
-    }
+    // textarea {
+    //     // font-size: rem(14px) !important;
+    //     font-size: inherit !important;
+    //     // border: 1px dotted #adadad;
+    // }
+
+    // .empty {
+    //     // font-size: inherit; 
+    //     .mat-label-text {
+    //         // font-size: rem(16px) !important;
+    //         font-size: 100% !important;
+    //         transform: translate(12px, 50%) !important;
+    //         opacity: 1;
+    //     }
+    
+    // }
 }

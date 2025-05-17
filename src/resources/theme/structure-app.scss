@@ -47,8 +47,8 @@ h6 {
 
         align-items: flex-start;
         justify-content: flex-start;
-        transition: all 600ms cubic-bezier(0.075, 0.82, 0.165, 1);
-        transition: margin 600ms;
+        // transition: all 600ms cubic-bezier(0.075, 0.82, 0.165, 1);
+        // transition: margin 600ms;
 
         &.__register {
             margin-left: 0vw;
@@ -312,6 +312,7 @@ h6 {
     // position: absolute;
     width: 100%;
     // bottom: -20px;
+    font-size: 80%;
     display: flex;
     height: auto;
     align-items: center;
@@ -470,6 +471,11 @@ h6 {
         }
     }
 
+    ._question {
+        padding: 15px;
+        padding-top: 0;
+    }
+
     .hero-counter {
         button {
             padding: 0;
@@ -537,7 +543,7 @@ h6 {
     }
 
     ._question {
-        background: white;
+        background: rgba(219, 219, 219, 0.452);
         font-size: rem(16px);
         display: flex;
         flex-direction: column;
@@ -599,7 +605,8 @@ h6 {
             gap: 10px;
             padding: 10px;
             border-radius: 10px;
-            border: 2px solid #E5E5E5;
+            border: 2px solid #919191;
+            background: transparent;
             font-size: rem(14px);
 
 
@@ -614,27 +621,39 @@ h6 {
 
             &.hover,
             &:hover {
-                background: #f7f9ff;
-                color: #5a6fb3;
-                border-color: #a8b6e3;
+                // background: #f7f9ff;
+                // color: #5a6fb3;
+                // border-color: #a8b6e3;
+                color: #4287cf;
+                border-color: #4287cf;
+                background: #515151;
             }
 
             &.selected {
-                background: #e9e9e9;
+                // background: #e9e9e9;
+                // color: #4287cf;
+                // border-color: #4287cf;
                 color: #4287cf;
                 border-color: #4287cf;
+                background: #515151;
             }
 
             &.correct {
-                background: #D2FFE5;
+                // background: #D2FFE5;
                 color: #2E5248;
                 border-color: #2E5248;
+                color: #a6d3c7;
+                border-color: #b8ded4;
+                background: #515151;
             }
 
             &.incorrect {
-                background: #FBE8EF;
+                // background: #FBE8EF;
                 color: #5E0F2B;
                 border-color: #630f2b;
+                color: #d2497a;
+                border-color: #c34c74;
+                background: #515151;
             }
 
             &.view {
@@ -737,6 +756,12 @@ h6 {
         .item-details {
             height: 400px;
         }
+    }
+
+    &.centred {
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
     }
 }
 
@@ -920,7 +945,7 @@ h6 {
 
 [data-tooltip] {
     position: relative;
-    border-bottom: 1px dashed #000;
+    // border-bottom: 1px dashed #000;
     cursor: help
 }
 
@@ -991,6 +1016,51 @@ h6 {
             transition-delay: 100ms;
             transform: translate(0, 0) scale(1);
             background: #000;
+        }
+
+        .root-container {
+            transition: transform 300ms;
+            transform: translate(0, 0);
+            opacity: 1;
+
+            .mat-form-field {
+                transition: transform 300ms;
+                transition-delay: 200ms;
+                transform: translate(0, 0);
+            }
+        }
+
+    }
+}
+
+.screen_main {
+    // overflow: hidden;
+
+    ._animation_state {
+
+        &.init,
+        &.exit {
+            .root-header {
+                transform: translate(0px, -100px);
+            }
+
+            .root-container {
+                transform: translate(0, 100%);
+
+                .mat-form-field {
+                    transform: translate(100%, 0);
+
+                    &:nth-child(2) {
+                        transform: translate(-100%, 0);
+                    }
+                }
+            }
+        }
+
+        .root-header {
+            transition: transform 300ms;
+            transition-delay: 100ms;
+            transform: translate(0, 0);
         }
 
         .root-container {

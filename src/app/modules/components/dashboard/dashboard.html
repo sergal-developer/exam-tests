@@ -1,143 +1,42 @@
-<header [mode]="'dashboard'"></header>
+<div class="_animation_state {{ uistate }}">
+    <header [mode]="'dashboard'"></header>
 
-<div class="root_container_collection">
-    <div class="root_container_mask {{ currentSection }}">
+    <div class="root_container_collection">
+        <div class="root_container_mask {{ currentSection }}">
 
-        <div class="root-container">
-            <div class="hero-section">
-                <div class="hero-content">
-                    <div class="hero-item" *ngIf="!listQuiz.length">
-
-                        <h3>{{ 'empty_exam_title' | translate }}</h3>
-                        <div>{{ 'empty_exam_subtitle' | translate }}</div>
-
-                        <button (click)="createQuiz()" [attr.data-tooltip]="'new' | translate">
-                            <div class="inner">
-                                <span class="material-icons-outlined">
-                                    add
-                                </span>
-                            </div>
-                        </button>
-                    </div>
-                    <div class="hero-item" *ngIf="listQuiz.length">
-                        <button (click)="createQuiz()">
-                            <div class="inner">
-                                {{ 'new_quiz' | translate }} <span class="material-icons-outlined">
-                                    add
-                                </span>
-                            </div>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="exam-section" *ngIf="listQuiz.length">
-                <h2>{{ 'list_exam' | translate }}</h2>
-                <div class="exam-collection">
-                    <ng-container *ngFor="let quiz of listQuiz">
-                        <div class="item">
-                            <div class="image">
-                                <span class="material-icons">
-                                    receipt_long
-                                </span>
-                            </div>
-                            <div class="description">
-                                <div class="description-title">{{ quiz.title }}</div>
-                                <div class="description-status">{{ quiz._status }}</div>
-                            </div>
-                            <div class="action clickable" (click)="showDetails(quiz)">
-                                <span class="material-icons-outlined">
-                                    navigate_next
-                                </span>
-                            </div>
-                        </div>
-                    </ng-container>
-
-                </div>
-            </div>
-
-            <div class="exam-section" *ngIf="!listQuiz.length">
-                <img src="../../../../assets/people.svg" alt="">
-            </div>
-        </div>
-
-        <div class="root-container">
-            <div class="_title_quiz" *ngIf="currentQuiz">
-                <h3 class="clickable" (click)="returnMain()">
-                    <span class="material-icons">
-                        keyboard_arrow_left
-                    </span>
-                    {{ currentQuiz.title }}
-                </h3>
-
-                <button (click)="editQuiz(currentQuiz)" [attr.data-tooltip]="'action_edit' | translate">
-                    <div class="inner"><span class="material-icons">mode_edit</span> </div>
-                </button>
-                <button (click)="deleteQuiz(currentQuiz)" [attr.data-tooltip]="'action_delete' | translate">
-                    <div class="inner"><span class="material-icons">delete</span> </div>
-                </button>
-            </div>
-
-
-            <ng-container *ngIf="currentQuiz">
-                <div class="_collection">
-                    <div class="stadistic">
-                        <h4>{{ 'evaluations' | translate }}</h4>
-                        <div>{{ currentQuiz._attemptsValue }}</div>
-                    </div>
-                    <div class="stadistic">
-                        <h4>{{ 'questions' | translate }}</h4>
-                        <div>{{ currentQuiz.questions.length }}</div>
-                    </div>
-
-                    <div class="stadistic">
-                        <h4>{{ 'best_time' | translate }}</h4>
-                        <div>{{ currentQuiz._bestTimeValue }}</div>
-                    </div>
-                </div>
-
-                <div class="exam-section">
-                    <h4>{{ 'evaluations' | translate }}</h4>
-                    <div class="exam-collection">
-                        <div class="item">
-                            <div class="description">
-                                <div class="description-title" *ngIf="listAttempts.length">{{ 'new_attempt_text' |
-                                    translate }}</div>
-                                <div class="description-title" *ngIf="!listAttempts.length">{{ 'empty_attempt_text' |
-                                    translate }}</div>
-                            </div>
-                            <div class="action" (click)="createattempt()">
-                                <button [attr.data-tooltip]="'start_attempt' | translate">
-                                    <div class="inner">
-                                        <span class="material-icons">
-                                            play_arrow
-                                        </span>
-                                    </div>
-                                </button>
-                            </div>
-                        </div>
-
-                        <ng-container *ngFor="let attempt of listAttempts">
-                            <div class="item">
-                                <div class="description">
-                                    <div class="description-title">{{ attempt.title }}</div>
-                                    <div class="description-status">{{ attempt._date }}</div>
+            <div class="root-container">
+                <div class="hero-section">
+                    <div class="hero-content">
+                        <div class="hero-item" *ngIf="listQuiz.length">
+                            <button (click)="createQuiz()">
+                                <div class="inner">
+                                    {{ 'new_quiz' | translate }} <span class="material-icons-outlined">
+                                        add
+                                    </span>
                                 </div>
-                                <div class="action">
-                                    <button (click)="goToReviewAttempt(attempt)" [attr.data-tooltip]="'review_attempt' | translate" *ngIf="attempt.state != 'completed'">
-                                        <div class="inner">
-                                            <span class="material-icons">
-                                                play_arrow
-                                            </span>
-                                        </div>
-                                    </button>
-                                    <button (click)="goToCompleteAttempt(attempt)" [attr.data-tooltip]="'complete_attempt' | translate" *ngIf="attempt.state == 'completed'">
-                                        <div class="inner">
-                                            <span class="material-icons">
-                                                task
-                                            </span>
-                                        </div>
-                                    </button>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exam-section" *ngIf="listQuiz.length">
+                    <h2>{{ 'list_exam' | translate }}</h2>
+                    <div class="exam-collection">
+                        <ng-container *ngFor="let quiz of listQuiz">
+                            <div class="item">
+                                <div class="image">
+                                    <span class="material-icons">
+                                        receipt_long
+                                    </span>
+                                </div>
+                                <div class="description">
+                                    <div class="description-title">{{ quiz.title }}</div>
+                                    <div class="description-status">{{ quiz._status }}</div>
+                                </div>
+                                <div class="action clickable" (click)="showDetails(quiz)">
+                                    <span class="material-icons-outlined">
+                                        navigate_next
+                                    </span>
                                 </div>
                             </div>
                         </ng-container>
@@ -145,9 +44,116 @@
                     </div>
                 </div>
 
-            </ng-container>
+                <div class="exam-section centred" *ngIf="!listQuiz.length">
+                    <h3>{{ 'empty_exam_title' | translate }}</h3>
+                            <div>{{ 'empty_exam_subtitle' | translate }}</div>
+
+                            <button (click)="createQuiz()" >
+                                <div class="inner">
+                                    <span>{{ 'new_quiz' | translate }}</span>  <span class="material-icons-outlined">
+                                        add
+                                    </span>
+                                </div>
+                            </button>
+
+                    <img style="width: 70%; margin-top: 40px;" src="../../../../assets/empty-2.svg" alt="">
+                </div>
+            </div>
+
+            <div class="root-container">
+                <div class="_title_quiz" *ngIf="currentQuiz">
+                    <h3 class="clickable" (click)="returnMain()">
+                        <span class="material-icons">
+                            keyboard_arrow_left
+                        </span>
+                        {{ currentQuiz.title }}
+                    </h3>
+
+                    <button (click)="editQuiz(currentQuiz)" [attr.data-tooltip]="'action_edit' | translate">
+                        <div class="inner"><span class="material-icons">mode_edit</span> </div>
+                    </button>
+                    <button (click)="deleteQuiz(currentQuiz)" [attr.data-tooltip]="'action_delete' | translate">
+                        <div class="inner"><span class="material-icons">delete</span> </div>
+                    </button>
+                </div>
+
+
+                <ng-container *ngIf="currentQuiz">
+                    <div class="_collection">
+                        <div class="stadistic">
+                            <h4>{{ 'evaluations' | translate }}</h4>
+                            <div>{{ currentQuiz._attemptsValue }}</div>
+                        </div>
+                        <div class="stadistic">
+                            <h4>{{ 'questions' | translate }}</h4>
+                            <div>{{ currentQuiz.questions.length }}</div>
+                        </div>
+
+                        <div class="stadistic">
+                            <h4>{{ 'best_time' | translate }}</h4>
+                            <div>{{ currentQuiz._bestTimeValue }}</div>
+                        </div>
+                    </div>
+
+                    <div class="exam-section">
+                        <h4>{{ 'evaluations' | translate }}</h4>
+                        <div class="exam-collection">
+                            <div class="item">
+                                <div class="description">
+                                    <div class="description-title" *ngIf="listAttempts.length">{{ 'new_attempt_text' |
+                                        translate }}</div>
+                                    <div class="description-title" *ngIf="!listAttempts.length">{{ 'empty_attempt_text'
+                                        |
+                                        translate }}</div>
+                                </div>
+                                <div class="action" (click)="createattempt()">
+                                    <button [attr.data-tooltip]="'start_attempt' | translate">
+                                        <div class="inner">
+                                            <span class="material-icons">
+                                                play_arrow
+                                            </span>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <ng-container *ngFor="let attempt of listAttempts">
+                                <div class="item">
+                                    <div class="description">
+                                        <div class="description-title">{{ attempt.title }}</div>
+                                        <div class="description-status">{{ attempt._date }}</div>
+                                    </div>
+                                    <div class="action">
+                                        <button (click)="goToReviewAttempt(attempt)"
+                                            [attr.data-tooltip]="'review_attempt' | translate"
+                                            *ngIf="attempt.state != 'completed'">
+                                            <div class="inner">
+                                                <span class="material-icons">
+                                                    play_arrow
+                                                </span>
+                                            </div>
+                                        </button>
+                                        <button (click)="goToCompleteAttempt(attempt)"
+                                            [attr.data-tooltip]="'complete_attempt' | translate"
+                                            *ngIf="attempt.state == 'completed'">
+                                            <div class="inner">
+                                                <span class="material-icons">
+                                                    task
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </div>
+                                </div>
+                            </ng-container>
+
+                        </div>
+                    </div>
+
+                </ng-container>
+
+            </div>
 
         </div>
-
     </div>
+
 </div>

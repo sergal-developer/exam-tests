@@ -42,8 +42,6 @@ export class RegisterComponent implements OnInit {
       image: ['', Validators.required],
     });
 
-    
-
     setTimeout(() => {
       this.checkSettings();
       this.uistate = '';
