@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { AttemptEntity, ProfileEntity, QuizEntity, SettingsEntity } from '../data/entities/entities';
 import { Utils } from '../data/utils/utils';
 import { DBLocal } from './storage/db-storage';
+import { FileStorage } from './storage/file-storage';
 
 @Injectable()
 export class CommonServices {
@@ -14,9 +15,49 @@ export class CommonServices {
   private dbQuizs = 'quiz';
   private dbAttempts = 'attempts';
 
-  constructor(private _router: Router) { }
+  private fileStorage = new FileStorage();
+  private fileSettings = 'settings.json';
+  private fileProfiles = 'profile.json';
+  private fileQuizs = 'templateQuiz.json';
+  private fileAttempts = 'attempts.json';
+  private fileObject = { data: [] };
+
+  constructor(private _router: Router) {
+    this.dbSettings = this.fileSettings;
+    this.dbProfiles = this.fileProfiles;
+    this.dbQuizs = this.fileQuizs;
+    this.dbAttempts = this.fileAttempts;
+  }
 
   //#region PUBLIC METHODS
+
+  async checkFiles() {
+    const settings = await this.fileStorage.checkFile(this.fileSettings);
+    if(!settings) {
+      this.fileStorage.saveFile(this.fileSettings, this.fileObject);
+    }
+    const profile = await this.fileStorage.checkFile(this.fileProfiles);
+    if(!profile) {
+      this.fileStorage.saveFile(this.fileProfiles, this.fileObject);
+    }
+    const quiz = await this.fileStorage.checkFile(this.fileQuizs);
+    if(!quiz) {
+      this.fileStorage.saveFile(this.fileQuizs, this.fileObject);
+    }
+    const attempts = await this.fileStorage.checkFile(this.fileAttempts);
+    if(!attempts) {
+      this.fileStorage.saveFile(this.fileAttempts, this.fileObject);
+    }
+    
+  }
+
+  async clearDB() {
+    await this.fileStorage.deleteFile(this.fileSettings);
+    await this.fileStorage.deleteFile(this.fileProfiles);
+    await this.fileStorage.deleteFile(this.fileQuizs);
+    await this.fileStorage.deleteFile(this.fileAttempts);
+  }
+
   //#region SETTINGS
   getAllSettings(): Array<SettingsEntity> { return this.actionGetAll(this.dbSettings); }
   searchSetting(id: string, idfield = 'id'): SettingsEntity { return this.actionSearch(this.dbSettings, id, idfield); }
@@ -87,41 +128,145 @@ export class CommonServices {
     });
   }
 
-  private actionGetAll(tableName: string): any {
+
+  private actionGetAllOld(tableName: string): any {
     const db = new DBLocal(this.localDbName);
     const response = db.get(tableName);
     return this.promiseMock(response);
   }
 
-  private actionSearch(tableName: string, id: any, idfield = 'id'): any {
+  private actionSearchOld(tableName: string, id: any, idfield = 'id'): any {
     const db = new DBLocal(this.localDbName);
     const response = db.search(tableName, id, idfield);
     return this.promiseMock(response);
   }
 
-  private actionFilter(tableName: string, id: any, idfield = 'id'): any {
+  private actionFilterOld(tableName: string, id: any, idfield = 'id'): any {
     const db = new DBLocal(this.localDbName);
     const response = db.filter(tableName, id, idfield);
     return this.promiseMock(response);
   }
 
-  private actionPost(tableName: string, data: any): any {
+  private actionPostOld(tableName: string, data: any): any {
     data.id = data.id ?? uuidv4();
     const db = new DBLocal(this.localDbName);
     const response = db.save(tableName, data);
     return this.promiseMock(response);
   }
 
-  private actionPut(tableName: string, id: any, data: any, idfield = 'id'): any {
+  private actionPutOld(tableName: string, id: any, data: any, idfield = 'id'): any {
     const db = new DBLocal(this.localDbName);
     const response = db.update(tableName, id, data, idfield);
     return this.promiseMock(response);
   }
 
-  private actionDelete(tableName: string, id: any, idfield = 'id'): any {
+  private actionDeleteOld(tableName: string, id: any, idfield = 'id'): any {
     const db = new DBLocal(this.localDbName);
     const response = db.delete(tableName, id, idfield);
     return this.promiseMock(response);
+  }
+
+
+  private actionGetAll(fileName: string): any {
+    return new Promise(async(resolve) => {
+      try {
+        const data = await this.fileStorage.readFile(fileName);
+        if(data) {
+          console.log(`${ fileName }`, data);
+          resolve(data.data.length ? data.data : null);
+        } else {
+          resolve(null);
+        }
+      } catch (error) {
+        console.warn(error)
+        resolve(null);
+      }
+    });
+  }
+
+  private actionSearch(fileName: string, id: any, idfield = 'id'): any {
+    return new Promise(async(resolve) => {
+      try {
+        const data = await this.actionGetAll(fileName);
+        if(data) {
+          const search = this.fileStorage.search(data, id, idfield);
+          resolve(search);
+        } else {
+          resolve(null);
+        }
+      } catch (error) {
+        console.warn(error)
+        resolve(null);
+      }
+    });
+  }
+
+  private actionFilter(fileName: string, id: any, idfield = 'id'): any {
+    return new Promise(async(resolve) => {
+      try {
+        const data = await this.actionGetAll(fileName);
+        if(data) {
+          const search = this.fileStorage.filter(data, id, idfield);
+          resolve(search);
+        } else {
+          resolve(null);
+        }
+      } catch (error) {
+        console.warn(error)
+        resolve(null);
+      }
+    });
+  }
+
+  private actionPost(fileName: string, data: any): any {
+    data.id = data.id ?? uuidv4();
+    return new Promise(async(resolve) => {
+      try {
+        const db = await this.actionGetAll(fileName);
+        const fileObject = JSON.parse(JSON.stringify(this.fileObject));
+        if(db) { fileObject.data = db; }
+        fileObject.data.push(data);
+        await this.fileStorage.saveFile(fileName, fileObject);
+        resolve(data);
+
+      } catch (error) {
+        console.warn(error)
+        resolve(null);
+      }
+    });
+  }
+
+  private actionPut(fileName: string, id: any, data: any, idfield = 'id'): any {
+    return new Promise(async(resolve) => {
+      try {
+        const db = await this.actionGetAll(fileName);
+        const fileObject = JSON.parse(JSON.stringify(this.fileObject));
+        if(db) { fileObject.data = db; }
+        fileObject.data = this.fileStorage.update(fileObject.data, id, data, idfield);
+        await this.fileStorage.saveFile(fileName, fileObject);
+        resolve(data);
+
+      } catch (error) {
+        console.warn(error)
+        resolve(null);
+      }
+    });
+  }
+
+  private actionDelete(fileName: string, id: any, idfield = 'id'): any {
+    return new Promise(async(resolve) => {
+      try {
+        const db = await this.actionGetAll(fileName);
+        const fileObject = JSON.parse(JSON.stringify(this.fileObject));
+        if(db) { fileObject.data = db; }
+        fileObject.data = this.fileStorage.delete(db, id, idfield);
+        await this.fileStorage.saveFile(fileName, fileObject);
+        resolve(true);
+      } catch (error) {
+        console.warn(error)
+        resolve(null);
+      }
+    });
   }
   //#endregion GENERIC
 

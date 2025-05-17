@@ -22,7 +22,7 @@ form,
     gap: 20px;
 }
 
-$fontsize: 18px;
+$fontsize: 14px;
 textarea,
 input {
     padding: calc($fontsize / 2);
@@ -58,7 +58,7 @@ input {
     // }
 }
 textarea {
-    padding: calc($fontsize / 1.5);
+    // padding: calc($fontsize / 1.5);
 }
 
 

@@ -40,11 +40,12 @@ export class RegisterComponent implements OnInit {
       image: ['', Validators.required],
     });
 
-    this.checkSettings();
-
     this.translate.get(['service_sucess_save', 'service_fail_save']).subscribe((res) => {
       this.translateLabels = res;
     });
+
+    
+    this.checkSettings();
   }
 
   //#region INTERNAL
@@ -53,6 +54,7 @@ export class RegisterComponent implements OnInit {
   //#region DATA
   async checkSettings() {
     let settings: any = await this._commonServices.getAllSettings();
+    console.log('settings: ', settings);
     if (!settings) {
       await this._commonServices.initializData();
       settings = await this._commonServices.getAllSettings();

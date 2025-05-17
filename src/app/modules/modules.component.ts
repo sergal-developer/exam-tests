@@ -2,8 +2,8 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { ScreenEnum } from 'src/app/shared/data/enumerables/enumerables';
-import { UiServices } from '../shared/services/ui.services';
 import { CommonServices } from '../shared/services/common.services';
+import { UiServices } from '../shared/services/ui.services';
 
 @Component({
   selector: 'modules',
@@ -28,8 +28,6 @@ export class ModuleComponent implements OnInit {
     private _commonServices: CommonServices,
     private translate: TranslateService) {
 
-    this.setupLanguage();
-
     this._router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
 
@@ -43,16 +41,17 @@ export class ModuleComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
+  async ngOnInit() {
+    // this._commonServices.clearDB();
+    await this._commonServices.checkFiles();
+    this.setupLanguage();
   }
 
   async setupLanguage() {
     const settings = await this._commonServices.getAllSettings();
     console.log('settings: ', settings);
     if(settings) {
-      
       const setting = settings[0];
-
       const languages = [];
       setting.availableLanguages.map((lan) => {
         languages.push(lan.value);

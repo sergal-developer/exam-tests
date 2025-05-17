@@ -12,6 +12,7 @@
 </div>
 
 <div class="timer-status" *ngIf="quiz">
+    <ng-container *ngIf="!showIAForm">
     <div>
         <span>{{ 'form_total_question' | translate }}:</span> {{ currentAnswerIndex + 1 }} {{ 'form_of_range' |
         translate }} {{ quiz.questions.length }}
@@ -40,10 +41,18 @@
             </button>
         </ng-container>
     </div>
+    </ng-container>
     <div class="timer-status-input" [ngClass]="{'buttonmode': !durationFormShow}">
         <button (click)="enableIA()">
             <div class="inner">
-                {{ 'use_ai' | translate }} <span class="material-icons">auto_awesome</span>
+                <ng-container *ngIf="!showIAForm">
+                    {{ 'use_ai' | translate }} <span class="material-icons">auto_awesome</span>
+                </ng-container>
+                <ng-container *ngIf="showIAForm">
+                    {{ 'use_manual' | translate }} <span class="material-icons">history_edu</span>
+                </ng-container>
+                
+                
             </div>
         </button>
     </div>
@@ -54,7 +63,7 @@
     <div class="simple-section" *ngIf="formQuestion">
         <div class="_question">
             <div class="_question_text">
-                <mat-input class="flat-form" [title]="'form_question' | translate"
+                <mat-input [title]="'form_question' | translate"
                     [mesageError]="'form_question_required' | translate" [formControl]="formQuestion.get('question')"
                     [multiline]="true">
                 </mat-input>
@@ -112,7 +121,7 @@
     <ng-container *ngIf="showIAForm">
         <div class="simple-section" *ngIf="formIAGenerated">
             <div class="_question" [ngClass]="{'loading_noclick': loadingDataAi }">
-                <div class="_question_text">
+                <div class="">
                     <mat-input [title]="'form_answer_ia_topic' | translate"
                         [mesageError]="'form_answer_ia_topic_required' | translate" [formControl]="formIAGenerated.get('topic')">
                     </mat-input>
@@ -127,7 +136,7 @@
                     </div>
                 </div>
 
-                <div>
+                <div class="_question_actions fixed">
                     <button (click)="generateQuiz()">{{ 'generate_questions' | translate }}</button>
                 </div>
             </div>

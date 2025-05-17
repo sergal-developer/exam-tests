@@ -34,6 +34,7 @@
   "form_answer_options": "Number of options",
   "form_answer_options_required": "The number of options is required",
   "use_ai": "Generate using AI",
+  "use_manual": "Generate Manually",
   "generate_questions": "Generate Questions",
   "generation_questions": "Generating questions...",
   "generation_questions_questions": "questions",

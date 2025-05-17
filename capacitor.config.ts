@@ -2,7 +2,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.simexam.coach.app',
-  appName: 'simexam.coach',
+  appName: 'simexam',
   webDir: 'build',
   bundledWebRuntime: false
 };

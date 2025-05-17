@@ -20,7 +20,6 @@ export class SplashComponent implements OnInit {
 
   async checkInit() {
     const profile = await this._commonServices.getActiveProfile();
-    console.log('profile: ', profile);
     const module = !profile ? ScreenEnum.register : ScreenEnum.dashboard;
     setTimeout(() => {
       this._commonServices.navigate(module);

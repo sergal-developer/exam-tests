@@ -26,7 +26,7 @@
         }
 
         .mat-error {
-            font-size: 80%;
+            font-size: 70%;
             opacity: 0.8;
             transition: all 300ms;
 
@@ -38,7 +38,8 @@
         &.empty {
             .mat-label-text {
                 transform: translate(12px, 44px);
-                font-size: rem(20px);
+                // font-size: rem(20px);
+                font-size: 100%;
             }
 
             input::placeholder {
@@ -52,23 +53,24 @@
     }
 }
 
-.flat-form {
+.flat-form___ {
 
     // font-size: 32px;
-    font-size: rem(16px);
+    // font-size: rem(16px);
     font-size: inherit;
 
     .mat-form-field {
         font-size: inherit;
     }
 
-    .mat-form-mat-label {}
+    .mat-form-mat-label { font-size: inherit; }
 
     .mat-label-text {
         opacity: 1;
         position: absolute;
         transform: translate(5px, -10px) !important;
-        font-size: rem(12px) !important;
+        // font-size: rem(12px) !important;
+        font-size: 70% !important;
     }
 
     .mat-error {
@@ -84,15 +86,16 @@
         // border: 1px dotted #adadad;
     }
     textarea {
-        font-size: rem(14px) !important;
-        // font-size: inherit;
+        // font-size: rem(14px) !important;
+        font-size: inherit !important;
         // border: 1px dotted #adadad;
     }
 
     .empty {
         // font-size: inherit; 
         .mat-label-text {
-            font-size: rem(16px) !important;
+            // font-size: rem(16px) !important;
+            font-size: 100% !important;
             transform: translate(12px, 50%) !important;
             opacity: 1;
         }
