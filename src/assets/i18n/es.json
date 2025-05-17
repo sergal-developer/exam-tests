@@ -1,7 +1,8 @@
 {
   "en": "Inglés",
   "es": "Español",
-  "register_title": "Hola, es un gusto conocerte, ¿cómo te llamas?",
+  "register_title": "Hola, es un gusto conocerte",
+  "register_title_question": "¿cómo te llamas?",
   "singup": "Registrarse",
   "welcome": "Bienvenido",
   "empty_exam_title": "Esto está muy vacío",

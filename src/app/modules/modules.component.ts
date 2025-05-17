@@ -49,7 +49,6 @@ export class ModuleComponent implements OnInit {
 
   async setupLanguage() {
     const settings = await this._commonServices.getAllSettings();
-    console.log('settings: ', settings);
     if(settings) {
       const setting = settings[0];
       const languages = [];

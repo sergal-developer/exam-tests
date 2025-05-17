@@ -28,6 +28,8 @@ export class RegisterComponent implements OnInit {
     service_fail_save: '',
   };
 
+  uistate = 'init';
+
   constructor(private fb: FormBuilder,
     private _commonServices: CommonServices,
     private _uiServices: UiServices,
@@ -40,12 +42,17 @@ export class RegisterComponent implements OnInit {
       image: ['', Validators.required],
     });
 
-    this.translate.get(['service_sucess_save', 'service_fail_save']).subscribe((res) => {
-      this.translateLabels = res;
-    });
-
     
-    this.checkSettings();
+
+    setTimeout(() => {
+      this.checkSettings();
+      this.uistate = '';
+
+      this.translate.get(['service_sucess_save', 'service_fail_save']).subscribe((res) => {
+        this.translateLabels = res;
+      });
+    }, 800);
+
   }
 
   //#region INTERNAL
@@ -54,7 +61,6 @@ export class RegisterComponent implements OnInit {
   //#region DATA
   async checkSettings() {
     let settings: any = await this._commonServices.getAllSettings();
-    console.log('settings: ', settings);
     if (!settings) {
       await this._commonServices.initializData();
       settings = await this._commonServices.getAllSettings();
@@ -83,10 +89,12 @@ export class RegisterComponent implements OnInit {
     let profile = await this._commonServices.getActiveProfile();
     if (profile) {
       this._uiServices.notification(this.translateLabels.service_sucess_save, { type: 'success', closeTimer: 1500 });
+      this.uistate = 'exit';
       setTimeout(() => {
         this._commonServices.navigate('dashboard');
       }, 1500);
     } else {
+      this.uistate = '';
       this._uiServices.notification(this.translateLabels.service_fail_save, { type: 'error', closeTimer: 1500 });
     }
   }

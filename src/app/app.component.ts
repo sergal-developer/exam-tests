@@ -17,7 +17,6 @@ export class AppComponent implements OnInit{
       if (this.platform.is('capacitor')) {
         try {
           await ScreenOrientation.lock({ orientation: 'portrait' });
-          console.log('Orientación bloqueada a portrait.');
         } catch (error) {
           console.error('Error al bloquear la orientación:', error);
         }

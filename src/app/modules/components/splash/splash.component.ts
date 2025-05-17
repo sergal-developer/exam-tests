@@ -14,7 +14,6 @@ export class SplashComponent implements OnInit {
   constructor(private _commonServices: CommonServices) { }
 
   ngOnInit() {
-    // this.launcSplash();
     this.checkInit();
   }
 

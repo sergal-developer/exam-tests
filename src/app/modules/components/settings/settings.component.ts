@@ -28,7 +28,6 @@ export class SettingsComponent implements OnInit {
   async getSettings() {
     const settings = await this._commonServices.getAllSettings();
     this.settings = settings[0];
-    console.log('this.settings: ', this.settings);
     this.profile = await this._commonServices.getActiveProfile();
   }
 

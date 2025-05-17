@@ -1,7 +1,8 @@
 {
   "en": "English",
   "es": "Spanish",
-  "register_title": "Hello, it's a pleasure to meet you, what's your name?",
+  "register_title": "Hello, it's a pleasure to meet you",
+  "register_title_question": "what's your name?",
   "singup": "Sign Up",
   "welcome": "Welcome",
   "empty_exam_title": "This is very empty",

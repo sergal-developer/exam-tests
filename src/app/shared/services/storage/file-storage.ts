@@ -57,7 +57,6 @@ export class FileStorage {
                 path: fileName,
                 directory: Directory.Data,
             });
-            console.log(`Archivo ${fileName} eliminado`);
         } catch (e) {
             console.error('Error al eliminar archivo:', e);
             throw e;

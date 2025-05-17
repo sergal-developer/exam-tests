@@ -10,8 +10,11 @@ h5,
 h6 {
     line-height: inherit;
     font-weight: normal;
-    margin: 10px 0;
+    margin: 0 0 10px 0;
     padding: 0;
+    display: flex;
+    align-items: center;
+
 }
 
 form,
@@ -29,15 +32,17 @@ input {
     width: 100%;
     transition: all 300ms;
     font-weight: normal;
-    font-size: rem($fontsize);
+    font-size: inherit;
     line-height: 1;
-    border-radius: 10px;
+    border-radius: 0;
     outline: none;
-    background: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(150, 150, 150, 0.5);
-    color: #292929;
+    background: transparent;
+    border: transparent;
+    // color: #292929;
+    // background: inherit;
+    color: inherit;
     min-height: 50px;
-    height: 50px;
+    height: 60px;
 
     &:hover,
     &.hover {
@@ -64,20 +69,24 @@ textarea {
 
 button,
 .button {
-    background: rgba(255, 255, 255, 0.2);
-    color: rgba(44, 44, 44, 0.6);
+    // background: rgba(255, 255, 255, 0.2);
+    // color: rgba(44, 44, 44, 0.6);
+    background: #7B5EEF;
+    color: #FFFCFF;
+
     border: 1px solid transparent;
 
     transition: all 300ms;
     cursor: pointer;
     padding: 10px 25px;
-    padding: 5px 15px;
+    padding: 8px 15px;
     font-family: $josefinFont;
     font-weight: 600;
     font-size: 16px;
     border-radius: 5px;
-    display: inline-block;
-    margin: 2px 5px;
+    display: inline-block; 
+    // margin: 2px 5px;
+    margin: 0;
 
     .inner {
         display: flex;
@@ -99,10 +108,11 @@ button,
 
     &:disabled,
     &.disabled {
-        background: rgba(177, 177, 177, 0.2);
-        border-color: transparent;
-        color: rgba(44, 44, 44, 0.2);
-        text-decoration: none;
+        opacity: 0.3;
+        // background: rgba(177, 177, 177, 0.2);
+        // border-color: transparent;
+        // color: rgba(44, 44, 44, 0.2);
+        // text-decoration: none;
     }
 
     &.accent {

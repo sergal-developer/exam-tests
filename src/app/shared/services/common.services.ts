@@ -172,7 +172,6 @@ export class CommonServices {
       try {
         const data = await this.fileStorage.readFile(fileName);
         if(data) {
-          console.log(`${ fileName }`, data);
           resolve(data.data.length ? data.data : null);
         } else {
           resolve(null);
@@ -317,8 +316,6 @@ export class CommonServices {
         body: JSON.stringify(postData),
       });
 
-      console.log('response: ', response);
-  
       if (!response.ok) {
         const errorData = await response.json();
         console.error('Error al llamar a la API de Gemini:', errorData);
@@ -329,7 +326,7 @@ export class CommonServices {
       // Procesar la respuesta
       if (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
         const generatedText = this.normalizeResponse(data.candidates[0].content.parts[0].text);
-        console.log('generatedText: ', generatedText);
+
         try {
           const cuestionarioJSON = JSON.parse(generatedText);
           return cuestionarioJSON;

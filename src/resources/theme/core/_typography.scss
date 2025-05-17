@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&family=Outfit:wght@100..900&display=swap');
+
 $josefinFont: 'Josefin Sans';
 .josefinFont {
     font-family: 'Josefin Sans', sans-serif;
@@ -7,4 +9,16 @@ $josefinFont: 'Josefin Sans';
 $openSansFont: 'Open Sans';
 .openSansFont {
     font-family: 'Open Sans', sans-serif;
+}
+
+$outfitFont: 'Outfit';
+.outfitFont {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 400;
+}
+
+$lexendDecaFont: 'Lexend Deca';
+.lexendDecaFont {
+    font-family: 'Lexend Deca', sans-serif;
+    font-weight: 400;
 }
