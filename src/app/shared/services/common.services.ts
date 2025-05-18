@@ -275,9 +275,9 @@ export class CommonServices {
       permissions: {
         create: true,
         delete: false,
-        duplicate: true,
+        duplicate: false,
         edit: true,
-        ai: false
+        ai: true
       },
       availableLanguages: [
         { name: 'Español', value: 'es' },

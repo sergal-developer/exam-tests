@@ -4,13 +4,13 @@
         <h2> <span class="material-icons">arrow_back</span></h2>
     </div>
     <div class="item editable-title" *ngIf="form">
-        <mat-input class="flat-form" [title]="'form_title' | translate"
+        <mat-input [title]="'form_title' | translate"
             [mesageError]="'form_title_required' | translate" [formControl]="form.get('title')">
         </mat-input>
     </div>
 </div>
 
-<div class="timer-status" *ngIf="quiz">
+<div class="timer-status" *ngIf="quiz && settings">
     <ng-container *ngIf="!showIAForm">
         <div class="step-counter">
             <span>{{ 'form_total_question' | translate }}:</span> {{ currentAnswerIndex + 1 }} {{ 'form_of_range' |
@@ -21,7 +21,7 @@
     </div> -->
         <div class="timer-status-input" [ngClass]="{'buttonmode': !durationFormShow}">
             <ng-container *ngIf="durationFormShow">
-                <mat-input class="flat-form" [title]="'form_minutes' | translate"
+                <mat-input [title]="'form_minutes' | translate"
                     [mesageError]="'form_time_required' | translate" [formControl]="form.get('time')" [type]="'number'"
                     (onChange)="onChangeDuration($event)">
                 </mat-input>
@@ -41,7 +41,7 @@
         </div>
     </ng-container>
 
-    <div class="timer-status-input" [ngClass]="{'buttonmode': !durationFormShow}">
+    <div class="timer-status-input" [ngClass]="{'buttonmode': !durationFormShow}" *ngIf="settings.permissions.ai">
         <button (click)="enableIA()">
             <div class="inner">
                 <ng-container *ngIf="!showIAForm">

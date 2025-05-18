@@ -62,6 +62,7 @@
   "permission_language": "Idioma",
   "action_edit": "Editar",
   "action_delete": "Eliminar",
+  "action_reset": "Reiniciar",
   "attempt_status_complete": "Completado",
   "attempt_status_approved": "Aprobado",
   "attempt_status_passed": "Aprobaste por poco",

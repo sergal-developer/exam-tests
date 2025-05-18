@@ -76,6 +76,8 @@ export interface AttemptEntity extends QuizEntity {
   attemptId: string;
   state: AttemptState;
   score: number;
+
+  _score?: string;
   timeEnlapsed?: number;
   grade?: GradeState;
   correctAnswers?: number;

@@ -62,6 +62,7 @@
   "permission_language": "Language",
   "action_edit": "Edit",
   "action_delete": "Delete",
+  "action_reset": "Reset",
   "attempt_status_complete": "Completed",
   "attempt_status_approved": "Approved",
   "attempt_status_passed": "Passed narrowly",

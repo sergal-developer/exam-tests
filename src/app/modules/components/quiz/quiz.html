@@ -5,10 +5,10 @@
         <div class="step-counter">{{ currentAnswerIndex + 1 }} {{ 'form_of_range' |
             translate }} {{ attempt.questions.length }}
         </div>
-        <div class="timer" [ngClass]="{'timer-green':  currentAnswerIndex == attempt.validTotalAnswers - 1 }">
+        <div class="timer" [ngClass]="{'timer-green':  currentAnswerIndex == attempt.questions.length - 1 }">
             <div class="timer-bar" [attr.style]="progresStyle"></div>
         </div>
-        <div class="remaining-time" *ngIf="!readonly && attempt.time != '0'">
+        <div class="remaining-time" *ngIf="!readonly && attempt.time">
             <span class="material-icons">
                 schedule
             </span>
@@ -70,7 +70,7 @@
                             </button>
                             <button class="link uppercase" (click)="nextAnswer()"
                                 [disabled]="!currentAnswer.selectedAnswer"
-                                *ngIf="currentAnswerIndex < attempt.validTotalAnswers - 1">
+                                *ngIf="currentAnswerIndex < attempt.questions.length - 1">
                                 <div class="inner">
                                     {{ 'action_next' | translate }}
                                     <span class="material-icons _accent color">
@@ -80,7 +80,7 @@
                                 </div>
                             </button>
                             <button class="primary" (click)="finishQuiz()"
-                                *ngIf="currentAnswerIndex == attempt.validTotalAnswers - 1 && !readonly">
+                                *ngIf="currentAnswerIndex == attempt.questions.length - 1 && !readonly">
                                 <div class="inner">
                                     <span>{{ 'action_complete' | translate }}</span>
                                 </div>
@@ -128,13 +128,13 @@
                         <div class="_collection">
                             <div class="stadistic">
                                 <h3>{{ 'attempt_status_hits' | translate }}</h3>
-                                <div class="_accent color">{{ attempt.correctAnswers }} de {{ attempt.validTotalAnswers
+                                <div class="_accent color">{{ attempt.correctAnswers }} de {{ attempt.questions.length
                                     }}</div>
                             </div>
 
                             <div class="stadistic">
                                 <h3>{{ 'attempt_status_rating' | translate }}</h3>
-                                <div class="_accent color">{{ attempt.score }}</div>
+                                <div class="_accent color">{{ attempt._score }}</div>
                             </div>
                         </div>
 

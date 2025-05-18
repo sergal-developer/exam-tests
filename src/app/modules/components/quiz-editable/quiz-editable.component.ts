@@ -40,6 +40,7 @@ export class QuizEditableComponent implements OnInit {
   durationFormShow = false;
   showIAForm = false;
   loadingDataAi = false;
+  settings = null;
   //#endregion INTERNAL
 
   constructor(private _commonService: CommonServices,
@@ -49,10 +50,15 @@ export class QuizEditableComponent implements OnInit {
   ) {
   }
 
-  ngOnInit() {
+  async ngOnInit() {
+    this.getSettings();
     this.setupLanguage(() => {
       this.setupComponent();
     });
+  }
+
+  async getSettings() {
+    this.settings = await this._commonService.getActiveSettings();
   }
 
   async setupLanguage(next) {

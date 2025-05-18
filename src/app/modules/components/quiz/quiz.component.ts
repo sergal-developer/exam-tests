@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewEncapsulation, } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation, } from '@angular/core';
 import { AnswerEntity, AttemptEntity, OptionEntity } from 'src/app/shared/data/entities/entities';
 import { AttemptState, GradeState } from 'src/app/shared/data/enumerables/enumerables';
 import { CommonServices } from 'src/app/shared/services/common.services';
@@ -12,6 +12,7 @@ import { UiServices } from 'src/app/shared/services/ui.services';
 export class QuizComponent implements OnInit {
   @Input() id: string = null;
   @Input() review: boolean = false;
+  @Output() onChange = new EventEmitter();
 
   //#region INTERNAL
   attempt: AttemptEntity = null;
@@ -25,6 +26,7 @@ export class QuizComponent implements OnInit {
   currentSection = 'show';
 
   _gradeState = GradeState;
+  gradePassedScore = 75; 
   //#endregion INTERNAL
 
   constructor(private _commonService: CommonServices,
@@ -40,6 +42,9 @@ export class QuizComponent implements OnInit {
   async getData() {
     if (this.id) {
       this.attempt = await this.getAttemptData(this.id);
+      if(this.attempt.state == 'completed') {
+        this.attempt._score = this.attempt.score.toFixed(2);
+      }
 
       if (!this.attempt) {
         this._uiService.notification('Ocurrio un error al recuperar los datos', { type: 'error', closeTimer: 3000 });
@@ -53,13 +58,7 @@ export class QuizComponent implements OnInit {
     this.readonly = this.attempt.state == AttemptState.completed;
     this.currentAnswerIndex = 0;
     this.currentAnswer = this.attempt.questions[this.currentAnswerIndex];
-    const validAnswers = [];
-    this.attempt.questions.map((answer: AnswerEntity) => {
-      if (answer.question != '' && answer.correctAnswer) {
-        validAnswers.push(answer);
-      }
-    });
-    this.attempt.validTotalAnswers = validAnswers.length;
+
     this.getProgress();
 
     if (this.readonly) {
@@ -166,25 +165,34 @@ export class QuizComponent implements OnInit {
 
   showFinishPage() {
     this.currentSection = 'show_2';
+    this.valueChange('secondary');
   }
 
   showQuiz() {
     this.setupComponent();
     this.currentSection = 'show';
+    this.valueChange('primary');
   }
 
   closeResults() {
     this.currentSection = 'show';
+    this.valueChange('primary');
   }
 
   gotoQuestion(index) {
     this.currentAnswerIndex = index - 1;
     this.nextAnswer();
+    this.getProgress();
     this.currentSection = 'show';
+    this.valueChange('primary');
   }
 
   gotoDashboard() {
     this._commonService.navigate('dashboard');
+  }
+
+  valueChange(value: string ) {
+    this.onChange.emit({ action: 'ui_update', value: value });
   }
   //#endregion EVENTS
 
@@ -201,6 +209,8 @@ export class QuizComponent implements OnInit {
     });
     score = (100 / answerTotal) * correctAnswers.length;
     this.attempt.score = score;
+    // this.attempt._score = Math.floor(this.attempt.score).toString();
+    this.attempt._score = Math.floor(this.attempt.score) >= 8 ? Math.floor(this.attempt.score).toString() : this.attempt.score.toFixed(1);
     this.attempt.correctAnswers = correctAnswers.length;
     return this.attempt;
   }

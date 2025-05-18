@@ -1,18 +1,20 @@
 <div class="_animation_state {{ uistate }}">
     <header [mode]="'dashboard'"></header>
 
-    <div class="root_container_collection">
+    <div class="root_container_collection" *ngIf="settings">
         <div class="root_container_mask {{ currentSection }}">
 
             <div class="root-container">
                 <div class="hero-section">
-                    <button (click)="createQuiz()" *ngIf="listQuiz.length">
-                        <div class="inner">
-                            {{ 'new_quiz' | translate }} <span class="material-icons-outlined">
-                                add
-                            </span>
-                        </div>
-                    </button>
+                    <ng-container *ngIf="settings.permissions.create">
+                        <button (click)="createQuiz()" *ngIf="listQuiz.length">
+                            <div class="inner">
+                                {{ 'new_quiz' | translate }} <span class="material-icons-outlined">
+                                    add
+                                </span>
+                            </div>
+                        </button>
+                    </ng-container>
                 </div>
 
                 <div class="exam-section gray-backdrop" *ngIf="listQuiz.length">
@@ -27,7 +29,9 @@
                                 </div>
                                 <div class="description">
                                     <div class="description-title">{{ quiz.title }}</div>
-                                    <div class="description-status">{{ quiz._status }}</div>
+                                    <div class="description-status">
+                                        <span class="_accent color">{{ quiz._updatedDate }}</span>
+                                    </div>
                                 </div>
                                 <div class="action clickable" (click)="showDetails(quiz)">
                                     <span class="material-icons-outlined _accent color">
@@ -44,13 +48,15 @@
                     <h3>{{ 'empty_exam_title' | translate }}</h3>
                             <div>{{ 'empty_exam_subtitle' | translate }}</div>
 
-                            <button (click)="createQuiz()" >
-                                <div class="inner">
-                                    <span>{{ 'new_quiz' | translate }}</span>  <span class="material-icons-outlined">
-                                        add
-                                    </span>
-                                </div>
-                            </button>
+                            <ng-container *ngIf="settings.permissions.create">
+                                <button (click)="createQuiz()" >
+                                    <div class="inner">
+                                        <span>{{ 'new_quiz' | translate }}</span>  <span class="material-icons-outlined">
+                                            add
+                                        </span>
+                                    </div>
+                                </button>
+                            </ng-container>
 
                     <img style="width: 70%; margin-top: 40px;" src="../../../../assets/empty-2.svg" alt="">
                 </div>
@@ -67,12 +73,21 @@
                 </div>
 
                 <div class="exam-section-actions">
-                    <button class="link uppercase" (click)="editQuiz(currentQuiz)">
-                        <div class="inner"> {{ 'action_edit' | translate }} <span class="material-icons _primary color">mode_edit</span> </div>
-                    </button>
-                    <button class="link uppercase" (click)="deleteQuiz(currentQuiz)">
-                        <div class="inner"> {{ 'action_delete' | translate }} <span class="material-icons _primary color">delete</span> </div>
-                    </button>
+                    <ng-container *ngIf="settings.permissions.duplicate">
+                        <button class="link uppercase" (click)="duplicateQuiz(currentQuiz)">
+                            <div class="inner"> {{ 'permission_duplicate' | translate }} <span class="material-icons _primary color">copy_all</span> </div>
+                        </button>
+                    </ng-container>
+                    <ng-container *ngIf="settings.permissions.edit">
+                        <button class="link uppercase" (click)="editQuiz(currentQuiz)">
+                            <div class="inner"> {{ 'action_edit' | translate }} <span class="material-icons _primary color">mode_edit</span> </div>
+                        </button>
+                    </ng-container>
+                    <ng-container *ngIf="settings.permissions.delete">
+                        <button class="link uppercase" (click)="deleteQuiz(currentQuiz)">
+                            <div class="inner"> {{ 'action_delete' | translate }} <span class="material-icons _primary color">delete</span> </div>
+                        </button>
+                    </ng-container>
                 </div>
 
 
@@ -95,6 +110,15 @@
 
                     <div class="exam-section">
                         <h2 class="_primary color">{{ 'evaluations' | translate }}</h2>
+
+                        <ng-container *ngIf="listAttempts.length">
+                            <div class="exam-reset">
+                                <button class="link uppercase" (click)="resetAttemps(currentQuiz)">
+                                    <div class="inner"> {{ 'action_reset' | translate }} <span class="material-icons _primary color">replay</span> </div>
+                                </button>
+                            </div>
+                        </ng-container>
+
                         <div class="exam-collection">
                             <div class="item listname">
                                 <div class="full" (click)="createattempt()">
@@ -117,7 +141,7 @@
                                         <div class="description-status">
                                             <span class="_accent color">{{ attempt._updatedDate }}</span>
                                             <span class="pill" *ngIf="attempt.state == 'completed'">
-                                                {{ 'attempt_score_label' | translate }} {{ attempt.score }}%
+                                                {{ 'attempt_score_label' | translate }} <b>{{ attempt._score }}%</b>
                                             </span>
                                         </div>
                                     </div>

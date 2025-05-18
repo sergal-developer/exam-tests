@@ -21,12 +21,14 @@ export class DashboardComponent implements OnInit {
   uistate = 'init';
 
   transform = new TransformData();
+  settings = null;
 
   constructor(private _commonServices: CommonServices,
     private _uiServices: UiServices) { }
 
-  ngOnInit() {
-    
+  async ngOnInit() {
+    await this.getSettings();
+
     setTimeout(() => {
       this.uistate = '';
       this.init();
@@ -40,6 +42,10 @@ export class DashboardComponent implements OnInit {
     if(list) {
       this.listQuiz = this.normalizeQuiz(list);
     }
+  }
+
+  async getSettings() {
+    this.settings = await this._commonServices.getActiveSettings();
   }
 
   async getAttempts(quiz: QuizEntity) {
@@ -56,10 +62,14 @@ export class DashboardComponent implements OnInit {
       timeEnlapsed: 0,
       title: this.currentQuiz.title,
       questions: this.currentQuiz.questions,
-      time: this.currentQuiz.time,
+      time: this.currentQuiz.time ? this.currentQuiz.time : 0,
       creationDate: new Date().getTime(),
       updatedDate: new Date().getTime()
     }
+
+    // DISCART INVALID ANSWERS
+    data.questions = this.validateQuestions(data.questions);
+    data.validTotalAnswers = data.questions.length;
 
     // clean selected elements
     data.questions.map((question: AnswerEntity) => {
@@ -68,6 +78,10 @@ export class DashboardComponent implements OnInit {
       })
     });
 
+    // SHUFFLE ANSWERS
+    data.questions = this.transform.shuffleArray(data.questions);
+
+    // SAVE DATA
     await this._commonServices.saveAttempt(data);
     const attempt = await this._commonServices.searchAttempt(data.attemptId, 'attemptId');
 
@@ -80,7 +94,19 @@ export class DashboardComponent implements OnInit {
   }
 
   async deleteQuiz(quiz: QuizEntity) {
-    console.log('quiz: ', quiz);
+    this.listAttempts.map(async(attemp) => {
+      await this._commonServices.deleteAttempt(attemp.id);
+    });
+    await this._commonServices.deleteQuiz(quiz.id);
+    this.init();
+    this.returnMain();
+  }
+
+  async resetAttemps(quiz: QuizEntity) {
+    this.listAttempts.map(async(attemp) => {
+      await this._commonServices.deleteAttempt(attemp.id);
+    });
+    this.returnMain();
   }
   //#endregion DATA
 
@@ -91,6 +117,11 @@ export class DashboardComponent implements OnInit {
 
   editQuiz(quiz: QuizEntity) {
     this._commonServices.navigate('quizedit', quiz.id);
+  }
+
+  duplicateQuiz(quiz: QuizEntity) {
+    console.log('quiz: ', quiz);
+    // this._commonServices.navigate('quizedit', quiz.id);
   }
   
 
@@ -136,9 +167,11 @@ export class DashboardComponent implements OnInit {
   //#region CONVERTERS
   normalizeQuiz(list: QuizEntity[]) {
     list.map((item) => {
-      item._status = new Date(item.creationDate).toString();
       item._attemptsValue = item._attemptsValue ?? '-';
       item._bestTimeValue = item._bestTimeValue ?? '-';
+
+      item._creationDate = this.transform.toDate(new Date(item.creationDate), 'MMM/d/yy h:mm a');
+      item._updatedDate = this.transform.toDate(new Date(item.updatedDate), 'MMM/d/yy h:mm a');
     })
     return list;
   }
@@ -149,6 +182,16 @@ export class DashboardComponent implements OnInit {
       item._updatedDate = this.transform.toDate(new Date(item.updatedDate), 'MMM/d/yy h:mm');
     })
     return list;
+  }
+
+  validateQuestions(list: AnswerEntity[]) {
+    const validAnswers = [];
+    list.map((answer: AnswerEntity) => {
+      if (answer.question != '' && answer.correctAnswer) {
+        validAnswers.push(answer);
+      }
+    });
+    return validAnswers;
   }
   //#endregion CONVERTERS
 }
