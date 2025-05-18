@@ -15,12 +15,10 @@ export class TimerComponent implements OnInit {
     protected _autostart: boolean = false;
     @Input()
     get autostart() { 
-      console.log('autostart: ', this._autostart);
       return this._autostart; }
 
     @Output() autostartChange = new EventEmitter();
     set autostart(autostart) {
-      console.log('autostart: ', autostart);
         this._autostart = autostart;
         this.autostartChange.emit(this._autostart);
         this.startTimers();
@@ -39,7 +37,6 @@ export class TimerComponent implements OnInit {
 
     //#region LIFECICLE
     ngOnInit() {
-      console.log('this.minutes: ', this.minutes);
     }
 
     // #endregion
@@ -49,7 +46,6 @@ export class TimerComponent implements OnInit {
     //#region EVENTS
     startTimers() {
         const minutes = 1000 * 60 * this.minutes;
-        console.log('minutes: ', minutes);
         this.timeEnlapsed = 0;
 
         if(!this.autostart) {

@@ -6,21 +6,17 @@
 
             <div class="root-container">
                 <div class="hero-section">
-                    <div class="hero-content">
-                        <div class="hero-item" *ngIf="listQuiz.length">
-                            <button (click)="createQuiz()">
-                                <div class="inner">
-                                    {{ 'new_quiz' | translate }} <span class="material-icons-outlined">
-                                        add
-                                    </span>
-                                </div>
-                            </button>
+                    <button (click)="createQuiz()" *ngIf="listQuiz.length">
+                        <div class="inner">
+                            {{ 'new_quiz' | translate }} <span class="material-icons-outlined">
+                                add
+                            </span>
                         </div>
-                    </div>
+                    </button>
                 </div>
 
-                <div class="exam-section" *ngIf="listQuiz.length">
-                    <h2>{{ 'list_exam' | translate }}</h2>
+                <div class="exam-section gray-backdrop" *ngIf="listQuiz.length">
+                    <h3 class="title-upper _accent color">{{ 'list_exam' | translate }}</h3>
                     <div class="exam-collection">
                         <ng-container *ngFor="let quiz of listQuiz">
                             <div class="item">
@@ -34,7 +30,7 @@
                                     <div class="description-status">{{ quiz._status }}</div>
                                 </div>
                                 <div class="action clickable" (click)="showDetails(quiz)">
-                                    <span class="material-icons-outlined">
+                                    <span class="material-icons-outlined _accent color">
                                         navigate_next
                                     </span>
                                 </div>
@@ -60,26 +56,28 @@
                 </div>
             </div>
 
-            <div class="root-container">
+            <div class="root-container gray-backdrop drop-padding">
                 <div class="_title_quiz" *ngIf="currentQuiz">
-                    <h3 class="clickable" (click)="returnMain()">
-                        <span class="material-icons">
+                    <div class="clickable _accent color" (click)="returnMain()">
+                        <span class="material-icons _primary color">
                             keyboard_arrow_left
                         </span>
                         {{ currentQuiz.title }}
-                    </h3>
+                    </div>
+                </div>
 
-                    <button (click)="editQuiz(currentQuiz)" [attr.data-tooltip]="'action_edit' | translate">
-                        <div class="inner"><span class="material-icons">mode_edit</span> </div>
+                <div class="exam-section-actions">
+                    <button class="link uppercase" (click)="editQuiz(currentQuiz)">
+                        <div class="inner"> {{ 'action_edit' | translate }} <span class="material-icons _primary color">mode_edit</span> </div>
                     </button>
-                    <button (click)="deleteQuiz(currentQuiz)" [attr.data-tooltip]="'action_delete' | translate">
-                        <div class="inner"><span class="material-icons">delete</span> </div>
+                    <button class="link uppercase" (click)="deleteQuiz(currentQuiz)">
+                        <div class="inner"> {{ 'action_delete' | translate }} <span class="material-icons _primary color">delete</span> </div>
                     </button>
                 </div>
 
 
                 <ng-container *ngIf="currentQuiz">
-                    <div class="_collection">
+                    <!-- <div class="_collection">
                         <div class="stadistic">
                             <h4>{{ 'evaluations' | translate }}</h4>
                             <div>{{ currentQuiz._attemptsValue }}</div>
@@ -93,23 +91,18 @@
                             <h4>{{ 'best_time' | translate }}</h4>
                             <div>{{ currentQuiz._bestTimeValue }}</div>
                         </div>
-                    </div>
+                    </div> -->
 
                     <div class="exam-section">
-                        <h4>{{ 'evaluations' | translate }}</h4>
+                        <h2 class="_primary color">{{ 'evaluations' | translate }}</h2>
                         <div class="exam-collection">
-                            <div class="item">
-                                <div class="description">
-                                    <div class="description-title" *ngIf="listAttempts.length">{{ 'new_attempt_text' |
-                                        translate }}</div>
-                                    <div class="description-title" *ngIf="!listAttempts.length">{{ 'empty_attempt_text'
-                                        |
-                                        translate }}</div>
-                                </div>
-                                <div class="action" (click)="createattempt()">
-                                    <button [attr.data-tooltip]="'start_attempt' | translate">
+                            <div class="item listname">
+                                <div class="full" (click)="createattempt()">
+                                    <button class="link uppercase">
                                         <div class="inner">
-                                            <span class="material-icons">
+                                            <span *ngIf="listAttempts.length">{{ 'start_attempt' | translate }}  {{ 'new_attempt_text' | translate }} </span>
+                                            <span *ngIf="!listAttempts.length">{{ 'start_attempt' | translate }}  {{ 'empty_attempt_text' | translate }} </span>
+                                            <span class="material-icons _accent color">
                                                 play_arrow
                                             </span>
                                         </div>
@@ -117,27 +110,32 @@
                                 </div>
                             </div>
 
-                            <ng-container *ngFor="let attempt of listAttempts">
-                                <div class="item">
+                            <ng-container *ngFor="let attempt of listAttempts; let i = index">
+                                <div class="item listname">
                                     <div class="description">
-                                        <div class="description-title">{{ attempt.title }}</div>
-                                        <div class="description-status">{{ attempt._date }}</div>
+                                        <div class="description-normal"> <span class="_primary color">{{ i + 1 }}.</span> {{ attempt.title }}</div>
+                                        <div class="description-status">
+                                            <span class="_accent color">{{ attempt._updatedDate }}</span>
+                                            <span class="pill" *ngIf="attempt.state == 'completed'">
+                                                {{ 'attempt_score_label' | translate }} {{ attempt.score }}%
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div class="action">
-                                        <button (click)="goToReviewAttempt(attempt)"
-                                            [attr.data-tooltip]="'review_attempt' | translate"
+                                    <div class="actions">
+                                        <button class="link uppercase" (click)="goToReviewAttempt(attempt)"
                                             *ngIf="attempt.state != 'completed'">
                                             <div class="inner">
-                                                <span class="material-icons">
+                                                <span>{{ 'review_attempt' | translate }}</span>
+                                                <span class="material-icons _accent color">
                                                     play_arrow
                                                 </span>
                                             </div>
                                         </button>
-                                        <button (click)="goToCompleteAttempt(attempt)"
-                                            [attr.data-tooltip]="'complete_attempt' | translate"
+                                        <button class="link uppercase" (click)="goToCompleteAttempt(attempt)"
                                             *ngIf="attempt.state == 'completed'">
                                             <div class="inner">
-                                                <span class="material-icons">
+                                                <span>{{ 'complete_attempt_review' | translate }}</span>
+                                                <span class="material-icons _accent color">
                                                     task
                                                 </span>
                                             </div>

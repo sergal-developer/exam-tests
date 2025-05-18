@@ -2,9 +2,9 @@
 
 <div class="root-container">
 
-    <div class="simple-section">
-        <div class="_content" *ngIf="profile">
-            <h3>{{ 'profile' | translate }}</h3>
+    <div class="simple-section gray-backdrop">
+        <div class="_content small" *ngIf="profile">
+            <h4 class="title-upper">{{ 'profile' | translate }}</h4>
             <div class="_content_inner">
                 <div class="_item_option">
                     <div class="image">
@@ -22,8 +22,8 @@
 
             </div>
         </div>
-        <div class="_content"  *ngIf="settings" >
-            <h3>{{ 'permission_language' | translate }}</h3>
+        <div class="_content small"  *ngIf="settings" >
+            <h4 class="title-upper">{{ 'permission_language' | translate }}</h4>
             <div class="_content_inner">
                 <div class="_item_option">
                     <div class="action active" >
@@ -40,8 +40,8 @@
             </div>
         </div>
 
-        <div class="_content" *ngIf="settings" >
-            <h3>{{ 'permission' | translate }}</h3>
+        <div class="_content small" *ngIf="settings" >
+            <h4 class="title-upper">{{ 'permission' | translate }}</h4>
             <div class="_content_inner">
                 <div class="_item_option">
                     <div class="description full">
@@ -91,8 +91,8 @@
 
             </div>
         </div>
-        <div class="_content" *ngIf="settings" >
-            <h3>{{ 'permission_data' | translate }}</h3>
+        <div class="_content small" *ngIf="settings" >
+            <h4 class="title-upper">{{ 'permission_data' | translate }}</h4>
             <div class="_content_inner">
                 <div class="_item_option">
                     <div class="description full">

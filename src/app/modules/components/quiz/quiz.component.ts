@@ -31,22 +31,25 @@ export class QuizComponent implements OnInit {
     private _uiService: UiServices
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    await this.getData();
     this.setupComponent();
   }
 
   //#region DATA
-  async setupComponent() {
+  async getData() {
     if (this.id) {
       this.attempt = await this.getAttemptData(this.id);
-      console.log('this.attempt: ', this.attempt);
 
       if (!this.attempt) {
-        this._uiService.notification('Ocurrio un errro al recuperar los datos', { type: 'error', closeTimer: 3000 });
-        return;
+        this._uiService.notification('Ocurrio un error al recuperar los datos', { type: 'error', closeTimer: 3000 });
+        return false;
       }
     }
+    return true;
+  }
 
+  async setupComponent() {
     this.readonly = this.attempt.state == AttemptState.completed;
     this.currentAnswerIndex = 0;
     this.currentAnswer = this.attempt.questions[this.currentAnswerIndex];
@@ -95,7 +98,6 @@ export class QuizComponent implements OnInit {
 
     this.attempt.updatedDate = new Date().getTime();
     this.readonly = this.attempt.state == AttemptState.completed;
-    console.log('this.attempt: ', this.attempt);
 
     await this._commonService.updateAttempt(this.attempt.attemptId, this.attempt, 'attemptId');
 
@@ -153,6 +155,10 @@ export class QuizComponent implements OnInit {
     this.updateResults(true);
   }
 
+  viewResultsAction() {
+    this.finishQuiz();
+  }
+
   getProgress() {
     this.progress = (100 / (this.attempt.validTotalAnswers)) * (this.currentAnswerIndex + 1);
     this.progresStyle = `width: ${this.progress}%`;
@@ -163,6 +169,17 @@ export class QuizComponent implements OnInit {
   }
 
   showQuiz() {
+    this.setupComponent();
+    this.currentSection = 'show';
+  }
+
+  closeResults() {
+    this.currentSection = 'show';
+  }
+
+  gotoQuestion(index) {
+    this.currentAnswerIndex = index - 1;
+    this.nextAnswer();
     this.currentSection = 'show';
   }
 

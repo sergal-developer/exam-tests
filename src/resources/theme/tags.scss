@@ -69,23 +69,18 @@ textarea {
 
 button,
 .button {
-    // background: rgba(255, 255, 255, 0.2);
-    // color: rgba(44, 44, 44, 0.6);
-    background: #7B5EEF;
-    color: #FFFCFF;
-
+    background: $defaultBG;
+    color: $defaultCOLOR;
     border: 1px solid transparent;
-
     transition: all 300ms;
     cursor: pointer;
     padding: 10px 25px;
     padding: 8px 15px;
-    font-family: $josefinFont;
+    // font-family: $josefinFont;
     font-weight: 600;
     font-size: 16px;
     border-radius: 5px;
     display: inline-block; 
-    // margin: 2px 5px;
     margin: 0;
 
     .inner {
@@ -93,6 +88,7 @@ button,
         flex-direction: row;
         justify-content: center;
         align-items: center;
+        line-height: 1;
         gap: 5px;
     }
 
@@ -102,17 +98,14 @@ button,
 
     &:hover,
     &.hover {
-        background: rgba(255, 255, 255, 0.6);
-        color: rgba(44, 44, 44, 1);
+        background: $defaultBG_hover;
+        color: $defaultCOLOR;
     }
 
     &:disabled,
     &.disabled {
         opacity: 0.7;
-        // background: rgba(177, 177, 177, 0.2);
-        // border-color: transparent;
-        // color: rgba(44, 44, 44, 0.2);
-        // text-decoration: none;
+        text-decoration: none;
     }
 
     &.circle {
@@ -122,49 +115,45 @@ button,
         font-size: rem(25px);
     }
 
-    &.accent {
-        background: #F1EBFF;
-        color: #7D55CF;
+    &.primary {
+        background: $primaryBG;
+        color: $primaryCOLOR;
 
         &:hover,
         &.hover {
-            background: #AF8CF8;
-            color: white;
-        }
-
-        &:disabled,
-        &.disabled {
-            background: rgba(177, 177, 177, 0.2);
-            border-color: transparent;
-            color: rgba(44, 44, 44, 0.2);
+            background: $primaryBG_hover;
+            color: $primaryCOLOR;
         }
     }
 
     &.link {
         background: transparent;
-        color: #7D55CF;
         padding: 0px;
-        display: inline-flex;
-        align-items: center;
+
+        // display: inline-flex;
+        // align-items: center;
 
         .material-icons {
-            border: none !important;
+            font-size: 150%;
         }
 
         &:hover,
         &.hover {
             background: transparent;
-            color: #310e77;
-            text-decoration: underline;
-
+            // color: #310e77;
+            // text-decoration: underline;
         }
 
-        &:disabled,
-        &.disabled {
-            background: transparent;
-            border-color: transparent;
-            color: rgba(44, 44, 44, 0.2);
-            text-decoration: none;
+        // &:disabled,
+        // &.disabled {
+        //     background: transparent;
+        //     border-color: transparent;
+        //     color: rgba(44, 44, 44, 0.2);
+        //     text-decoration: none;
+        // }
+
+        &.uppercase {
+            text-transform: uppercase;
         }
     }
 

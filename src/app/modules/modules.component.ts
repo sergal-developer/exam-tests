@@ -20,6 +20,8 @@ export class ModuleComponent implements OnInit {
 
   module: string;
   submodule: string;
+  uistate = '';
+  uisubstate = '';
 
   constructor(
     private _router: Router,
@@ -37,6 +39,11 @@ export class ModuleComponent implements OnInit {
         }
 
         this.submodule = this._activatedRoute.snapshot.paramMap.get('submodule');
+
+        setTimeout(() => {
+          this.uistate = `__${this.screen}`;
+          this.uisubstate = '';
+        }, 500);
       }
     });
   }
@@ -62,5 +69,9 @@ export class ModuleComponent implements OnInit {
       this.currentLang = 'es';
       this.translate.setDefaultLang(this.currentLang);
     }
+  }
+
+  onChangeUI(event) {
+    this.uisubstate = event.value;
   }
 }

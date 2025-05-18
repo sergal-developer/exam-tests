@@ -1,6 +1,7 @@
-import { Component, OnInit, ViewEncapsulation, } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, ViewEncapsulation, } from '@angular/core';
 import { AnswerEntity, AttemptEntity, OptionEntity, QuizEntity } from 'src/app/shared/data/entities/entities';
 import { AttemptState } from 'src/app/shared/data/enumerables/enumerables';
+import { TransformData } from 'src/app/shared/data/utils/transformData';
 import { CommonServices } from 'src/app/shared/services/common.services';
 import { UiServices } from 'src/app/shared/services/ui.services';
 import { v4 as uuidv4 } from 'uuid';
@@ -11,11 +12,15 @@ import { v4 as uuidv4 } from 'uuid';
   encapsulation: ViewEncapsulation.None,
 })
 export class DashboardComponent implements OnInit {
+  @Output() onChange = new EventEmitter();
+
   listQuiz: QuizEntity[] = [];
   currentQuiz: QuizEntity = null;
   currentSection = 'show';
   listAttempts: AttemptEntity[] = [];
   uistate = 'init';
+
+  transform = new TransformData();
 
   constructor(private _commonServices: CommonServices,
     private _uiServices: UiServices) { }
@@ -24,9 +29,9 @@ export class DashboardComponent implements OnInit {
     
     setTimeout(() => {
       this.uistate = '';
-    }, 500);
+      this.init();
+    }, 800);
 
-    this.init();
   }
 
   //#region DATA
@@ -35,17 +40,14 @@ export class DashboardComponent implements OnInit {
     if(list) {
       this.listQuiz = this.normalizeQuiz(list);
     }
-    // console.log('listQuiz: ', listQuiz);
   }
 
   async getAttempts(quiz: QuizEntity) {
     const attempt = await this._commonServices.filterAttempts(quiz.id);
-    this.listAttempts = attempt || [];
-    console.log('this.listAttempts: ', this.listAttempts);
+    this.listAttempts = attempt && attempt.length ? this.normalizeAttempt(attempt) : [];
   }
 
   async createattempt() {
-    console.log('currentQuiz: ', this.currentQuiz);
     const data: AttemptEntity = {
       id: this.currentQuiz.id,
       attemptId: uuidv4(),
@@ -75,12 +77,10 @@ export class DashboardComponent implements OnInit {
       // GLOBAL.service_error_attempt
       this._uiServices._notification('Ocurrio un error al generar la evaluacion, intente nuvamente', { type: 'error' })
     }
-    // console.log('listQuiz: ', listQuiz);
   }
 
   async deleteQuiz(quiz: QuizEntity) {
     console.log('quiz: ', quiz);
-
   }
   //#endregion DATA
 
@@ -95,12 +95,10 @@ export class DashboardComponent implements OnInit {
   
 
   goToCompleteAttempt(attempt: AttemptEntity) {
-    console.log('attempt: ', attempt);
     this._commonServices.navigate('attemptevalue',  attempt.attemptId);
   }
 
   goToReviewAttempt(attempt: AttemptEntity) {
-    console.log('attempt: ', attempt);
     this._commonServices.navigate('attemptreview', attempt.attemptId);
   }
 
@@ -110,7 +108,6 @@ export class DashboardComponent implements OnInit {
     });
     this.currentSection = 'show_2';
     this.currentQuiz = quiz;
-    console.log('this.currentQuiz: ', this.currentQuiz);
     this.getAttempts(this.currentQuiz);
 
     document.querySelector('.wrapper ').scrollTo({
@@ -119,6 +116,7 @@ export class DashboardComponent implements OnInit {
       behavior: 'smooth'
     });
 
+    this.valueChange('secondary');
   }
 
   returnMain() {
@@ -127,6 +125,11 @@ export class DashboardComponent implements OnInit {
       item._current = false;
     });
     this.currentQuiz = null;
+    this.valueChange('primary');
+  }
+
+  valueChange(value: string ) {
+    this.onChange.emit({ action: 'ui_update', value: value });
   }
   //#endregion EVENTS
 
@@ -136,6 +139,14 @@ export class DashboardComponent implements OnInit {
       item._status = new Date(item.creationDate).toString();
       item._attemptsValue = item._attemptsValue ?? '-';
       item._bestTimeValue = item._bestTimeValue ?? '-';
+    })
+    return list;
+  }
+
+  normalizeAttempt(list: AttemptEntity[]) {
+    list.map((item) => {
+      item._creationDate = this.transform.toDate(new Date(item.creationDate), 'MMM/d/yy h:mm');
+      item._updatedDate = this.transform.toDate(new Date(item.updatedDate), 'MMM/d/yy h:mm');
     })
     return list;
   }

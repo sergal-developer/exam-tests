@@ -23,10 +23,11 @@
             <div class="root-container">
                 <div class="simple-section" *ngIf="currentAnswer">
                     <div class="_question">
-                        <div class="_question_text" [innerHTML]="currentAnswer.question">
+                        <div class="_question_text gray-backdrop drop-padding drop-top"
+                            [innerHTML]="currentAnswer.question">
                         </div>
 
-                        <div class="_answer_collection">
+                        <div class="_answer_collection gray-backdrop drop-padding drop-bottom">
                             <ng-container *ngFor="let option of currentAnswer.options">
                                 <div class="_answer" [ngClass]="{   
                                         'selected': option.selected, 
@@ -44,7 +45,7 @@
                                         </ng-container>
                                         <ng-container *ngIf="!readonly">
                                             <span *ngIf="option.selected"
-                                                class="material-icons">check_circle_outline</span>
+                                                class="material-icons">radio_button_checked</span>
                                             <span *ngIf="!option.selected"
                                                 class="material-icons">radio_button_unchecked</span>
                                         </ng-container>
@@ -58,28 +59,36 @@
 
                         </div>
 
-                        <div class="_question_actions">
-                            <button (click)="prevAnswer()" *ngIf="currentAnswerIndex > 0">
+                        <div class="_question_actions fixed" *ngIf="currentSection != 'show_2'">
+                            <button class="link uppercase" (click)="prevAnswer()" *ngIf="currentAnswerIndex > 0">
                                 <div class="inner">
-                                    <span class="material-icons">
+                                    <span class="material-icons _accent color">
                                         chevron_left
                                     </span>
                                     {{ 'action_prev' | translate }}
                                 </div>
                             </button>
-                            <button (click)="nextAnswer()" [disabled]="!currentAnswer.selectedAnswer"
+                            <button class="link uppercase" (click)="nextAnswer()"
+                                [disabled]="!currentAnswer.selectedAnswer"
                                 *ngIf="currentAnswerIndex < attempt.validTotalAnswers - 1">
                                 <div class="inner">
                                     {{ 'action_next' | translate }}
-                                    <span class="material-icons">
+                                    <span class="material-icons _accent color">
                                         chevron_right
                                     </span>
 
                                 </div>
                             </button>
-                            <button (click)="finishQuiz()" *ngIf="currentAnswerIndex == attempt.validTotalAnswers - 1">
+                            <button class="primary" (click)="finishQuiz()"
+                                *ngIf="currentAnswerIndex == attempt.validTotalAnswers - 1 && !readonly">
                                 <div class="inner">
-                                    {{ 'action_complete' | translate }}
+                                    <span>{{ 'action_complete' | translate }}</span>
+                                </div>
+                            </button>
+
+                            <button class="primary" (click)="viewResultsAction()" *ngIf="readonly">
+                                <div class="inner">
+                                    {{ 'action_results' | translate }}
                                 </div>
                             </button>
                         </div>
@@ -119,34 +128,41 @@
                         <div class="_collection">
                             <div class="stadistic">
                                 <h3>{{ 'attempt_status_hits' | translate }}</h3>
-                                <div>{{ attempt.correctAnswers }} de {{ attempt.validTotalAnswers }}</div>
+                                <div class="_accent color">{{ attempt.correctAnswers }} de {{ attempt.validTotalAnswers
+                                    }}</div>
                             </div>
 
                             <div class="stadistic">
                                 <h3>{{ 'attempt_status_rating' | translate }}</h3>
-                                <div>{{ attempt.score }}</div>
+                                <div class="_accent color">{{ attempt.score }}</div>
                             </div>
+                        </div>
+
+                        <h3>{{ 'attempt_status_rating_correct' | translate }}</h3>
+                        <div class="_collection">
+                            <ng-container *ngFor="let item of attempt.questions; let i = index">
+                                <div class="question-dot" [ngClass]="{'correct': item.isCorrect }" (click)="gotoQuestion(i)">
+                                    {{ i + 1 }}
+                                </div>
+                            </ng-container>
                         </div>
 
                         <div class="_collection actions">
 
-                            <button (click)="showQuiz()">
+                            <button class="primary" (click)="showQuiz()">
                                 <div class="inner">
                                     <span class="material-icons">
-                                        grading
+                                        rule
                                     </span>
                                     {{ 'action_review' | translate }}
                                 </div>
                             </button>
 
-                            <button (click)="gotoDashboard()">
+                            <!-- <button (click)="closeResults()">
                                 <div class="inner">
-                                    <span class="material-icons">
-                                        west
-                                    </span>
                                     {{ 'action_close' | translate }}
                                 </div>
-                            </button>
+                            </button> -->
 
                         </div>
                     </div>

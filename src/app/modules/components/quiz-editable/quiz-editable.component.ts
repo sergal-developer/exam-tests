@@ -61,7 +61,6 @@ export class QuizEditableComponent implements OnInit {
     const keys = Object.keys(this.translateLabels);
     this.translate.get(keys).subscribe((res) => {
       this.translateLabels = res;
-      console.log('this.translateLabels: ', this.translateLabels);
       next();
     });
   }
@@ -102,7 +101,6 @@ export class QuizEditableComponent implements OnInit {
       if (injectData) {
         // add blanck spaces in questions
         this.quiz = injectData;
-        console.log('this.quiz: ', this.quiz);
         this.quiz.questions.map((answer: AnswerEntity) => {
           const length = this.quiz.questions.length || 0;
           answer.options.map((option: OptionEntity) => {
@@ -122,9 +120,6 @@ export class QuizEditableComponent implements OnInit {
           this.durationFormShow = true;
         }
 
-        setTimeout(() => {
-          console.log('this.quiz: ', this.quiz);
-        }, 3000);
       } else {
         this.form = this.fb.group({
           title: [this.translateLabels.new_quiz, Validators.required],
@@ -213,7 +208,6 @@ export class QuizEditableComponent implements OnInit {
     }
     const data = await this._commonService.searchQuiz(this.quiz.id);
     this.quiz = data;
-    console.log('data: ', data);
 
     if (!data) {
       this._uiService.notification(this.translateLabels.service_fail_update);
@@ -311,12 +305,9 @@ export class QuizEditableComponent implements OnInit {
     if (this.loadingDataAi) { return; }
     this.loadingDataAi = true;
     const data = this.formIAGenerated.value;
-    console.log('data: ', data);
     this._uiService.notification(`<h3><span class="material-icons">auto_awesome</span> ${this.translateLabels.generation_questions}</h3>`, { closeTimer: -1 });
     const response: any = await this._commonService.geminiGenerate(data);
-    // this is a mockdata
-    // let response: any = await this.mockDataAI();
-    console.log('resp: ', response);
+
     if (!response) {
       this._uiService.notification(this.translateLabels.service_fail_generate, { type: 'error', closeTimer: 3000 });
     } else {

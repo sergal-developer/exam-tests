@@ -48,12 +48,40 @@
             }
         }
 
-        textarea, input {
+        .textarea-warp, input, textarea {
             margin-top: 10px;
             padding: 10px;
             font-size: 100%;
             min-height: 50px;
             height: 50px;
+        }
+
+        .textarea-warp {
+            width: 100%;
+            padding: 0;
+            display: grid;
+            height: auto;
+            line-height: 1;
+
+            &:after {
+                content: attr(data-replicated-value) " ";
+                white-space: pre-wrap;
+                visibility: hidden;
+                grid-area: 1 / 1 / 2 / 2;
+                padding: 10px;
+                line-height: 1;
+            }
+
+            textarea {
+                resize: none;
+                overflow: hidden;
+                grid-area: 1 / 1 / 2 / 2;
+            }
+        }
+
+        textarea {
+            width: 100%;
+            height: auto;
         }
 
         &.empty {
@@ -64,12 +92,11 @@
                 opacity: 1;
             }
 
-            input::placeholder {
-                opacity: 0;
-            }
-
-            textarea::placeholder {
-                opacity: 0;
+            textarea, input{
+                height: 50px;
+                &::placeholder {
+                    opacity: 0;
+                }
             }
         }
 
@@ -91,6 +118,10 @@
     textarea,
     input {
        margin: 0 !important;
+    }
+
+    .textarea-warp {
+        margin: 0 !important;
     }
 
     // .mat-form-mat-label { font-size: inherit; }
