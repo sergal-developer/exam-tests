@@ -38,7 +38,7 @@ export class ModuleComponent implements OnInit {
           this.screen = this._screen[this.module];
         }
 
-        this.submodule = this._activatedRoute.snapshot.paramMap.get('submodule');
+        this.submodule = this._activatedRoute.snapshot.queryParamMap.get('action');
 
         setTimeout(() => {
           this.uistate = `__${this.screen}`;

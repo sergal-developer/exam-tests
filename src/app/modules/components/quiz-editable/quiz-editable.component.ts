@@ -41,6 +41,7 @@ export class QuizEditableComponent implements OnInit {
   showIAForm = false;
   loadingDataAi = false;
   settings = null;
+  isEdit = false;
   //#endregion INTERNAL
 
   constructor(private _commonService: CommonServices,
@@ -74,7 +75,9 @@ export class QuizEditableComponent implements OnInit {
   //#region DATA
   async setupComponent(injectData?: QuizEntity) {
 
-    if (this.quizId) {
+    this.isEdit = this.quizId ? true : false;
+
+    if (this.quizId && !injectData) {
       this.quiz = await this.getQuizData(this.quizId);
 
       if (!this.quiz) {
@@ -105,8 +108,14 @@ export class QuizEditableComponent implements OnInit {
     } else {
 
       if (injectData) {
-        // add blanck spaces in questions
+        // BACKUP OLD DATA 
+        const oldQuiz: QuizEntity = JSON.parse(JSON.stringify(this.quiz));
         this.quiz = injectData;
+
+        // RECOVER OLD DATA
+        this.quiz.title = oldQuiz.title == this.translateLabels.new_quiz ? this.quiz.title : oldQuiz.title;
+        this.quiz.questions = oldQuiz.questions.length > 1 ? [...oldQuiz.questions, ...this.quiz.questions] : this.quiz.questions;
+
         this.quiz.questions.map((answer: AnswerEntity) => {
           const length = this.quiz.questions.length || 0;
           answer.options.map((option: OptionEntity) => {
@@ -312,6 +321,7 @@ export class QuizEditableComponent implements OnInit {
     this.loadingDataAi = true;
     const data = this.formIAGenerated.value;
     this._uiService.notification(`<h3><span class="material-icons">auto_awesome</span> ${this.translateLabels.generation_questions}</h3>`, { closeTimer: -1 });
+    // const response: any = await this.mockDataAI();
     const response: any = await this._commonService.geminiGenerate(data);
 
     if (!response) {
@@ -328,7 +338,11 @@ export class QuizEditableComponent implements OnInit {
           updatedDate: new Date().getTime()
         }
         this.setupComponent(quiz);
-      }, 3000);
+
+        if(!this.isEdit) {
+          this.finishCreation();
+        }
+      }, 1000);
     }
 
     this.loadingDataAi = false;
@@ -1356,7 +1370,6 @@ export class QuizEditableComponent implements OnInit {
         resolve(data);
       }, 1000);
     });
-
   }
   //#endregion EVENTS
 

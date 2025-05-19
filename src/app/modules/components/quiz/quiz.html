@@ -39,7 +39,7 @@
                                             <span *ngIf="option.id == currentAnswer.correctAnswer"
                                                 class="material-icons">verified</span>
                                             <span *ngIf="(option.id != currentAnswer.correctAnswer) && option.selected"
-                                                class="material-icons">check_circle_outline</span>
+                                                class="material-icons">radio_button_checked</span>
                                             <span *ngIf="(option.id != currentAnswer.correctAnswer) && !option.selected"
                                                 class="material-icons">radio_button_unchecked</span>
                                         </ng-container>
@@ -139,7 +139,7 @@
                         </div>
 
                         <h3>{{ 'attempt_status_rating_correct' | translate }}</h3>
-                        <div class="_collection">
+                        <div class="_collection overflow_180">
                             <ng-container *ngFor="let item of attempt.questions; let i = index">
                                 <div class="question-dot" [ngClass]="{'correct': item.isCorrect }" (click)="gotoQuestion(i)">
                                     {{ i + 1 }}

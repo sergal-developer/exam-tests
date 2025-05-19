@@ -105,15 +105,14 @@ export class CommonServices {
   //#region NAVIGATION
   navigate(section: string, action?: string, id?: string) {
     if (!action) {
-      this._router.navigate([section]);
+      this._router.navigateByUrl(`/${section}`);
     } else {
       if (id) {
-        this._router.navigate([section, action, id]);
+        this._router.navigateByUrl(`/${section}?action=${action}&id=${id}`);
       } else {
-        this._router.navigate([section, action]);
+        this._router.navigateByUrl(`/${section}?action=${action}`);
       }
     }
-
   }
   //#endregion NAVIGATION
 

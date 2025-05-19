@@ -996,10 +996,15 @@ h6 {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 6px;
+    gap: 10px;
 
     &.actions {
         margin-top: 40px;
+    }
+
+    &.overflow_180 {
+        max-height: 180px;
+        overflow: auto;
     }
 }
 
@@ -1051,14 +1056,14 @@ h6 {
 }
 
 .question-dot {
-    width: 20px;
-    height: 20px;
+    width: 35px;
+    height: 35px;
     border-radius: 50%;
     background: #4c4a4a;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: rem(12px);
+    font-size: rem(14px);
     cursor: pointer;
 
     &.correct {
@@ -1071,7 +1076,7 @@ h6 {
     align-items: center;
 
     &.passed {
-        color: #000;
+        color: #fff;
     }
 
     &.failed {
@@ -1079,7 +1084,7 @@ h6 {
     }
 
     &.barely_passed {
-        color: #000;
+        color: #fff;
     }
 }
 
@@ -1095,7 +1100,7 @@ h6 {
     backdrop-filter: blur(4px);
 
     &.passed {
-        background: rgba(224, 242, 218 , 0.5);
+        background: rgba(69, 83, 65 , 0.5);
     }
 
     &.failed {
@@ -1103,7 +1108,8 @@ h6 {
     }
 
     &.barely_passed {
-        background: rgba(221, 221, 99, 0.5);
+        background: rgba(89, 89, 20, 0.5);
+        
     }
 }
 

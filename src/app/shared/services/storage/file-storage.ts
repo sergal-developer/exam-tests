@@ -3,10 +3,10 @@ export class FileStorage {
     databaseName: string = 'default';
 
     constructor() {
-        //   this.databaseName = databaseName;
-        //   if (!localStorage.getItem(databaseName)) {
-        //     localStorage.setItem(databaseName, JSON.stringify({}));
-        //   }
+    }
+
+    async setupPermisssions() {
+        await Filesystem.requestPermissions();
     }
 
     async saveFile(fileName: string, data: any): Promise<void> {
