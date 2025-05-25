@@ -60,6 +60,9 @@
   "permission_import": "Importar",
   "permission_export": "Exportar",
   "permission_language": "Idioma",
+  "permission_theme": "Tema",
+  "permission_theme_light": "Claro",
+  "permission_theme_dark": "Oscuro",
   "action_edit": "Editar",
   "action_delete": "Eliminar",
   "action_reset": "Reiniciar",
@@ -87,5 +90,13 @@
   "service_fail_get": "Ocurrió un problema al intentar obtener los datos.",
   "service_fail_update": "Ups, ocurrió un problema al intentar actualizar.",
   "service_fail_generate": "Ocurrió un problema al intentar generar.",
-  "exit": "Salir"
+  "exit": "Salir",
+  "help_profile": "Puedes editar cualquier dato al tocar sobre el elemento.",
+  "help_flags": "Los siguientes parametros otorga acceso a las distintas funciones de la aplicación.",
+  "help_accept_terms": "He leido y acepto los ",
+  "help_accept_terms_join": "junto con la",
+  "terms_conditions": "terminos y condiciones ",
+  "privacy_policy": "politica de privacidad",
+  "legal_title": "Legal",
+  "customize": "Personalizar"
 }

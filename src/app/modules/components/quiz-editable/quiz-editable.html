@@ -19,7 +19,7 @@
         <!-- <div class="timer">
         <div class="timer-bar"></div>
     </div> -->
-        <div class="timer-status-input" [ngClass]="{'buttonmode': !durationFormShow}">
+        <div class="timer-status-input" [ngClass]="{'buttonmode': !durationFormShow}" *ngIf="false">
             <ng-container *ngIf="durationFormShow">
                 <mat-input [title]="'form_minutes' | translate"
                     [mesageError]="'form_time_required' | translate" [formControl]="form.get('time')" [type]="'number'"

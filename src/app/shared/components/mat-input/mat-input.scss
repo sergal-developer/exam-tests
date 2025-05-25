@@ -9,20 +9,17 @@
 
     .mat-label {
         position: relative;
-        // font-size: rem(16px);
         display: flex;
         flex-direction: column;
         width: 100%;
         gap: 5px;
         align-items: flex-start;
-
-        background: rgba(33, 33, 33, 0.7);
+        background: var(--formBackground);
         border-radius: 10px;
-        color: white;
+        color: var(--appColor);
         margin: 15px 0;
         min-height: 60px;
         font-size: rem(18px);
-    // border: 1px solid rgba(150, 150, 150, 0.5);  
 
         .mat-label-text {
             transform: translate(10px, 5px);
@@ -44,11 +41,13 @@
             transition: all 300ms;
 
             &.error {
-                color: #f08d9c;
+                color: var(--formErrorColor);
             }
         }
 
-        .textarea-warp, input, textarea {
+        .textarea-warp,
+        input,
+        textarea {
             margin-top: 10px;
             padding: 10px;
             font-size: 100%;
@@ -92,8 +91,10 @@
                 opacity: 1;
             }
 
-            textarea, input{
+            textarea,
+            input {
                 height: 50px;
+
                 &::placeholder {
                     opacity: 0;
                 }
@@ -108,52 +109,22 @@
 
 .flat-form {
 
-    // .mat-form-field {
-    //     font-size: inherit;
-    // }
     .mat-label {
         background: transparent;
         margin: 0;
     }
+
     textarea,
     input {
-       margin: 0 !important;
+        margin: 0 !important;
     }
 
     .textarea-warp {
         margin: 0 !important;
     }
 
-    // .mat-form-mat-label { font-size: inherit; }
-
-    // .mat-label-text {
-    //     opacity: 1;
-    //     position: absolute;
-    //     transform: translate(5px, -10px) !important;
-    //     // font-size: rem(12px) !important;
-    //     font-size: 70% !important;
-    // }
-
-    // .mat-error {
-    //     position: absolute;
-    //     bottom: -20px;
-    // }
-
-    
-    // textarea {
-    //     // font-size: rem(14px) !important;
-    //     font-size: inherit !important;
-    //     // border: 1px dotted #adadad;
-    // }
-
-    // .empty {
-    //     // font-size: inherit; 
-    //     .mat-label-text {
-    //         // font-size: rem(16px) !important;
-    //         font-size: 100% !important;
-    //         transform: translate(12px, 50%) !important;
-    //         opacity: 1;
-    //     }
-    
-    // }
+    textarea {
+        min-height: 60px !important;
+        margin: 0;
+    }
 }

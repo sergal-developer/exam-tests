@@ -55,5 +55,16 @@ export class UiServices {
     }
     this._notification.show = false;
   }
+
+  applyTheme(theme: any) {
+    let root = document.documentElement;
+    if(root) {
+      const keys = Object.keys(theme);
+      keys.map((key) => {
+        root.style.setProperty(`--${key}`, theme[key]);
+      });
+    }
+    
+  }
   //#endregion
 }

@@ -60,6 +60,9 @@
   "permission_import": "Import",
   "permission_export": "Export",
   "permission_language": "Language",
+  "permission_theme": "Theme",
+  "permission_theme_light": "Light",
+  "permission_theme_dark": "Dark",
   "action_edit": "Edit",
   "action_delete": "Delete",
   "action_reset": "Reset",
@@ -87,5 +90,13 @@
   "service_fail_get": "There was a problem trying to get the data.",
   "service_fail_update": "Oops, there was a problem trying to update.",
   "service_fail_generate": "There was a problem trying to generate.",
-  "exit": "Exit"
+  "exit": "Exit",
+  "help_profile": "You can edit any data by tapping on the item.",
+  "help_flags": "The following parameters grant access to the different functions of the application.",
+  "help_accept_terms": "I have read and accept the ",
+  "help_accept_terms_join": "along with the ",
+  "terms_conditions": "terms and conditions ",
+  "privacy_policy": "privacy policy",
+  "legal_title": "Legal",
+  "customize": "Customize"
 }

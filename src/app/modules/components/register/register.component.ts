@@ -40,6 +40,7 @@ export class RegisterComponent implements OnInit {
     this.form = this.fb.group({
       name: ['', Validators.required],
       image: ['', Validators.required],
+      legal: [false, Validators.required],
     });
 
     setTimeout(() => {
@@ -95,6 +96,12 @@ export class RegisterComponent implements OnInit {
       this.uistate = '';
       this._uiServices.notification(this.translateLabels.service_fail_save, { type: 'error', closeTimer: 1500 });
     }
+  }
+
+  validateData() {
+    const invalid = this.form.valid;
+    const terms =  this.form.get('legal').value;
+    return invalid && (invalid == terms);
   }
   //#endregion DATA
 

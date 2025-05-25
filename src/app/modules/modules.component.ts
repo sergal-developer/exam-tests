@@ -1,16 +1,17 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { ScreenEnum } from 'src/app/shared/data/enumerables/enumerables';
 import { CommonServices } from '../shared/services/common.services';
 import { UiServices } from '../shared/services/ui.services';
+import { SettingsEntity, ThemeProps } from '../shared/data/entities/entities';
 
 @Component({
   selector: 'modules',
   templateUrl: './modules.html',
   encapsulation: ViewEncapsulation.None,
 })
-export class ModuleComponent implements OnInit {
+export class ModuleComponent implements OnInit, AfterViewInit {
   availableLangs = ['es', 'en'];
   browserLangs: string[] = [];
   currentLang = '';
@@ -54,16 +55,21 @@ export class ModuleComponent implements OnInit {
     this.setupLanguage();
   }
 
+  async ngAfterViewInit() {
+  }
+
   async setupLanguage() {
     const settings = await this._commonServices.getAllSettings();
     if(settings) {
-      const setting = settings[0];
+      const setting: SettingsEntity = settings[0];
       const languages = [];
       setting.availableLanguages.map((lan) => {
         languages.push(lan.value);
       })
       this.translate.addLangs(languages);
       this.translate.setDefaultLang(setting.language);
+
+      this.applyCurrentTheme(setting);
     } else {
       this.translate.addLangs(this.availableLangs);
       this.currentLang = 'es';
@@ -73,5 +79,12 @@ export class ModuleComponent implements OnInit {
 
   onChangeUI(event) {
     this.uisubstate = event.value;
+  }
+
+  applyCurrentTheme(settings: SettingsEntity | any) {
+    console.log('settings: ', settings);
+    const theme = settings.themeProps[settings.theme.toLowerCase()];
+    console.log('theme: ', theme);
+    this._uiServices.applyTheme(theme);
   }
 }
