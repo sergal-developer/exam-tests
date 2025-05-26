@@ -6,7 +6,7 @@
         </div>
 
         <div class="screen" [ngClass]="{'open': screen === _screen.dashboard }">
-            <dashboard class="_screen screen_main" *ngIf="screen === _screen.dashboard" (onChange)="onChangeUI($event)"></dashboard>
+            <dashboard [selected]="submodule" class="_screen screen_main" *ngIf="screen === _screen.dashboard" (onChange)="onChangeUI($event)"></dashboard>
         </div>
 
         <div class="screen" [ngClass]="{'open': screen === _screen.settings }">

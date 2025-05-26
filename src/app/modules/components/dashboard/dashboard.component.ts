@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output, ViewEncapsulation, } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation, } from '@angular/core';
 import { AnswerEntity, AttemptEntity, OptionEntity, QuizEntity } from 'src/app/shared/data/entities/entities';
 import { AttemptState } from 'src/app/shared/data/enumerables/enumerables';
 import { TransformData } from 'src/app/shared/data/utils/transformData';
@@ -13,6 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
 })
 export class DashboardComponent implements OnInit {
   @Output() onChange = new EventEmitter();
+  @Input() selected: string = null;
 
   listQuiz: QuizEntity[] = [];
   currentQuiz: QuizEntity = null;
@@ -42,6 +43,11 @@ export class DashboardComponent implements OnInit {
     if(list) {
       this.listQuiz = this.normalizeQuiz(list);
     }
+
+    if (this.selected) {
+      const quiz = this.listQuiz.find((quiz) => quiz.id == this.selected);
+      this.showDetails(quiz);
+    }
   }
 
   async getSettings() {
@@ -64,7 +70,8 @@ export class DashboardComponent implements OnInit {
       questions: this.currentQuiz.questions,
       time: this.currentQuiz.time ? this.currentQuiz.time : 0,
       creationDate: new Date().getTime(),
-      updatedDate: new Date().getTime()
+      updatedDate: new Date().getTime(),
+      startDate: null
     }
 
     // DISCART INVALID ANSWERS
@@ -148,6 +155,7 @@ export class DashboardComponent implements OnInit {
     });
 
     this.valueChange('secondary');
+    this._commonServices.navigate('dashboard', this.currentQuiz.id);
   }
 
   returnMain() {
@@ -157,6 +165,8 @@ export class DashboardComponent implements OnInit {
     });
     this.currentQuiz = null;
     this.valueChange('primary');
+
+    this._commonServices.navigate('dashboard');
   }
 
   valueChange(value: string ) {

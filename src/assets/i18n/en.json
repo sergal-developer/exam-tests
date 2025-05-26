@@ -98,5 +98,6 @@
   "terms_conditions": "terms and conditions ",
   "privacy_policy": "privacy policy",
   "legal_title": "Legal",
-  "customize": "Customize"
+  "customize": "Customize",
+  "help_attempt": "Each assessment generates a new record and orders the questions randomly."
 }

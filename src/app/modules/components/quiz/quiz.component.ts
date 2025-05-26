@@ -26,7 +26,10 @@ export class QuizComponent implements OnInit {
   currentSection = 'show';
 
   _gradeState = GradeState;
-  gradePassedScore = 75; 
+  gradePassedScore = 75;
+
+  timerStart = null;
+  timerEnd = null;
   //#endregion INTERNAL
 
   constructor(private _commonService: CommonServices,
@@ -44,6 +47,10 @@ export class QuizComponent implements OnInit {
       this.attempt = await this.getAttemptData(this.id);
       if(this.attempt.state == 'completed') {
         this.attempt._score = this.attempt.score.toFixed(2);
+      }
+
+      if(!this.attempt.startDate) {
+        this.attempt.startDate = new Date().getTime();
       }
 
       if (!this.attempt) {
@@ -106,8 +113,6 @@ export class QuizComponent implements OnInit {
 
     this.savingData = false;
   }
-
-
   //#endregion DATA
 
   //#region EVENTS

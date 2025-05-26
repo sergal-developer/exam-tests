@@ -103,15 +103,29 @@ export class CommonServices {
   //#endregion EXAMS_ATTEMPTS
 
   //#region NAVIGATION
-  navigate(section: string, action?: string, id?: string) {
-    if (!action) {
+  navigate(section: string, action?: string, id?: string, props?: any ) {
+    let params = [];
+    props = props || {};
+    props.action = action;
+    props.id = id || null;
+
+    if(props) {
+      const keys = Object.keys(props);
+      keys.map((key) => {
+        if(props[key]) {
+          params.push(`${key}=${props[key]}`);
+        }
+      })
+    }
+
+    if (!props.action) {
       this._router.navigateByUrl(`/${section}`);
     } else {
-      if (id) {
-        this._router.navigateByUrl(`/${section}?action=${action}&id=${id}`);
-      } else {
-        this._router.navigateByUrl(`/${section}?action=${action}`);
-      }
+      let paramsUrl = '';
+      params.map((param, index) => { 
+        paramsUrl = index == 0 ?  `?${param}` : `${paramsUrl}&${param}`;
+      });
+      this._router.navigateByUrl(`/${section}${paramsUrl}`);
     }
   }
   //#endregion NAVIGATION
@@ -417,14 +431,14 @@ export class CommonServices {
   };
 
   //#region IA GEMINI
-  async geminiGenerate(data: { topic: string, questions: number, options: number }) {
+  async geminiGenerate(data: { topic: string, questions: number, options: number, language: string }) {
     const apiKey = atob('QUl6YVN5QktXS3RGX2ttMm81TWZDSzRFeGJ6OHVPOEpKWTBuZ2pZ');
     const model = 'gemini-2.0-flash';
     const prompt = `Genera un cuestionario sobre el tema "${data.topic}" de ${data.questions} preguntas en total, en cada pregunta debe tener de 2 a ${data.options} opciones de respuesta, donde solo debe de existir una respuesta correcta, el resultado debe de seguir el sigueinte patron json:
     { questions: [{ "question": "pregunta a realizar", 
      "options": [{ "id": "indice del array", "text": ""posible respuesta" }], 
      "correctAnswer": "numero del id de la opcion correcta"
-    }]}, si en la primer respuesta no se generan todas las preguntas envia un json valido donde queda la mayor cantidad solicitada.`;
+    }]}, si en la primer respuesta no se generan todas las preguntas envia un json valido donde este la mayor cantidad solicitada, ademas que los valores deben de estar en el idioma ${ data.language }`;
 
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
     const postData = {

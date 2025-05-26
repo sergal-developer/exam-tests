@@ -82,9 +82,7 @@ export class ModuleComponent implements OnInit, AfterViewInit {
   }
 
   applyCurrentTheme(settings: SettingsEntity | any) {
-    console.log('settings: ', settings);
     const theme = settings.themeProps[settings.theme.toLowerCase()];
-    console.log('theme: ', theme);
     this._uiServices.applyTheme(theme);
   }
 }

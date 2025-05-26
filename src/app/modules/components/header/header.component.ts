@@ -11,6 +11,7 @@ import { CommonServices } from 'src/app/shared/services/common.services';
 export class HeaderComponent implements OnInit {
   @Input() mode: 'dashboard' | 'settings' | 'quiz' | 'result' | 'quizeditable' = 'dashboard';
   @Input() title: string = '';
+  @Input() dashbaordparent: string = null;
 
   profile: ProfileEntity = null;
 
@@ -29,6 +30,12 @@ export class HeaderComponent implements OnInit {
   }
 
   gotoDashboard() {
-    this._commonService.navigate('dashboard');
+    if(this.dashbaordparent) {
+      	this._commonService.navigate('dashboard', this.dashbaordparent );
+    }
+
+    if(!this.dashbaordparent) { 
+      this._commonService.navigate('dashboard');
+    }
   }
 }

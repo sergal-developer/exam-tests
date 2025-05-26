@@ -1,5 +1,5 @@
 <ng-container *ngIf="attempt">
-    <header [mode]="'quiz'" [title]="attempt.title"></header>
+    <header [mode]="'quiz'" [title]="attempt.title" [dashbaordparent]="attempt.id"></header>
 
     <div class="timer-status" *ngIf="currentSection != 'show_2'">
         <div class="step-counter">{{ currentAnswerIndex + 1 }} {{ 'form_of_range' |

@@ -98,5 +98,6 @@
   "terms_conditions": "terminos y condiciones ",
   "privacy_policy": "politica de privacidad",
   "legal_title": "Legal",
-  "customize": "Personalizar"
+  "customize": "Personalizar",
+  "help_attempt": "Cada evaluación genera un nuevo registro y ordena las preguntas aleatoriamente."
 }

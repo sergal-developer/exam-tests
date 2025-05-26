@@ -107,8 +107,13 @@
                             <div>{{ currentQuiz._bestTimeValue }}</div>
                         </div>
                     </div> -->
-
-                    <div class="exam-section">
+                    <div class="exam-section _help">
+                        <span class="material-icons _accent color">
+                            help
+                        </span>
+                        <div>{{ 'help_attempt' | translate }}</div>
+                    </div>
+                    <div class="exam-section padding-top">
                         <h2 class="_primary color">{{ 'evaluations' | translate }}</h2>
 
                         <ng-container *ngIf="listAttempts.length">

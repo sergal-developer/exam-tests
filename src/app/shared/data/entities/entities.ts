@@ -65,6 +65,7 @@ export interface QuizEntity {
 
   creationDate: number;
   updatedDate: number;
+  startDate?: number;
 
   // varaibles for UI and format
   _showDetails?: boolean;
@@ -72,6 +73,7 @@ export interface QuizEntity {
   _current?: boolean;
   _creationDate?: string;
   _updatedDate?: string;
+  _startDate?: string;
   _attemptsValue?: string;
   _bestTimeValue?: string;
 }

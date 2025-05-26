@@ -113,7 +113,7 @@ export class QuizEditableComponent implements OnInit {
         this.quiz = injectData;
 
         // RECOVER OLD DATA
-        this.quiz.title = oldQuiz.title == this.translateLabels.new_quiz ? this.quiz.title : oldQuiz.title;
+        this.quiz.title = this.quiz.title == '' ? this.translateLabels.new_quiz : this.quiz.title;
         this.quiz.questions = oldQuiz.questions.length > 1 ? [...oldQuiz.questions, ...this.quiz.questions] : this.quiz.questions;
 
         this.quiz.questions.map((answer: AnswerEntity) => {
@@ -268,7 +268,7 @@ export class QuizEditableComponent implements OnInit {
   }
 
   gotoDashboard() {
-    this._commonService.navigate('dashboard');
+    this._commonService.navigate('dashboard', this.quiz.id );
   }
 
   nextQuestion() {
@@ -319,15 +319,18 @@ export class QuizEditableComponent implements OnInit {
   async generateQuiz() {
     if (this.loadingDataAi) { return; }
     this.loadingDataAi = true;
-    const data = this.formIAGenerated.value;
+    const data: { topic: string, questions: number, options: number, language: string } = this.formIAGenerated.value;
+    data.language = this.settings.language == 'es' ? 'español' : 'ingles';
+
     this._uiService.notification(`<h3><span class="material-icons">auto_awesome</span> ${this.translateLabels.generation_questions}</h3>`, { closeTimer: -1 });
+
     // const response: any = await this.mockDataAI();
     const response: any = await this._commonService.geminiGenerate(data);
 
     if (!response) {
       this._uiService.notification(this.translateLabels.service_fail_generate, { type: 'error', closeTimer: 3000 });
     } else {
-      this._uiService.notification(`${this.translateLabels.service_sucess_generation} ${response.questions.length} ${this.translateLabels.generation_questions_questions}.`, { closeTimer: 5000 });
+      this._uiService.notification(`${this.translateLabels.service_sucess_generation} ${response.questions.length} ${this.translateLabels.generation_questions_questions}.`, { closeTimer: 3000 });
 
       setTimeout(() => {
         const quiz: QuizEntity = {
