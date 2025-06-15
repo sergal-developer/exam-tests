@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { v4 as uuidv4 } from 'uuid';
-import { AttemptEntity, ProfileEntity, QuizEntity, SettingsEntity, ThemeProps } from '../data/entities/entities';
+import { AttemptEntity, LogEntity, ProfileEntity, QuizEntity, SettingsEntity, ThemeProps } from '../data/entities/entities';
 import { Utils } from '../data/utils/utils';
 import { DBLocal } from './storage/db-storage';
 import { FileStorage } from './storage/file-storage';
@@ -14,12 +14,14 @@ export class CommonServices {
   private dbProfiles = 'profiles';
   private dbQuizs = 'quiz';
   private dbAttempts = 'attempts';
+  private dbLogs = 'logs';
 
   private fileStorage = new FileStorage();
   private fileSettings = 'settings.json';
   private fileProfiles = 'profile.json';
   private fileQuizs = 'templateQuiz.json';
   private fileAttempts = 'attempts.json';
+  private fileLogs = 'logs.json'; 
   private fileObject = { data: [] };
 
   constructor(private _router: Router) {
@@ -27,6 +29,7 @@ export class CommonServices {
     this.dbProfiles = this.fileProfiles;
     this.dbQuizs = this.fileQuizs;
     this.dbAttempts = this.fileAttempts;
+    this.dbLogs = this.fileLogs; 
   }
 
   //#region PUBLIC METHODS
@@ -101,6 +104,22 @@ export class CommonServices {
   updateAttempt(id: string, data: any, idfield = 'id') { return this.actionPut(this.dbAttempts, id, data, idfield); }
   deleteAttempt(id: string, idfield = 'id') { return this.actionDelete(this.dbAttempts, id, idfield); }
   //#endregion EXAMS_ATTEMPTS
+
+    //#region LOGS
+  getAllLogs(): Array<LogEntity> { return this.actionGetAll(this.dbLogs); }
+  searchLog(id: string, idfield = 'id'): LogEntity { return this.actionSearch(this.dbLogs, id, idfield); }
+  filterLogs(id: string, idfield = 'id'): Array<LogEntity> { return this.actionFilter(this.dbLogs, id, idfield); }
+  saveLog(data: string, type = 'log') { 
+    const log: LogEntity = { 
+      date: new Date().getTime(),
+      id: uuidv4(),
+      content: data,
+      type: type
+    }
+    return this.actionPost(this.dbLogs, log); }
+  updateLog(id: string, data: any, idfield = 'id') { return this.actionPut(this.dbLogs, id, data, idfield); }
+  deleteLog(id: string, idfield = 'id') { return this.actionDelete(this.dbLogs, id, idfield); }
+  //#endregion LOGS
 
   //#region NAVIGATION
   navigate(section: string, action?: string, id?: string, props?: any ) {
@@ -466,6 +485,7 @@ export class CommonServices {
       const data = await response.json();
       // Procesar la respuesta
       if (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+        this.saveLog(data.candidates[0].content.parts[0].text);
         const generatedText = this.normalizeResponse(data.candidates[0].content.parts[0].text);
 
         try {

@@ -163,4 +163,13 @@ export interface ThemeProps {
   matLabelContrastBackground?: String;
   itemOptionBorder?: String;
   stadisticBackground?: String;
+
+  zoomLevel?: String;
+}
+
+export interface LogEntity {
+  id?: string;
+  date?: number,
+  content: any,
+  type?: string
 }

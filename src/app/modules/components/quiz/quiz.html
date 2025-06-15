@@ -15,6 +15,9 @@
             {{ attempt.time }}
         </div>
         <div class="status completed" *ngIf="readonly"> {{ 'attempt_status_complete' | translate }} </div>
+
+        
+        <div class="zoom" (click)="updateZoom()"> {{ zoomlevel }}</div>
     </div>
 
     <div class="root_container_collection" *ngIf="attempt">
@@ -23,7 +26,7 @@
             <div class="root-container">
                 <div class="simple-section" *ngIf="currentAnswer">
                     <div class="_question">
-                        <div class="_question_text gray-backdrop drop-padding drop-top"
+                        <div class="_question_text gray-backdrop drop-padding drop-top font_variable"
                             [innerHTML]="currentAnswer.question">
                         </div>
 
@@ -34,7 +37,7 @@
                                         'view': readonly,
                                         'correct': readonly && (option.id == currentAnswer.correctAnswer) }"
                                     (click)="selectOption(option)">
-                                    <div class="_answer_selection">
+                                    <div class="_answer_selection font_variable">
                                         <ng-container *ngIf="readonly">
                                             <span *ngIf="option.id == currentAnswer.correctAnswer"
                                                 class="material-icons">verified</span>
@@ -52,7 +55,7 @@
 
 
                                     </div>
-                                    <div class="_answer_text" [innerHTML]="option.text">
+                                    <div class="_answer_text font_variable" [innerHTML]="option.text">
                                     </div>
                                 </div>
                             </ng-container>

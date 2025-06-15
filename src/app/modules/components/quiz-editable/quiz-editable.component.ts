@@ -52,19 +52,14 @@ export class QuizEditableComponent implements OnInit {
   }
 
   async ngOnInit() {
-    this.getSettings();
     this.setupLanguage(() => {
       this.setupComponent();
     });
   }
 
-  async getSettings() {
-    this.settings = await this._commonService.getActiveSettings();
-  }
-
   async setupLanguage(next) {
-    const settings = await this._commonService.getActiveSettings();
-    this.translate.setDefaultLang(settings.language);
+    this.settings = await this._commonService.getActiveSettings();
+    this.translate.setDefaultLang(this.settings.language);
     const keys = Object.keys(this.translateLabels);
     this.translate.get(keys).subscribe((res) => {
       this.translateLabels = res;
@@ -79,6 +74,7 @@ export class QuizEditableComponent implements OnInit {
 
     if (this.quizId && !injectData) {
       this.quiz = await this.getQuizData(this.quizId);
+      console.log('this.quiz: ', this.quiz);
 
       if (!this.quiz) {
         this._uiService.notification(this.translateLabels.service_fail_get, { type: 'error', closeTimer: 3000 });

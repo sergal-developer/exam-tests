@@ -1749,3 +1749,9 @@ h6 {
         color: var(--accent);
     }
 }
+
+
+.font_variable {
+    font-size: var(--zoomLevel) !important;
+    transition: font-size 300ms ease 300ms;
+}

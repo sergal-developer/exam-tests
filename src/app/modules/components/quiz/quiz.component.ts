@@ -30,6 +30,8 @@ export class QuizComponent implements OnInit {
 
   timerStart = null;
   timerEnd = null;
+  zoomlevel = '100%';
+  settings = null;
   //#endregion INTERNAL
 
   constructor(private _commonService: CommonServices,
@@ -37,6 +39,7 @@ export class QuizComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
+    this.settings = await this._commonService.getActiveSettings();
     await this.getData();
     this.setupComponent();
   }
@@ -198,6 +201,19 @@ export class QuizComponent implements OnInit {
 
   valueChange(value: string ) {
     this.onChange.emit({ action: 'ui_update', value: value });
+  }
+
+  updateZoom() {
+    const currentLevel = parseInt(this.zoomlevel.replace('%', ''));
+    const increment = 10;
+    let lavel = currentLevel <= 160 ? currentLevel + increment :
+                currentLevel >= 160 ? 70 + increment : 100;
+
+    this.zoomlevel = `${lavel}%`;
+    console.log('currentLevel: ', this.zoomlevel);
+
+    this._uiService.applyThemeKey('zoomLevel', this.zoomlevel);
+    // this._uiService.applyTheme(this.settings.themeProps[this.settings.theme.toLowerCase()])
   }
   //#endregion EVENTS
 

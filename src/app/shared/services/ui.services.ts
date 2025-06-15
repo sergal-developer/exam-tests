@@ -64,7 +64,13 @@ export class UiServices {
         root.style.setProperty(`--${key}`, theme[key]);
       });
     }
-    
+  }
+
+  applyThemeKey(key: string, value: any) {
+    let root = document.documentElement;
+    if(root) {
+        root.style.setProperty(`--${key}`, value);
+    }
   }
   //#endregion
 }

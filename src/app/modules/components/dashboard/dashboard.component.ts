@@ -197,7 +197,7 @@ export class DashboardComponent implements OnInit {
   validateQuestions(list: AnswerEntity[]) {
     const validAnswers = [];
     list.map((answer: AnswerEntity) => {
-      if (answer.question != '' && answer.correctAnswer) {
+      if (answer.question != '' && answer.correctAnswer != null) {
         validAnswers.push(answer);
       }
     });

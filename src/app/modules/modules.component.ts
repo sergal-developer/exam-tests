@@ -51,6 +51,7 @@ export class ModuleComponent implements OnInit, AfterViewInit {
 
   async ngOnInit() {
     // this._commonServices.clearDB();
+    this.getPropsScreen();
     await this._commonServices.checkFiles();
     this.setupLanguage();
   }
@@ -60,7 +61,7 @@ export class ModuleComponent implements OnInit, AfterViewInit {
 
   async setupLanguage() {
     const settings = await this._commonServices.getAllSettings();
-    if(settings) {
+    if (settings) {
       const setting: SettingsEntity = settings[0];
       const languages = [];
       setting.availableLanguages.map((lan) => {
@@ -82,7 +83,27 @@ export class ModuleComponent implements OnInit, AfterViewInit {
   }
 
   applyCurrentTheme(settings: SettingsEntity | any) {
+    settings.themeProps.dark.zoomLevel = '100%';
+    settings.themeProps.light.zoomLevel = '100%';
     const theme = settings.themeProps[settings.theme.toLowerCase()];
     this._uiServices.applyTheme(theme);
+  }
+
+  async getLogs() {
+    const logs = await this._commonServices.getAllLogs();
+    console.log('logs: ', logs);
+  }
+
+  screenwidth = 0;
+  screenheight = 0;
+
+  getPropsScreen() {
+    this.screenwidth = window.innerWidth
+      || document.documentElement.clientWidth
+      || document.body.clientWidth;
+
+    this.screenheight = window.innerHeight
+      || document.documentElement.clientHeight
+      || document.body.clientHeight;
   }
 }
