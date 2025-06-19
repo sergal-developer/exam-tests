@@ -1,20 +1,26 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
-import { AvatarModule } from "./avatar/avatar.module";
-import { ModalModule } from "./modal/modal.module";
+import { LogoComponent } from "./logo/logo.component";
+import { MatInputComponent } from "./mat-input/mat-input.component";
+import { ModalComponent } from "./modal/modal.component";
 
 @NgModule ( {
     imports : [
         CommonModule,
-        AvatarModule,
-        ModalModule
+        FormsModule,
+        ReactiveFormsModule
     ],
-    declarations: [],
+    declarations: [
+        LogoComponent,
+        MatInputComponent,
+        ModalComponent,
+    ],
     exports: [
-        AvatarModule,
-        ModalModule
-    ],
-    providers: []
+        LogoComponent,
+        MatInputComponent,
+        ModalComponent,
+    ]
 } )
 export class ComponentsModule { }

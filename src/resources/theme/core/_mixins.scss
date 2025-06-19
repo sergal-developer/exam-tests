@@ -4,6 +4,7 @@
 $mobile-width: 0px;
 $tablet-width: 768px;
 $desktop-width: 1204px;
+$desktop-ultra-wide-width: 2500px;
 
 @mixin mobile {
     @media (min-width: #{$mobile-width}) and (max-width: #{$tablet-width - 1px}) {
@@ -18,13 +19,19 @@ $desktop-width: 1204px;
 }
 
 @mixin mobile-tablet {
-    @media (min-width: #{$mobile-width}) and (max-width: #{$desktop-width - 1px}) {
+  @media (min-width: #{$mobile-width}) and (max-width: #{$desktop-width - 1px}) {
+    @content;
+  }
+}
+
+@mixin desktop {
+    @media (min-width: #{$desktop-width}) and (max-width: #{$desktop-ultra-wide-width - 1px}) {
       @content;
     }
 }
 
-@mixin desktop {
-    @media (min-width: #{$desktop-width}) {
+@mixin desktop-ultra-wide {
+    @media (min-width: #{$desktop-ultra-wide-width}) {
       @content;
     }
 }
@@ -68,7 +75,10 @@ $desktop-width: 1204px;
         scrollbar-face-color: $foreground-color;
         scrollbar-track-color: $background-color;
     }
-    
+}
+
+@mixin defaultScroll() {
+    @include scroll(10px, gray, gray, 10px);
 }
 
 /**
@@ -108,7 +118,38 @@ $desktop-width: 1204px;
 // #endregion
 
 
-$root-font-size: 16px; // Cambia esto al tamaño de fuente base en píxeles
-@mixin rem($value) {
-    font-size: calc(($value / $root-font-size) * 1rem);
+
+
+$browser-context: 16;
+/**
+ * @description
+ * convert PX to EM
+ *
+ * @param $pixels: value of pixels
+ * @param $context: value of context
+ *
+ */
+@function em($pixels, $context: $browser-context) {
+  @if (unitless($pixels)) {
+    $pixels: $pixels * 1px;
+  }
+
+  @if (unitless($context)) {
+    $context: $context * 1px;
+  }
+
+  @return calc($pixels / $context) * 1em;
 }
+
+@function rem($pixels, $context: $browser-context) {
+    @if (unitless($pixels)) {
+      $pixels: $pixels * 1px;
+    }
+  
+    @if (unitless($context)) {
+      $context: $context * 1px;
+    }
+  
+    @return calc($pixels / $context) * 1rem;
+  }
+// #endregion

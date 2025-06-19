@@ -5,19 +5,38 @@ export enum EVENTS {
 
 export enum ScreenEnum {
     splash = 'splash',
+    register = 'register',
     dashboard = 'dashboard',
+
+    settings = 'settings',
+    quiz = 'quiz',
+    quizcreate = 'quizcreate',
+    quizedit = 'quizedit',
+    attemptevalue = 'attemptevalue',
+    attemptreview = 'attemptreview',
+    quizresults = 'quizresults',
+
+    
     exam = 'exam',
     create = 'create',
     admin = 'admin',
     edit = 'edit',
-
-    
     profile = 'profile',
-    settings = 'settings',
     home = 'home',
     game = 'game',
 }
 
+export enum AttemptState {
+    new = 'new',
+    progress = 'progress',
+    completed = 'completed'
+}
+
+export enum GradeState {
+    passed = 'passed',
+    failed = 'failed',
+    barely_passed = 'barely_passed',
+}
 
 export enum GamesEnum {
     ColorNumbers = 'ColorNumbers',

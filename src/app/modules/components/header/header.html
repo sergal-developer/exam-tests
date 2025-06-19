@@ -1,0 +1,66 @@
+<div class="root-header">
+    <ng-container *ngIf="mode == 'dashboard'">
+        <div class="item">
+            <div class="avatar" *ngIf="profile">
+                <img [attr.src]="profile.avatar.url">
+            </div>
+        </div>
+        <div class="item" *ngIf="profile">
+            <h2>{{ 'welcome' | translate }} </h2>
+            <div>{{ profile.userName }}</div>
+        </div>
+        <div class="item settings">
+            <button class="circle primary" (click)="gotoSettings()" >
+                <div class="inner">
+                    <span class="material-icons-outlined">
+                        settings
+                    </span>
+                </div>
+            </button>
+        </div>
+        
+    </ng-container>
+    <ng-container *ngIf="mode == 'settings'">
+        <div class="root-header aling-left">
+            <div class="item clickable" (click)="gotoDashboard()">
+                <h1> <span class="material-icons">arrow_back</span> </h1>
+            </div>
+            <div class="item">
+                <h2>{{ 'header_settings' | translate }}</h2>
+            </div>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="mode == 'quiz'">
+        <div class="root-header aling-left" (click)="gotoDashboard()">
+            <div class="item clickable" >
+                <h1> <span class="material-icons">arrow_back</span></h1>
+            </div>
+            <div class="item title">
+                <h2 *ngIf="title">{{ title }}</h2>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="mode == 'quizeditable'">
+        <div class="root-header aling-left">
+            <div class="item clickable" (click)="gotoDashboard()">
+                <h1> <span class="material-icons">arrow_back</span></h1>
+            </div>
+            <div class="item">
+                <h2 *ngIf="title">{{ title }}</h2>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="mode == 'result'">
+        <div class="root-header aling-left">
+            <div class="item clickable" (click)="gotoDashboard()">
+                <h1> <span class="material-icons">arrow_back</span></h1>
+            </div>
+            <div class="item">
+                <h2>{{ 'header_results' | translate }}</h2>
+            </div>
+        </div>
+    </ng-container>
+    
+</div>

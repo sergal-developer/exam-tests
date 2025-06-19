@@ -9,7 +9,10 @@ android {
 
 apply from: "../capacitor-cordova-android-plugins/cordova.variables.gradle"
 dependencies {
+    implementation project(':boengli-capacitor-fullscreen')
     implementation project(':capacitor-filesystem')
+    implementation project(':capacitor-screen-orientation')
+    implementation project(':capacitor-status-bar')
 
 }
 

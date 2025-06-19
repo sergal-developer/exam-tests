@@ -1,4 +1,121 @@
-h1, h2, h3, h4, h5, h6 {
-    line-height: 1;
+@import './core/colors';
+@import './core/typography';
+@import './core/mixins';
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    line-height: inherit;
     font-weight: normal;
+    margin: 0 0 10px 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+
+}
+
+form,
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+textarea,
+input {
+    padding: calc(var(--appFontSize) / 2);
+    width: 100%;
+    transition: all 300ms;
+    font-weight: normal;
+    font-size: inherit;
+    line-height: 1;
+    border-radius: 0;
+    outline: none;
+    background: transparent;
+    border: transparent;
+    color: inherit;
+    min-height: 50px;
+    height: 60px;
+}
+
+button,
+.button {
+    background: var(--primaryBackground);
+    color: var(--primaryColor);
+    border: 1px solid transparent;
+    transition: all 300ms;
+    cursor: pointer;
+    padding: 10px 25px;
+    padding: 8px 15px;
+    font-weight: 600;
+    font-size: 16px;
+    border-radius: 5px;
+    display: inline-block;
+    margin: 0;
+
+    .inner {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        line-height: 1;
+        gap: 5px;
+    }
+
+    .material-icons {
+        display: inline-block;
+    }
+
+    &:hover,
+    &.hover {
+        background: var(--primaryBackgroundHover);
+        color: var(--primaryColor);
+    }
+
+    &:disabled,
+    &.disabled {
+        opacity: 0.7;
+        text-decoration: none;
+    }
+
+    &.circle {
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        font-size: rem(25px);
+    }
+
+    &.primary {
+        background: var(--secondaryBackground);
+        color: var(--secondaryColor);
+
+        &:hover,
+        &.hover {
+            background: var(--secondaryBackgroundHover);
+            color: var(--secondaryColor);
+        }
+    }
+
+    &.link {
+        color: var(--appColor);
+        background: transparent;
+        padding: 0px;
+
+        .material-icons {
+            font-size: 150%;
+        }
+
+        &:hover,
+        &.hover {
+            background: transparent;
+        }
+
+        &.uppercase {
+            text-transform: uppercase;
+        }
+    }
+
 }

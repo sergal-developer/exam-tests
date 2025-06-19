@@ -6,7 +6,7 @@ $_modal-gray: #8f8f8f;
 ._modal-panel {
   position: fixed;
   width: 100vw;
-  height: 100vh;
+  height: 50vh;
   top: 0;
   left: 0;
   z-index: -1;
@@ -115,6 +115,7 @@ $_modal-gray: #8f8f8f;
 
   &.open {
     z-index: 9999;
+    height: 100vh;
     ._modal-overlap {
       opacity: 1;
       background: rgba(0, 0, 0, 0.4);

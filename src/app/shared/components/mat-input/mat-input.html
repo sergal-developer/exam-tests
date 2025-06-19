@@ -1,0 +1,23 @@
+<div class="mat-form-field">
+    <div class="mat-label" [ngClass]="{'empty': !ngControl.control.value, 'disabled': ngControl.control.disabled  }">
+        <div class="mat-label-text">{{ title }}</div>
+
+        <input *ngIf="!multiline" placeholder="{{ title }}" [attr.maxlength]="maxlength"
+            [formControl]="ngControl.control" type="{{type}}" (input)="valueChange($event)">
+
+        <div class="textarea-warp" *ngIf="multiline" [attr.data-replicated-value]="ngControl.control.value">
+            <textarea placeholder="{{ title }}" [attr.maxlength]="maxlength" [formControl]="ngControl.control"
+                (input)="valueChange($event)">
+            </textarea>
+        </div>
+
+        <div class="mat-error"
+            *ngIf="ngControl.control.invalid && (ngControl.control.dirty || ngControl.control.touched)"
+            [ngClass]="{'error': ngControl.control.errors }">
+            <div *ngIf="ngControl.control.errors">
+                {{ mesageError }}
+                <!-- {{ ngControl.control.errors | json }} -->
+            </div>
+        </div>
+    </div>
+</div>
