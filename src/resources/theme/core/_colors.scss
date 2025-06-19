@@ -1,12 +1,23 @@
-$primary: blue;
 
-$black_12: rgba(0, 0, 0, 0.12);
-$black_22: rgba(0, 0, 0, 0.22);
-$black_100: rgba(0, 0, 0, 1);
+$background: #000;
+$black: #d0d0d0;
 
-$white_100: rgba(255, 255, 255, 1);
+$default: #174FA1;
+$defaultBG: $default;
+$defaultBG_hover: #346ec5;
+$defaultCOLOR: #FFFCFF;
 
-$accent1: #B5C2F4;
-$accent2: #C5F2E5;
-$accent3: #C7F8CA;
-$accent4: #F18B52;
+$secondary: #174FA1;
+$secondaryBG: $secondary;
+$secondaryBG_hover: #346ec5;
+$secondaryCOLOR: #FFFCFF;
+
+$primary: #B30ECF;
+$primaryBG: $primary;
+$primaryBG_hover: #be29d8;
+$primaryCOLOR: #e4e4e4;
+
+$accent: #FFD477;
+$accentBG: $accent;
+$accentBG_hover: #d1aa56;
+$accentCOLOR: #444444;

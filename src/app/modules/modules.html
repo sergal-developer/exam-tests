@@ -1,0 +1,51 @@
+<div class="wrapper {{ uistate }} {{ uisubstate }}">
+    <div class="screen-collection {{ '__' + screen }}">
+
+        <div class="screen full" [ngClass]="{'open': screen === _screen.register }">
+            <register class="_screen screen_register" *ngIf="screen === _screen.register"></register>
+        </div>
+
+        <div class="screen" [ngClass]="{'open': screen === _screen.dashboard }">
+            <dashboard [selected]="submodule" class="_screen screen_main" *ngIf="screen === _screen.dashboard" (onChange)="onChangeUI($event)"></dashboard>
+        </div>
+
+        <div class="screen" [ngClass]="{'open': screen === _screen.settings }">
+            <settings class="_screen screen_settings" *ngIf="screen === _screen.settings"></settings>
+        </div>
+
+        <div class="screen" [ngClass]="{'open': screen === _screen.quizcreate }">
+            <quiz-editable class="_screen screen_quiz" *ngIf="screen === _screen.quizcreate"></quiz-editable>
+        </div>
+
+        <div class="screen" [ngClass]="{'open': screen === _screen.quizedit }">
+            <quiz-editable [quizId]="submodule" class="_screen screen_quiz" *ngIf="screen === _screen.quizedit"></quiz-editable>
+        </div>
+
+        <div class="screen" [ngClass]="{'open': screen === _screen.attemptevalue }">
+            <quiz [id]="submodule" [review]="false" class="_screen screen_quiz" *ngIf="screen === _screen.attemptevalue" (onChange)="onChangeUI($event)"></quiz>
+        </div>
+
+        <div class="screen" [ngClass]="{'open': screen === _screen.attemptreview }">
+            <quiz [id]="submodule" [review]="true" class="_screen screen_quiz" *ngIf="screen === _screen.attemptreview" (onChange)="onChangeUI($event)"></quiz>
+        </div>
+
+    </div>
+
+    <div class="bg-item _bg_1"><img src="../../assets/item-1.svg" alt=""></div>
+    <div class="bg-item _bg_2"><img src="../../assets/item-2.svg" alt=""></div>
+    <div class="bg-item _bg_3"><img src="../../assets/item-3.svg" alt=""></div>
+    <div class="bg-item _bg_4"><img src="../../assets/item-4.svg" alt=""></div>
+    <div class="bg-item _bg_5"><img src="../../assets/item-5.svg" alt=""></div>
+    <div class="bg-item _bg_6"><img src="../../assets/item-6.svg" alt=""></div>
+    <div class="bg-item _bg_7"><img src="../../assets/item-7.svg" alt=""></div>
+</div>
+
+<div class="notification {{ _uiServices._notification.type }}"
+    [ngClass]="{'show': _uiServices._notification.show }">
+    <div class="item" *ngIf="_uiServices._notification.icon"><span class="material-icons">{{
+            _uiServices._notification.icon }}</span></div>
+    <div class="item" [innerHTML]="_uiServices._notification.text"></div>
+    <div class="item actions">
+        <button (click)="_uiServices.closeNotification()"> <span class="material-icons">close</span> </button>
+    </div>
+</div>

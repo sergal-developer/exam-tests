@@ -1,0 +1,189 @@
+<ng-container *ngIf="attempt">
+    <header [mode]="'quiz'" [title]="attempt.title" [dashbaordparent]="attempt.id"></header>
+
+    <div class="timer-status" *ngIf="currentSection != 'show_2'">
+        <div class="step-counter">
+            <span class="material-icons">
+layers
+</span>
+            {{ currentAnswerIndex + 1 }} {{ 'form_of_range' |
+            translate }} {{ attempt.questions.length }}
+        </div>
+        <div class="timer" [ngClass]="{'timer-green':  currentAnswerIndex == attempt.questions.length - 1 }">
+            <div class="timer-bar" [attr.style]="progresStyle"></div>
+        </div>
+        <div class="remaining-time" *ngIf="!readonly && attempt.time">
+            <span class="material-icons">
+                schedule
+            </span>
+            {{ attempt.time }}
+        </div>
+        <div class="status completed" *ngIf="readonly"> {{ 'attempt_status_complete' | translate }} </div>
+
+
+        <div class="zoom" (click)="updateZoom()">
+            <span class="material-icons">text_fields</span>
+            {{ zoomlevelLabel }}
+        </div>
+    </div>
+
+    <div class="root_container_collection" *ngIf="attempt">
+        <div class="root_container_mask {{ currentSection }}">
+
+            <div class="root-container">
+                <div class="simple-section" *ngIf="currentAnswer">
+                    <div class="_question">
+                        <div class="_question_text gray-backdrop drop-padding drop-top font_variable"
+                            [innerHTML]="currentAnswer.question">
+                        </div>
+
+                        <div class="_answer_collection gray-backdrop drop-padding drop-bottom">
+                            <ng-container *ngFor="let option of currentAnswer.options">
+                                <div class="_answer" [ngClass]="{   
+                                        'selected': option.selected, 
+                                        'view': readonly,
+                                        'correct': readonly && (option.id == currentAnswer.correctAnswer) }"
+                                    (click)="selectOption(option)">
+                                    <div class="_answer_selection font_variable">
+                                        <ng-container *ngIf="readonly">
+                                            <span *ngIf="option.id == currentAnswer.correctAnswer"
+                                                class="material-icons">verified</span>
+                                            <span *ngIf="(option.id != currentAnswer.correctAnswer) && option.selected"
+                                                class="material-icons">radio_button_checked</span>
+                                            <span *ngIf="(option.id != currentAnswer.correctAnswer) && !option.selected"
+                                                class="material-icons">radio_button_unchecked</span>
+                                        </ng-container>
+                                        <ng-container *ngIf="!readonly">
+                                            <span *ngIf="option.selected"
+                                                class="material-icons">radio_button_checked</span>
+                                            <span *ngIf="!option.selected"
+                                                class="material-icons">radio_button_unchecked</span>
+                                        </ng-container>
+
+
+                                    </div>
+                                    <div class="_answer_text font_variable" [innerHTML]="option.text">
+                                    </div>
+                                </div>
+                            </ng-container>
+
+                        </div>
+
+                        <div class="_question_actions fixed" *ngIf="currentSection != 'show_2'">
+                            <button class="link uppercase" (click)="prevAnswer()" *ngIf="currentAnswerIndex > 0">
+                                <div class="inner">
+                                    <span class="material-icons _accent color">
+                                        chevron_left
+                                    </span>
+                                    {{ 'action_prev' | translate }}
+                                </div>
+                            </button>
+                            <button class="link uppercase" (click)="nextAnswer()"
+                                [disabled]="!currentAnswer.selectedAnswer"
+                                *ngIf="currentAnswerIndex < attempt.questions.length - 1">
+                                <div class="inner">
+                                    {{ 'action_next' | translate }}
+                                    <span class="material-icons _accent color">
+                                        chevron_right
+                                    </span>
+
+                                </div>
+                            </button>
+                            <button class="primary" (click)="finishQuiz()"
+                                *ngIf="currentAnswerIndex == attempt.questions.length - 1 && !readonly">
+                                <div class="inner">
+                                    <span>{{ 'action_complete' | translate }}</span>
+                                </div>
+                            </button>
+
+                            <button class="primary" (click)="viewResultsAction()" *ngIf="readonly">
+                                <div class="inner">
+                                    {{ 'action_results' | translate }}
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="root-container grade-container {{ attempt.grade }}">
+                <div class="simple-section">
+
+                    <div class="_content transparent section-column grade {{ attempt.grade }}">
+                        <h1 class="">
+                            <ng-container *ngIf="attempt.grade == _gradeState.passed">
+                                <span>{{ 'attempt_status_approved' | translate }}</span>
+                                <span class="material-icons">
+                                    verified
+                                </span>
+                            </ng-container>
+                            <ng-container *ngIf="attempt.grade == _gradeState.barely_passed">
+                                <span>{{ 'attempt_status_passed' | translate }}</span>
+                                <span class="material-icons">
+                                    done
+                                </span>
+                            </ng-container>
+                            <ng-container *ngIf="attempt.grade == _gradeState.failed">
+                                <span>{{ 'attempt_status_failed' | translate }}</span>
+                                <span class="material-icons">
+                                    warning_amber
+                                </span>
+                            </ng-container>
+                        </h1>
+
+                        <div class="_question_text">
+                            {{ 'attempt_subtitle' | translate }}
+                        </div>
+
+                        <div class="_collection">
+                            <div class="stadistic">
+                                <h3>{{ 'attempt_status_hits' | translate }}</h3>
+                                <div class="_accent color">{{ attempt.correctAnswers }} de {{ attempt.questions.length
+                                    }}</div>
+                            </div>
+
+                            <div class="stadistic">
+                                <h3>{{ 'attempt_status_rating' | translate }}</h3>
+                                <div class="_accent color">{{ attempt._score }}</div>
+                            </div>
+                        </div>
+
+                        <h3>{{ 'attempt_status_rating_correct' | translate }}</h3>
+                        <div class="_collection overflow_180">
+                            <ng-container *ngFor="let item of attempt.questions; let i = index">
+                                <div class="question-dot" [ngClass]="{'correct': item.isCorrect }"
+                                    (click)="gotoQuestion(i)">
+                                    {{ i + 1 }}
+                                </div>
+                            </ng-container>
+                        </div>
+
+                        <div class="_collection actions">
+
+                            <button class="primary" (click)="showQuiz()">
+                                <div class="inner">
+                                    <span class="material-icons">
+                                        rule
+                                    </span>
+                                    {{ 'action_review' | translate }}
+                                </div>
+                            </button>
+
+                            <!-- <button (click)="closeResults()">
+                                <div class="inner">
+                                    {{ 'action_close' | translate }}
+                                </div>
+                            </button> -->
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</ng-container>
+<ng-container *ngIf="!attempt">
+    <h1>{{ 'service_loading' | translate }}</h1>
+</ng-container>

@@ -1,5 +1,4 @@
 import { Component, EventEmitter, HostListener, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
-import { EmitResponse } from '../../data/entities/emitRespose.entity';
 
 @Component({
   selector: 'modal',
@@ -50,7 +49,7 @@ export class ModalComponent implements OnInit {
     }
 
     this.open = false;
-    this.afterChange.emit( new EmitResponse('PANEL', { action: 'close' }));
+    // this.afterChange.emit( new EmitResponse('PANEL', { action: 'close' }));
   }
 
   closeInOverlap() {
