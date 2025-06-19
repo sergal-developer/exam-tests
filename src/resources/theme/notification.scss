@@ -51,21 +51,51 @@
         background: var(--notificationSuccess);
         color: var(--notificationColorContrast);
     }
+
     &.warning {
-        background: var(--notificationWarning);;
+        background: var(--notificationWarning);
+        ;
         color: var(--notificationColorContrast);
     }
+
     &.error {
-        background: var(--notificationError);;
+        background: var(--notificationError);
+        ;
         color: white;
     }
+
     &.info {
-        background: var(--notificationInfo);;
+        background: var(--notificationInfo);
+        ;
         color: var(--notificationColorContrast);
+    }
+
+    &.full-IA {
+        height: 98vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+        background: linear-gradient(-45deg, rgba(238, 118, 82, 0.8), rgba(231, 60, 126, 0.8), rgba(35, 165, 213, 0.8), rgba(35, 213, 171, 0.8));
+        background-size: 200% 200%;
+        animation: gradient 5s ease infinite;
+        color: black;
     }
 
     &.static {
         transform: translatey(0%);
         position: relative;
     }
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }

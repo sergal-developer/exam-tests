@@ -34,7 +34,8 @@ export class QuizEditableComponent implements OnInit {
     generation_questions: '',
     service_sucess_generation: '',
     service_fail_update: '',
-    generation_questions_questions: ''
+    generation_questions_questions: '',
+    ia_subtitle: ''
   };
 
   durationFormShow = false;
@@ -73,8 +74,8 @@ export class QuizEditableComponent implements OnInit {
     this.isEdit = this.quizId ? true : false;
 
     if (this.quizId && !injectData) {
+      // no se esta injectando datos y recupera el examen solicitado
       this.quiz = await this.getQuizData(this.quizId);
-      console.log('this.quiz: ', this.quiz);
 
       if (!this.quiz) {
         this._uiService.notification(this.translateLabels.service_fail_get, { type: 'error', closeTimer: 3000 });
@@ -107,9 +108,11 @@ export class QuizEditableComponent implements OnInit {
         // BACKUP OLD DATA 
         const oldQuiz: QuizEntity = JSON.parse(JSON.stringify(this.quiz));
         this.quiz = injectData;
+        console.log('this.quiz: ', this.quiz);
+        this.quiz.id = this.quizId;
 
         // RECOVER OLD DATA
-        this.quiz.title = this.quiz.title == '' ? this.translateLabels.new_quiz : this.quiz.title;
+        this.quiz.title = oldQuiz.title == '' ? this.quiz.title : oldQuiz.title;
         this.quiz.questions = oldQuiz.questions.length > 1 ? [...oldQuiz.questions, ...this.quiz.questions] : this.quiz.questions;
 
         this.quiz.questions.map((answer: AnswerEntity) => {
@@ -157,6 +160,8 @@ export class QuizEditableComponent implements OnInit {
       options: [4, Validators.required],
     });
     this.showIAForm = false;
+
+    console.log('final quiz', this.quiz);
   }
 
   setCurrentAnswer() {
@@ -189,7 +194,7 @@ export class QuizEditableComponent implements OnInit {
 
   async updateQuiz(cleanUnused = false) {
     const { title, time } = this.form.value;
-    this.quiz.title = title;
+    this.quiz.title = title.length > 30 ? title.slice(0, 28) : title;
     this.quiz.time = time;
     this.quiz.creationDate = new Date().getTime();
     this.quiz.updatedDate = new Date().getTime();
@@ -318,15 +323,15 @@ export class QuizEditableComponent implements OnInit {
     const data: { topic: string, questions: number, options: number, language: string } = this.formIAGenerated.value;
     data.language = this.settings.language == 'es' ? 'español' : 'ingles';
 
-    this._uiService.notification(`<h3><span class="material-icons">auto_awesome</span> ${this.translateLabels.generation_questions}</h3>`, { closeTimer: -1 });
 
+    this._uiService.notification(`<h3><span class="material-icons">auto_awesome</span> ${this.translateLabels.generation_questions}</h3> <br> <p>${ this.translateLabels.ia_subtitle }</p>`, { closeTimer: -1, type: 'full-IA' });
     // const response: any = await this.mockDataAI();
     const response: any = await this._commonService.geminiGenerate(data);
 
     if (!response) {
       this._uiService.notification(this.translateLabels.service_fail_generate, { type: 'error', closeTimer: 3000 });
     } else {
-      this._uiService.notification(`${this.translateLabels.service_sucess_generation} ${response.questions.length} ${this.translateLabels.generation_questions_questions}.`, { closeTimer: 3000 });
+      this._uiService.notification(`${this.translateLabels.service_sucess_generation} ${response.questions.length} ${this.translateLabels.generation_questions_questions}.`, { closeTimer: 2500 });
 
       setTimeout(() => {
         const quiz: QuizEntity = {

@@ -19,7 +19,7 @@
 
                 <div class="exam-section gray-backdrop" *ngIf="listQuiz.length">
                     <h3 class="title-upper _accent color">{{ 'list_exam' | translate }}</h3>
-                    <div class="exam-collection">
+                    <div class="exam-collection collection-limited">
                         <ng-container *ngFor="let quiz of listQuiz">
                             <div class="item">
                                 <div class="image">
@@ -62,7 +62,7 @@
                 </div>
             </div>
 
-            <div class="root-container gray-backdrop drop-padding">
+            <div class="root-container gray-backdrop drop-padding root-container-details">
                 <div class="_title_quiz" *ngIf="currentQuiz">
                     <div class="clickable _accent color" (click)="returnMain()">
                         <span class="material-icons _primary color">
@@ -138,6 +138,8 @@
                                     </button>
                                 </div>
                             </div>
+                        </div>
+                        <div class="exam-collection collection-limited-details">
 
                             <ng-container *ngFor="let attempt of listAttempts; let i = index">
                                 <div class="item listname">

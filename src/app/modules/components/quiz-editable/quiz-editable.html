@@ -3,10 +3,13 @@
     <div class="item clickable" (click)="gotoDashboard()">
         <h2> <span class="material-icons">arrow_back</span></h2>
     </div>
-    <div class="item editable-title" *ngIf="form">
+    <div class="item editable-title" *ngIf="form && !showIAForm">
         <mat-input [title]="'form_title' | translate"
             [mesageError]="'form_title_required' | translate" [formControl]="form.get('title')">
         </mat-input>
+    </div>
+    <div class="item editable-title" *ngIf="form && showIAForm">
+        <h2>{{ form.get('title').value }}</h2>
     </div>
 </div>
 
@@ -61,6 +64,13 @@
             <div class="_question">
 
                 <div class="_question_text gray-backdrop drop-padding drop-top">
+                    <div class="exam-section _help">
+                        <span class="material-icons _accent color">
+                            help
+                        </span>
+                        <div>{{ 'help_quiz_title' | translate }}</div>
+                    </div>
+                    
                     <mat-input [title]="'form_question' | translate"
                         [mesageError]="'form_question_required' | translate"
                         [formControl]="formQuestion.get('question')" [multiline]="true">
@@ -124,6 +134,7 @@
                 <div class="gray-backdrop drop-padding">
                     <mat-input [title]="'form_answer_ia_topic' | translate"
                         [mesageError]="'form_answer_ia_topic_required' | translate"
+                        [multiline]="true"
                         [formControl]="formIAGenerated.get('topic')">
                     </mat-input>
 

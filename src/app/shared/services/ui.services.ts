@@ -17,7 +17,7 @@ export class UiServices {
   constructor() { }
 
   ///#region NOTIFICATIONS
-  public notification(text: string, options?: { type?: 'info' | 'success' | 'warning' | 'error', closeTimer?: number }) {
+  public notification(text: string, options?: { type?: 'info' | 'success' | 'warning' | 'error' | 'full-IA' , closeTimer?: number }) {
 
     // Reset notification
     this._notification = {
@@ -71,6 +71,14 @@ export class UiServices {
     if(root) {
         root.style.setProperty(`--${key}`, value);
     }
+  }
+
+  getThemeKey(key: string): any {
+    let root = document.documentElement;
+    if(root) {
+        return root.style.getPropertyValue(`--${key}`);
+    }
+    return null;
   }
   //#endregion
 }

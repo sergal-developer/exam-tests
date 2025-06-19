@@ -2,7 +2,11 @@
     <header [mode]="'quiz'" [title]="attempt.title" [dashbaordparent]="attempt.id"></header>
 
     <div class="timer-status" *ngIf="currentSection != 'show_2'">
-        <div class="step-counter">{{ currentAnswerIndex + 1 }} {{ 'form_of_range' |
+        <div class="step-counter">
+            <span class="material-icons">
+layers
+</span>
+            {{ currentAnswerIndex + 1 }} {{ 'form_of_range' |
             translate }} {{ attempt.questions.length }}
         </div>
         <div class="timer" [ngClass]="{'timer-green':  currentAnswerIndex == attempt.questions.length - 1 }">
@@ -16,8 +20,11 @@
         </div>
         <div class="status completed" *ngIf="readonly"> {{ 'attempt_status_complete' | translate }} </div>
 
-        
-        <div class="zoom" (click)="updateZoom()"> {{ zoomlevel }}</div>
+
+        <div class="zoom" (click)="updateZoom()">
+            <span class="material-icons">text_fields</span>
+            {{ zoomlevelLabel }}
+        </div>
     </div>
 
     <div class="root_container_collection" *ngIf="attempt">
@@ -144,7 +151,8 @@
                         <h3>{{ 'attempt_status_rating_correct' | translate }}</h3>
                         <div class="_collection overflow_180">
                             <ng-container *ngFor="let item of attempt.questions; let i = index">
-                                <div class="question-dot" [ngClass]="{'correct': item.isCorrect }" (click)="gotoQuestion(i)">
+                                <div class="question-dot" [ngClass]="{'correct': item.isCorrect }"
+                                    (click)="gotoQuestion(i)">
                                     {{ i + 1 }}
                                 </div>
                             </ng-container>

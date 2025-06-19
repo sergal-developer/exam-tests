@@ -99,5 +99,7 @@
   "privacy_policy": "privacy policy",
   "legal_title": "Legal",
   "customize": "Customize",
-  "help_attempt": "Each assessment generates a new record and orders the questions randomly."
+  "help_attempt": "Each assessment generates a new record and orders the questions randomly.",
+  "ia_subtitle": "Wait a minute, the artificial intelligence is creating the questions.",
+  "help_quiz_title": "Write a question that has multiple answer options, remember that only one option can be correct."
 }

@@ -31,6 +31,7 @@ export class QuizComponent implements OnInit {
   timerStart = null;
   timerEnd = null;
   zoomlevel = '100%';
+  zoomlevelLabel = '1.1x';
   settings = null;
   //#endregion INTERNAL
 
@@ -40,19 +41,34 @@ export class QuizComponent implements OnInit {
 
   async ngOnInit() {
     this.settings = await this._commonService.getActiveSettings();
+
     await this.getData();
     this.setupComponent();
+
+    setTimeout(() => {
+      this.zoomlevel = this._uiService.getThemeKey('zoomLevel');
+      this.zoomlevelLabel = this.getZoomLevel(this.zoomlevel);
+      this.setZoom();
+    }, 500);
   }
 
   //#region DATA
   async getData() {
     if (this.id) {
       this.attempt = await this.getAttemptData(this.id);
-      if(this.attempt.state == 'completed') {
+
+      if (this.attempt.state == 'completed') {
         this.attempt._score = this.attempt.score.toFixed(2);
+      } else {
+        const indedxLastResponse = this.attempt.questions.findIndex((item) => !item.selectedAnswer);
+        if (indedxLastResponse > 0) {
+          setTimeout(() => {
+            this.gotoQuestion(indedxLastResponse - 1);
+          }, 500);
+        }
       }
 
-      if(!this.attempt.startDate) {
+      if (!this.attempt.startDate) {
         this.attempt.startDate = new Date().getTime();
       }
 
@@ -199,7 +215,7 @@ export class QuizComponent implements OnInit {
     this._commonService.navigate('dashboard');
   }
 
-  valueChange(value: string ) {
+  valueChange(value: string) {
     this.onChange.emit({ action: 'ui_update', value: value });
   }
 
@@ -207,13 +223,17 @@ export class QuizComponent implements OnInit {
     const currentLevel = parseInt(this.zoomlevel.replace('%', ''));
     const increment = 10;
     let lavel = currentLevel <= 160 ? currentLevel + increment :
-                currentLevel >= 160 ? 70 + increment : 100;
+      currentLevel >= 160 ? 70 + increment : 100;
 
     this.zoomlevel = `${lavel}%`;
-    console.log('currentLevel: ', this.zoomlevel);
-
     this._uiService.applyThemeKey('zoomLevel', this.zoomlevel);
+    this.zoomlevelLabel = this.getZoomLevel(this.zoomlevel);
+    
     // this._uiService.applyTheme(this.settings.themeProps[this.settings.theme.toLowerCase()])
+  }
+
+  setZoom() {
+    this._uiService.applyThemeKey('zoomLevel', this.zoomlevel);
   }
   //#endregion EVENTS
 
@@ -242,6 +262,11 @@ export class QuizComponent implements OnInit {
       score > 60 && score < 75.9 ? GradeState.barely_passed : score > 0 && score < 59.9 ? GradeState.failed : GradeState.failed;
 
     return this.attempt;
+  }
+
+  getZoomLevel(zoomLevel: string) {
+    const num = parseInt(zoomLevel.replace('%', ''));
+    return `${ num / 100 }x`;
   }
   //#endregion CONVERTERS
 }

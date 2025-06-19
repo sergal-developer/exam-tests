@@ -99,5 +99,7 @@
   "privacy_policy": "politica de privacidad",
   "legal_title": "Legal",
   "customize": "Personalizar",
-  "help_attempt": "Cada evaluación genera un nuevo registro y ordena las preguntas aleatoriamente."
+  "help_attempt": "Cada evaluación genera un nuevo registro y ordena las preguntas aleatoriamente.",
+  "ia_subtitle": "Espere un momento la inteligencia articifial esta creando las preguntas.",
+  "help_quiz_title": "Escriba una pregunta que tenga múltiples opciones de respuesta, recuerda que solo una opcion puede ser correcta."
 }
