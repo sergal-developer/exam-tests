@@ -8,8 +8,14 @@ import { APP_BASE_HREF } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { WebSqlite } from 'angular-web-sqlite';
 import { modulePackage } from './modules/modules.module';
 import { NotFoundModule } from './pages/notFound/notFound.module';
+import { DatabaseService } from './shared/services/database/sql.database.service';
+
+export function initializeApp(dbService: DatabaseService) {
+  return () => dbService.initDataBase();
+}
 
 @NgModule({
   declarations: [
@@ -33,6 +39,8 @@ import { NotFoundModule } from './pages/notFound/notFound.module';
     }),
   ],
   providers: [
+    WebSqlite,
+    DatabaseService,
     { provide: APP_BASE_HREF, useValue: '/' },
   ],
   bootstrap: [AppComponent]
