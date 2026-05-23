@@ -51,7 +51,7 @@ export class DashboardComponent implements OnInit {
   }
 
   async getSettings() {
-    this.settings = await this._commonServices.getActiveSettings();
+    // this.settings = await this._commonServices.getActiveSettings();
   }
 
   async getAttempts(quiz: QuizEntity) {

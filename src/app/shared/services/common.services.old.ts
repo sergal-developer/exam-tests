@@ -5,8 +5,6 @@ import { AttemptEntity, LogEntity, ProfileEntity, QuizEntity, SettingsEntity, Th
 import { Utils } from '../data/utils/utils';
 import { DBLocal } from './storage/db-storage';
 import { FileStorage } from './storage/file-storage';
-import { DatabaseService, UserRow } from './database/sql.database.service';
-import { ISettingsDTO } from '../data/entities/dtos';
 
 @Injectable()
 export class CommonServices {
@@ -23,10 +21,16 @@ export class CommonServices {
   private fileProfiles = 'profile.json';
   private fileQuizs = 'templateQuiz.json';
   private fileAttempts = 'attempts.json';
-  private fileLogs = 'logs.json';
+  private fileLogs = 'logs.json'; 
   private fileObject = { data: [] };
 
-  constructor(private _router: Router, private _services: DatabaseService) { }
+  constructor(private _router: Router) {
+    this.dbSettings = this.fileSettings;
+    this.dbProfiles = this.fileProfiles;
+    this.dbQuizs = this.fileQuizs;
+    this.dbAttempts = this.fileAttempts;
+    this.dbLogs = this.fileLogs; 
+  }
 
   //#region PUBLIC METHODS
 
@@ -57,32 +61,18 @@ export class CommonServices {
     await this.fileStorage.deleteFile(this.fileAttempts);
   }
 
-  //#region USERS
-  async getAllUsers() {
-    let response = await this._services.getAllUsers();
-    return response && response.length ? response[0] : null;
+  //#region SETTINGS
+  getAllSettings(): Array<SettingsEntity> { return this.actionGetAll(this.dbSettings); }
+  searchSetting(id: string, idfield = 'id'): SettingsEntity { return this.actionSearch(this.dbSettings, id, idfield); }
+  filterSettings(id: string, idfield = 'id'): Array<SettingsEntity> { return this.actionFilter(this.dbSettings, id, idfield); }
+  saveSetting(data: SettingsEntity) { return this.actionPost(this.dbSettings, data); }
+  updateSetting(id: string, data: SettingsEntity, idfield = 'id') { return this.actionPut(this.dbSettings, id, data, idfield); }
+  deleteSetting(id: string, idfield = 'id') { return this.actionDelete(this.dbSettings, id, idfield); }
+  async getActiveSettings(): Promise<SettingsEntity> {
+    const data: any = await this.getAllSettings();
+    return data ? data[0] : null;
   }
-
-  async getUserById(userId: number) {
-    let response = await this._services.getUserById(userId);
-    return response && response.length ? response[0] : null;
-  }
-
-  async getCurrentUser() {
-    let response = await this._services.getCurrentUser();
-    return response && response.length ? response[0] : null;
-  }
-
-  async postUser(user: UserRow) {
-    let response = await this._services.postUser(user);
-    return response && response.length ? response[0] : null;
-  }
-
-  async deleteUser(userId: number) {
-    let response = await this._services.deleteUser(userId);
-    return response && response.length ? response[0] : null;
-  }
-  //#endregion USERS
+  //#endregion SETTINGS
 
   //#region PROFILES
   getAllProfiles(): Array<ProfileEntity> { return this.actionGetAll(this.dbProfiles); }
@@ -115,34 +105,33 @@ export class CommonServices {
   deleteAttempt(id: string, idfield = 'id') { return this.actionDelete(this.dbAttempts, id, idfield); }
   //#endregion EXAMS_ATTEMPTS
 
-  //#region LOGS
+    //#region LOGS
   getAllLogs(): Array<LogEntity> { return this.actionGetAll(this.dbLogs); }
   searchLog(id: string, idfield = 'id'): LogEntity { return this.actionSearch(this.dbLogs, id, idfield); }
   filterLogs(id: string, idfield = 'id'): Array<LogEntity> { return this.actionFilter(this.dbLogs, id, idfield); }
-  saveLog(data: string, type = 'log') {
-    const log: LogEntity = {
+  saveLog(data: string, type = 'log') { 
+    const log: LogEntity = { 
       date: new Date().getTime(),
       id: uuidv4(),
       content: data,
       type: type
     }
-    return this.actionPost(this.dbLogs, log);
-  }
+    return this.actionPost(this.dbLogs, log); }
   updateLog(id: string, data: any, idfield = 'id') { return this.actionPut(this.dbLogs, id, data, idfield); }
   deleteLog(id: string, idfield = 'id') { return this.actionDelete(this.dbLogs, id, idfield); }
   //#endregion LOGS
 
   //#region NAVIGATION
-  navigate(section: string, action?: string, id?: string, props?: any) {
+  navigate(section: string, action?: string, id?: string, props?: any ) {
     let params = [];
     props = props || {};
     props.action = action;
     props.id = id || null;
 
-    if (props) {
+    if(props) {
       const keys = Object.keys(props);
       keys.map((key) => {
-        if (props[key]) {
+        if(props[key]) {
           params.push(`${key}=${props[key]}`);
         }
       })
@@ -152,8 +141,8 @@ export class CommonServices {
       this._router.navigateByUrl(`/${section}`);
     } else {
       let paramsUrl = '';
-      params.map((param, index) => {
-        paramsUrl = index == 0 ? `?${param}` : `${paramsUrl}&${param}`;
+      params.map((param, index) => { 
+        paramsUrl = index == 0 ?  `?${param}` : `${paramsUrl}&${param}`;
       });
       this._router.navigateByUrl(`/${section}${paramsUrl}`);
     }
@@ -312,9 +301,30 @@ export class CommonServices {
   }
   //#endregion GENERIC
 
+  async initializData() {
+    const setting: SettingsEntity = {
+      language: 'es',
+      permissions: {
+        create: true,
+        delete: false,
+        duplicate: false,
+        edit: true,
+        ai: true
+      },
+      availableLanguages: [
+        { name: 'Español', value: 'es' },
+        { name: 'English', value: 'en' }
+      ],
+      theme: 'dark',
+      themeProps: {
+        light: this.defaultThemeLight,
+        dark: this.defaultThemeDark
+      },
+      premium: false
+    }
+    return await this.saveSetting(setting);
+  }
 
-
-  //#region DEFAULT_DATA
   defaultThemeLight: ThemeProps = {
     appBackground: '#bebebe',
     appColor: '#2d2d2d',
@@ -439,42 +449,6 @@ export class CommonServices {
     stadisticBackground: 'rgba(0, 0, 0, 0.5)'
   };
 
-  async getStructure() {
-    return await this._services.getStructure();
-  }
-
-  async setDefaultData(): Promise<ISettingsDTO> {
-    let settings = await this._services.getSettingCompleteById(0);
-    let response: ISettingsDTO = null;
-
-    if (!settings.length) {
-      await this._services.postLanguage({ name: 'Español', value: 'es' });
-      await this._services.postLanguage({ name: 'English', value: 'en' });
-      await this._services.postTheme({ id: 'light', content: this.defaultThemeLight });
-      await this._services.postTheme({ id: 'dark', content: this.defaultThemeDark });
-
-      const permissions = {
-        create: true,
-        delete: false,
-        duplicate: false,
-        edit: true,
-        ai: true
-      };
-
-      await this._services.postSetting({ settingId: 0, language: 'en', theme: 'dark', permissions: permissions });
-      settings = await this._services.getSettingCompleteById(0);
-    }
-
-    response = settings && settings.length ? settings[0] : null;
-    return response;
-  }
-
-  async getActiveUser() {
-    let users = await this._services.getAllUsers();
-    return users && users.length ? users[0] : null;
-  }
-  //#endregion DEFAULT_DATA
-
   //#region IA GEMINI
   async geminiGenerate(data: { topic: string, questions: number, options: number, language: string }) {
     const apiKey = atob('QUl6YVN5QktXS3RGX2ttMm81TWZDSzRFeGJ6OHVPOEpKWTBuZ2pZ');
@@ -483,7 +457,7 @@ export class CommonServices {
     { questions: [{ "question": "pregunta a realizar", 
      "options": [{ "id": "indice del array", "text": ""posible respuesta" }], 
      "correctAnswer": "numero del id de la opcion correcta"
-    }]}, si en la primer respuesta no se generan todas las preguntas envia un json valido donde este la mayor cantidad solicitada, ademas que los valores deben de estar en el idioma ${data.language}`;
+    }]}, si en la primer respuesta no se generan todas las preguntas envia un json valido donde este la mayor cantidad solicitada, ademas que los valores deben de estar en el idioma ${ data.language }`;
 
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
     const postData = {

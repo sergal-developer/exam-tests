@@ -52,8 +52,8 @@ export class SettingsComponent implements OnInit {
 
   //#region DATA
   async getSettings() {
-    const settings = await this._commonServices.getAllSettings();
-    this.settings = settings[0];
+    // const settings = await this._commonServices.getAllSettings();
+    // this.settings = settings[0];
     this.profile = await this._commonServices.getActiveProfile();
 
     this.form = this.fb.group({
@@ -77,9 +77,9 @@ export class SettingsComponent implements OnInit {
   async updatePermission() {
     if (this.updating) { return; }
     this.updating = true;
-    await this._commonServices.updateSetting(this.settings.id, this.settings);
-    const settings = await this._commonServices.getAllSettings();
-    this.settings = settings[0];
+    // await this._commonServices.updateSetting(this.settings.id, this.settings);
+    // const settings = await this._commonServices.getAllSettings();
+    // this.settings = settings[0];
 
     // this._uiServices._notification('Permisos actualizados');
     this.updating = false;
@@ -95,7 +95,7 @@ export class SettingsComponent implements OnInit {
     this.settings.language = language;
 
     this.translate.setDefaultLang(this.settings.language);
-    await this._commonServices.updateSetting(this.settings.id, this.settings);
+    // await this._commonServices.updateSetting(this.settings.id, this.settings);
   }
 
   changeTheme(theme) {

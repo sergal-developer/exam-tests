@@ -40,7 +40,7 @@ export class QuizComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
-    this.settings = await this._commonService.getActiveSettings();
+    // this.settings = await this._commonService.getActiveSettings();
 
     await this.getData();
     this.setupComponent();

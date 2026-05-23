@@ -5,6 +5,7 @@ import { ScreenEnum } from 'src/app/shared/data/enumerables/enumerables';
 import { CommonServices } from '../shared/services/common.services';
 import { UiServices } from '../shared/services/ui.services';
 import { SettingsEntity, ThemeProps } from '../shared/data/entities/entities';
+import { DatabaseService } from '../shared/services/database/sql.database.service';
 
 @Component({
   selector: 'modules',
@@ -23,17 +24,19 @@ export class ModuleComponent implements OnInit, AfterViewInit {
   submodule: string;
   uistate = '';
   uisubstate = '';
+  screenwidth = 0;
+  screenheight = 0;
 
   constructor(
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
     public _uiServices: UiServices,
     private _commonServices: CommonServices,
-    private translate: TranslateService) {
+    private translate: TranslateService,
+    private services: DatabaseService) {
 
     this._router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
-
         this.module = this._activatedRoute.snapshot.paramMap.get('module');
         if (this.module) {
           this.screen = this._screen[this.module];
@@ -45,37 +48,54 @@ export class ModuleComponent implements OnInit, AfterViewInit {
           this.uistate = `__${this.screen}`;
           this.uisubstate = '';
         }, 500);
+
+        
+        console.log('this.screen: ', this.screen, this.submodule);
       }
     });
   }
 
   async ngOnInit() {
-    // this._commonServices.clearDB();
+    await this.loadDatabaseStructure();
     this.getPropsScreen();
-    await this._commonServices.checkFiles();
     this.setupLanguage();
   }
 
   async ngAfterViewInit() {
   }
 
-  async setupLanguage() {
-    const settings = await this._commonServices.getAllSettings();
-    if (settings) {
-      const setting: SettingsEntity = settings[0];
-      const languages = [];
-      setting.availableLanguages.map((lan) => {
-        languages.push(lan.value);
-      })
-      this.translate.addLangs(languages);
-      this.translate.setDefaultLang(setting.language);
-
-      this.applyCurrentTheme(setting);
+  async loadDatabaseStructure() {
+    await this.services.loadStructure();
+    const structure = await this.services.getStructure();
+    console.log('structure: ', structure);
+    if(!structure) {
+      this._uiServices.notification("Error al establecer conexion SQL.")
     } else {
-      this.translate.addLangs(this.availableLangs);
-      this.currentLang = 'es';
-      this.translate.setDefaultLang(this.currentLang);
+      this._uiServices.notification("Conexion estable con base de datos.")
     }
+  }
+
+  async setupLanguage() {
+    this.translate.addLangs(this.availableLangs);
+    this.currentLang = 'es';
+    this.translate.setDefaultLang(this.currentLang);
+
+    // const settings = await this._commonServices.getAllSettings();
+    // if (settings) {
+    //   const setting: SettingsEntity = settings[0];
+    //   const languages = [];
+    //   setting.availableLanguages.map((lan) => {
+    //     languages.push(lan.value);
+    //   })
+    //   this.translate.addLangs(languages);
+    //   this.translate.setDefaultLang(setting.language);
+
+    //   this.applyCurrentTheme(setting);
+    // } else {
+    //   this.translate.addLangs(this.availableLangs);
+    //   this.currentLang = 'es';
+    //   this.translate.setDefaultLang(this.currentLang);
+    // }
   }
 
   onChangeUI(event) {
@@ -93,9 +113,6 @@ export class ModuleComponent implements OnInit, AfterViewInit {
     const logs = await this._commonServices.getAllLogs();
     console.log('logs: ', logs);
   }
-
-  screenwidth = 0;
-  screenheight = 0;
 
   getPropsScreen() {
     this.screenwidth = window.innerWidth

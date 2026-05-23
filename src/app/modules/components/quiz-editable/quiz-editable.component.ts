@@ -59,7 +59,7 @@ export class QuizEditableComponent implements OnInit {
   }
 
   async setupLanguage(next) {
-    this.settings = await this._commonService.getActiveSettings();
+    // this.settings = await this._commonService.getActiveSettings();
     this.translate.setDefaultLang(this.settings.language);
     const keys = Object.keys(this.translateLabels);
     this.translate.get(keys).subscribe((res) => {

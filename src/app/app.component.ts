@@ -10,9 +10,7 @@ import { DatabaseService } from './shared/services/database/sql.database.service
   encapsulation : ViewEncapsulation.None
 })
 export class AppComponent implements OnInit{
-  constructor(public platform: Platform, 
-    private services: DatabaseService
-  ) {}
+  constructor(public platform: Platform ) {}
 
   async ngOnInit() {
     this.activeFullscreen();
@@ -25,8 +23,6 @@ export class AppComponent implements OnInit{
         }
       }
     });
-
-    this.getTheme();
   }
 
   async activeFullscreen() {
@@ -35,12 +31,5 @@ export class AppComponent implements OnInit{
     } catch (error) {
       // console.error('Error activando fullscreen:', error);
     }
-  }
-
-  async getTheme() {
-    const dataNames = await this.services.deleteStructure();
-    console.log('dataNames: ', dataNames);
-    const data = await this.services.getStructure();
-    console.log('data: ', data);
   }
 }

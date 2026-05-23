@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewEncapsulation, } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { ProfileEntity } from 'src/app/shared/data/entities/entities';
 import { CommonServices } from 'src/app/shared/services/common.services';
+import { UserRow } from 'src/app/shared/services/database/sql.database.service';
 import { UiServices } from 'src/app/shared/services/ui.services';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -44,28 +44,22 @@ export class RegisterComponent implements OnInit {
     });
 
     setTimeout(() => {
-      this.checkSettings();
+      this.checkInitialSettings();
       this.uistate = '';
 
       this.translate.get(['service_sucess_save', 'service_fail_save']).subscribe((res) => {
         this.translateLabels = res;
       });
     }, 800);
-
   }
 
   //#region INTERNAL
   //#endregion INTERNAL
 
   //#region DATA
-  async checkSettings() {
-    let settings: any = await this._commonServices.getAllSettings();
-    if (!settings) {
-      await this._commonServices.initializData();
-      settings = await this._commonServices.getAllSettings();
-    }
-
-    let profile: any = await this._commonServices.getActiveProfile();
+  async checkInitialSettings() {
+    const settings = await this._commonServices.setDefaultData();
+    const profile = await this._commonServices.getActiveUser()
     if (profile) {
       this._commonServices.navigate('dashboard');
     }
@@ -74,19 +68,21 @@ export class RegisterComponent implements OnInit {
   async register() {
     const { name, image } = this.form.value;
     const id = uuidv4();
-    const data: ProfileEntity = {
-      id: id,
+    const data: UserRow = {
+      userId: 0,
+      uuid: id,
       userName: name,
       age: 0,
-      avatar: {
-        url: image
-      },
+      avatarUrl: image,
+      avatarBody: '',
       current: true,
     };
+    console.log('registerdata: ', data);
 
-    await this._commonServices.saveProfile(data);
-    let profile = await this._commonServices.getActiveProfile();
-    if (profile) {
+    await this._commonServices.postUser(data);    
+
+    let user = await this._commonServices.getCurrentUser();
+    if (user) {
       this._uiServices.notification(this.translateLabels.service_sucess_save, { type: 'success', closeTimer: 1500 });
       this.uistate = 'exit';
       setTimeout(() => {
@@ -100,7 +96,7 @@ export class RegisterComponent implements OnInit {
 
   validateData() {
     const invalid = this.form.valid;
-    const terms =  this.form.get('legal').value;
+    const terms = this.form.get('legal').value;
     return invalid && (invalid == terms);
   }
   //#endregion DATA
@@ -113,8 +109,4 @@ export class RegisterComponent implements OnInit {
     this.form.get('image').setValue(item.url);
   }
   //#endregion EVENTS
-
-  //#region CONVERTERS
-  //#endregion CONVERTERS
-
 }

@@ -1,22 +1,16 @@
-import { Column, generateTableFromClass } from "src/app/shared/services/database/sqlite.orm";
-import { IThemeDTO } from "./theme.dto";
 import { ILanguageDTO } from "./language.dto";
+import { IThemeDTO } from "./theme.dto";
 
-export class SettingsDTO {
-    @Column({ primaryKey: true  })
-    id!: number;
-
-    @Column({ notNull: true })
-    language!: string;
-
-    @Column({ json: true })
-    permissions!: string;
-}
-
-export const SettingsDTOScript = generateTableFromClass(SettingsDTO, 'settings_table');
+export const settings_table_script = 
+`CREATE TABLE IF NOT EXISTS [settings_table] (
+  [settingId] INTEGER PRIMARY KEY,
+  [language] TEXT NOT NULL,
+  [permissions] TEXT,
+  [theme] TEXT
+);`;
 
 export interface ISettingsDTO {
-  id?: string;
+  settingId?: string;
   language: string;
   permissions: {
     create: boolean,
@@ -24,14 +18,11 @@ export interface ISettingsDTO {
     edit: boolean,
     delete: boolean,
     ai: boolean,
-  }
-
-  availableLanguages: ILanguageDTO[];
-  premium: boolean,
-  colors?: Array<any>;
+  },
   theme?: string;
-  themeProps: {
-    light: IThemeDTO,
-    dark: IThemeDTO
-  }
+
+  // GENERATED
+  _languages?: ILanguageDTO[],
+  _themes?: IThemeDTO[],
+  _colors?: Array<any>
 }

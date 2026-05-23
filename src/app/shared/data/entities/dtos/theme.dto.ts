@@ -1,14 +1,8 @@
-import { Column, generateTableFromClass } from "src/app/shared/services/database/sqlite.orm";
-
-export class ThemeDTO {
-    @Column({ primaryKey: true, autoIncrement: true })
-    id!: number;
-
-    @Column({ notNull: true, json: true })
-    content!: string;
-}
-
-export const ThemeDTOScript = generateTableFromClass(ThemeDTO, 'theme_table');
+export const theme_table_script = 
+`CREATE TABLE IF NOT EXISTS [theme_table] (
+  [id] TEXT PRIMARY KEY,
+  [content] TEXT NOT NULL
+);`;
 
 export interface IThemeDTO {
   appBackground?: String;

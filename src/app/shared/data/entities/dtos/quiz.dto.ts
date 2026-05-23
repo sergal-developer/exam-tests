@@ -1,125 +1,63 @@
-import { Column, generateTableFromClass } from "src/app/shared/services/database/sqlite.orm";
+export const quiz_table_script = `CREATE TABLE IF NOT EXISTS [quiz_table] (
+  [quizId] INTEGER PRIMARY KEY,
+  [uuid] TEXT,
+  [title] TEXT,
+  [time] INTEGER,
+  [creationDate] INTEGER,
+  [updatedDate] INTEGER,
+  [startDate] INTEGER
+);`;
 
-export class QuizDTO {
-    @Column({ primaryKey: true, autoIncrement: true })
-    id!: number;
+export const answer_table_script = `CREATE TABLE IF NOT EXISTS [answer_table] (
+  [answerId] INTEGER PRIMARY KEY,
+  [quizId] INTEGER,
+  [title] TEXT,
+  [updatedDate] INTEGER,
+  FOREIGN KEY ([quizId]) REFERENCES [quiz_table] ([quizId]) ON DELETE CASCADE
+);`;
 
-    @Column({ notNull: true })
-    title!: string;
+export const answer_option_table_script = `CREATE TABLE IF NOT EXISTS [answer_option_table] (
+  [optionId] INTEGER PRIMARY KEY AUTOINCREMENT,
+  [answerId] INTEGER,
+  [content] TEXT,
+  [optionIndex] INTEGER,
+  [updatedDate] INTEGER,
+  [isCorrect] BOOLEAN,
+  FOREIGN KEY ([answerId]) REFERENCES [answer_table] ([answerId]) ON DELETE CASCADE
+);`;
 
-    @Column({ notNull: true })
-    time!: number;
+export const quiz_attempt_table_script = `CREATE TABLE IF NOT EXISTS [quiz_attempt_table] (
+  [attemptId] INTEGER PRIMARY KEY,
+  [quizId] INTEGER,
+  [userId] INTEGER,
+  [startedDate] INTEGER,
+  [finishedDate] INTEGER,
+  [score] REAL,
+  FOREIGN KEY ([quizId]) REFERENCES [quiz_table] ([quizId]) ON DELETE CASCADE
+);`;
 
-    @Column()
-    creationDate!: number;
-
-    @Column()
-    updatedDate!: number;
-
-    @Column()
-    startDate!: number;
-    
-    @Column()
-    questions!: string;
-}
-
-export class AttemptDTO {
-    @Column({ primaryKey: true, autoIncrement: true })
-    id!: number;
-
-    @Column({ notNull: true })
-    title!: string;
-
-    @Column({ notNull: true })
-    time!: number;
-
-    @Column()
-    creationDate!: number;
-
-    @Column()
-    updatedDate!: number;
-
-    @Column()
-    startDate!: number;
-    
-    @Column()
-    questions!: string;
-
-    @Column()
-    state!: string;
-
-    @Column()
-    score!: number;
-
-    @Column()
-    grade!: string;
-
-    @Column()
-    correctAnswers!: number;
-}
-
-export class AnswerDTO {
-  @Column({ primaryKey: true, autoIncrement: true })
-  id!: number;
-
-  @Column({ notNull: true })
-  question!: string;
-
-  // @Column({ notNull: true })
-  // options!: OptionEntity[];
-
-  @Column({ notNull: true })
-  correctAnswer!: number;
-
-  @Column()
-  answerText!: string;
-
-  @Column()
-  selectedAnswer!: string;
-
-  @Column()
-  isEvaluated!: boolean;
-
-  @Column()
-  isCorrect!: boolean;
-}
-
-export class OptionDTO {
-  @Column({ primaryKey: true, autoIncrement: true })
-  id!: number;
-
-  @Column({ notNull: true })
-  text!: string;
-
-  @Column()
-  letter!: string;
-
-  @Column()
-  selected!: boolean;
-
-  @Column({ notNull: true })
-  correctAnswer!: boolean;
-}
-
-export const QuizDTOScript = generateTableFromClass(QuizDTO, 'quiz_table');
-
-export const AttemptDTOScript = generateTableFromClass(AttemptDTO, 'attempts_table');
-
-export const AnswerDTOScript = generateTableFromClass(AnswerDTO, 'answers_table');
-
-export const OptionDTOScript = generateTableFromClass(OptionDTO, 'options_table');
+export const answer_attempt_table_script = `CREATE TABLE IF NOT EXISTS [answer_attempt_table] (
+  [answerAttemptId] INTEGER PRIMARY KEY AUTOINCREMENT,
+  [attemptId] INTEGER,
+  [answerId] INTEGER,
+  [selectedOptionId] INTEGER,
+  [isCorrect] BOOLEAN,
+  FOREIGN KEY ([attemptId]) REFERENCES [quiz_attempt_table] ([attemptId]) ON DELETE CASCADE,
+  FOREIGN KEY ([answerId]) REFERENCES [answer_table] ([answerId]),
+  FOREIGN KEY ([selectedOptionId]) REFERENCES [answer_option_table] ([optionId])
+);`;
 
 
 export interface IQuizDTO {
-  id?: string;
+  quizId?: string;
   title: string;
-  questions: IAnswerDTO[];
   time: number;
-
   creationDate: number;
   updatedDate: number;
   startDate?: number;
 
+  // Generated
+  answers: IAnswerDTO[];
   // varaibles for UI and format
   _showDetails?: boolean;
   _status?: string;
@@ -131,35 +69,53 @@ export interface IQuizDTO {
   _bestTimeValue?: string;
 }
 
-export interface IAttemptDTO extends IQuizDTO {
-  attemptId: string;
-  state: AttemptState;
-  score: number;
-
-  _score?: string;
-  timeEnlapsed?: number;
-  grade?: GradeState;
-  correctAnswers?: number;
-  validTotalAnswers?: number;
-}
-
 export interface IAnswerDTO {
-  id?: number;
-  question: string;
-  options: IOptionDTO[];
-  correctAnswer?: number
+  answerId?: number;
+  quizId?: number;
+  title: string;
+  updatedDate: number;
+  
+  // Generated
+  options: IAnswerOptionDTO[];
+  correntOption: number | null;
   answerText: string | null;
   selectedAnswer?: number | string;
   isEvaluated?: boolean;
   isCorrect?: boolean;
 }
 
-export interface IOptionDTO {
-  id: number;
-  text: string;
-  letter?: string
-  selected?: boolean
-  correctAnswer?: boolean
+export interface IAnswerOptionDTO {
+  optionId: number;
+  answerId: number;
+  content: string;
+  optionIndex: number;
+  updatedDate: number;
+  isCorrect?: boolean;
+}
+
+export interface IQuizAttemptDTO {
+  attemptId: number;
+  quizId: number;
+  userId: number;
+  startedDate: number;
+  finishedDate: number;
+  score?: number;
+
+  // Generated
+  answers: IAttemptAnswerDTO[];
+  state: AttemptState;
+  timeEnlapsed?: number;
+  correctAnswers?: number;
+  validTotalAnswers?: number;
+  grade?: GradeState;
+}
+
+export interface IAttemptAnswerDTO {
+  answerAttemptId: number;
+  attemptId: number;
+  answerId: number;
+  selectedOptionId: number;
+  isCorrect: boolean;
 }
 
 export enum AttemptState {
