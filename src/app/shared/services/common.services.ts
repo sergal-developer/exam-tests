@@ -5,8 +5,8 @@ import { AttemptEntity, LogEntity, ProfileEntity, QuizEntity, SettingsEntity, Th
 import { Utils } from '../data/utils/utils';
 import { DBLocal } from './storage/db-storage';
 import { FileStorage } from './storage/file-storage';
-import { DatabaseService, UserRow } from './database/sql.database.service';
-import { ISettingsDTO } from '../data/entities/dtos';
+import { AnswerAttemptRow, AnswerOptionRow, AnswerRow, DatabaseService, LogRow, QuizAttemptRow, QuizRow, SettingRow, ThemeRow, UserRow } from './database/sql.database.service';
+import { IAnswerDTO, IAnswerOptionDTO, ILogDTO, IQuizAttemptDTO, IQuizDTO, ISettingsDTO, IThemeDTO, IUserDTO } from '../data/entities/dtos';
 
 @Injectable()
 export class CommonServices {
@@ -57,10 +57,38 @@ export class CommonServices {
     await this.fileStorage.deleteFile(this.fileAttempts);
   }
 
+  //#region SETTINGS
+  async getAllSettings(): Promise<ISettingsDTO[]> { return await this._services.getAllSettings(); }
+  async getCurrentSettings(): Promise<ISettingsDTO> {
+    const response = await this._services.getSettingCompleteById(0);
+    return response && response.length ? response[0] : null;
+  }
+  async getSettingById(id: number): Promise<ISettingsDTO> {
+    const response = await this._services.getSettingCompleteById(id);
+    return response && response.length ? response[0] : null;
+  }
+  async saveSettings(data: SettingRow): Promise<ISettingsDTO[]> {
+    const response = await this._services.postSetting(data);
+    return response;
+  }
+  async updateSettings(data: SettingRow): Promise<ISettingsDTO> {
+    await this._services.postSetting(data);
+    return this.getSettingById(data.settingId);
+  }
+  //#endregion SETTINGS
+
+  //#region THEMES
+  async getThemes(): Promise<IThemeDTO[]> { return await this._services.getAllThemes(); }
+
+  async saveTheme(data: ThemeRow): Promise<IThemeDTO> {
+    const response = await this._services.postTheme(data);
+    return response;
+  }
+  //#endregion THEMES
+
   //#region USERS
   async getAllUsers() {
-    let response = await this._services.getAllUsers();
-    return response && response.length ? response[0] : null;
+    return await this._services.getAllUsers();
   }
 
   async getUserById(userId: number) {
@@ -68,7 +96,7 @@ export class CommonServices {
     return response && response.length ? response[0] : null;
   }
 
-  async getCurrentUser() {
+  async getCurrentUser(): Promise<IUserDTO> {
     let response = await this._services.getCurrentUser();
     return response && response.length ? response[0] : null;
   }
@@ -84,52 +112,118 @@ export class CommonServices {
   }
   //#endregion USERS
 
-  //#region PROFILES
-  getAllProfiles(): Array<ProfileEntity> { return this.actionGetAll(this.dbProfiles); }
-  searchProfile(id: string, idfield = 'id'): ProfileEntity { return this.actionSearch(this.dbProfiles, id, idfield); }
-  filterProfiles(id: string, idfield = 'id'): Array<ProfileEntity> { return this.actionFilter(this.dbProfiles, id, idfield); }
-  saveProfile(data: ProfileEntity) { return this.actionPost(this.dbProfiles, data); }
-  updateProfile(id: string, data: ProfileEntity, idfield = 'id') { return this.actionPut(this.dbProfiles, id, data, idfield); }
-  deleteProfile(id: string, idfield = 'id') { return this.actionDelete(this.dbProfiles, id, idfield); }
-  async getActiveProfile(): Promise<ProfileEntity> {
-    const data: any = await this.getAllProfiles();
-    return data ? data[0] : null;
+  //#region QUIZ
+  async getAllQuizs(): Promise<IQuizDTO[]> {
+    let response: IQuizDTO[] = await this._services.getAllQuizzes();
+    return response;
   }
-  //#endregion PROFILES
 
-  //#region EXAMS
-  getAllQuizs(): Array<QuizEntity> { return this.actionGetAll(this.dbQuizs); }
-  searchQuiz(id: string, idfield = 'id'): QuizEntity { return this.actionSearch(this.dbQuizs, id, idfield); }
-  filterQuizs(id: string, idfield = 'id'): Array<QuizEntity> { return this.actionFilter(this.dbQuizs, id, idfield); }
-  saveQuiz(data: any) { return this.actionPost(this.dbQuizs, data); }
-  updateQuiz(id: string, data: any, idfield = 'id') { return this.actionPut(this.dbQuizs, id, data, idfield); }
-  deleteQuiz(id: string, idfield = 'id') { return this.actionDelete(this.dbQuizs, id, idfield); }
-  //#endregion EXAMS
+  async getQuizById(quizId: number): Promise<IQuizDTO> {
+    let response = await this._services.getQuizById(quizId);
+    return response && response.length ? response[0] : null;
+  }
 
-  //#region EXAMS_ATTEMPTS
-  getAllAttempts(): Array<AttemptEntity> { return this.actionGetAll(this.dbAttempts); }
-  searchAttempt(id: string, idfield = 'id'): AttemptEntity { return this.actionSearch(this.dbAttempts, id, idfield); }
-  filterAttempts(id: string, idfield = 'id'): Array<AttemptEntity> { return this.actionFilter(this.dbAttempts, id, idfield); }
-  saveAttempt(data: any) { return this.actionPost(this.dbAttempts, data); }
-  updateAttempt(id: string, data: any, idfield = 'id') { return this.actionPut(this.dbAttempts, id, data, idfield); }
-  deleteAttempt(id: string, idfield = 'id') { return this.actionDelete(this.dbAttempts, id, idfield); }
-  //#endregion EXAMS_ATTEMPTS
+  async saveQuiz(quiz: QuizRow): Promise<IQuizDTO> {
+    let response = await this._services.postQuiz(quiz);
+    return response && response.length ? response[0] : null;
+  }
+
+  async deleteQuiz(quizId: number): Promise<IQuizDTO> {
+    let response = await this._services.deleteQuiz(quizId);
+    return response && response.length ? response[0] : null;
+  }
+  //#endregion QUIZ
+
+  //#region QUIZ_AWNSWERS
+  async getAllAnswers(): Promise<IAnswerDTO[]> {
+    let response: IAnswerDTO[] = await this._services.getAllAnswers();
+    return response;
+  }
+
+  async getAnswersByQuiz(quizId: number): Promise<IAnswerDTO> {
+    let response = await this._services.getAnswersByQuiz(quizId);
+    return response && response.length ? response[0] : null;
+  }
+
+  async saveAnswer(data: AnswerRow): Promise<IAnswerDTO> {
+    let response = await this._services.postAnswer(data);
+    return response && response.length ? response[0] : null;
+  }
+
+  async deleteAnswer(id: number): Promise<IAnswerDTO> {
+    let response = await this._services.deleteAnswer(id);
+    return response && response.length ? response[0] : null;
+  }
+  //#endregion QUIZ_AWNSWERS
+
+  //#region AWNSWERS_OPTIONS
+  async getOptionsByAnswer(answerId: number): Promise<IAnswerOptionDTO[]> {
+    return await this._services.getOptionsByAnswer(answerId);
+  }
+
+  async saveAnswerOption(data: AnswerOptionRow): Promise<IAnswerOptionDTO> {
+    let response = await this._services.postAnswerOption(data);
+    return response && response.length ? response[0] : null;
+  }
+
+  async deleteAnswerOption(id: number): Promise<IAnswerOptionDTO> {
+    let response = await this._services.deleteAnswerOption(id);
+    return response && response.length ? response[0] : null;
+  }
+  //#endregion AWNSWERS_OPTIONS
+
+  //#region QUIZ_ATTEMPS
+  async getAttemptsByUser(userId: number): Promise<IQuizAttemptDTO[]> {
+    let response: IQuizAttemptDTO[] = await this._services.getAttemptsByUser(userId);
+    return response;
+  }
+
+  async getAttemptById(attemptId: number): Promise<IQuizAttemptDTO[]> {
+    let response: IQuizAttemptDTO[] = await this._services.getAttemptById(attemptId);
+    return response;
+  }
+
+  async saveQuizAttempt(data: QuizAttemptRow): Promise<IQuizAttemptDTO> {
+    let response = await this._services.postQuizAttempt(data);
+    return response && response.length ? response[0] : null;
+  }
+
+  async deleteQuizAttempt(attemptId: number): Promise<IQuizDTO> {
+    let response = await this._services.deleteQuizAttempt(attemptId);
+    return response && response.length ? response[0] : null;
+  }
+  //#endregion QUIZ_ATTEMPS
+
+  //#region AWNSWERS_ATTEMPTS
+  async getAnswerAttemptsByAttempt(attemptId: number): Promise<IAnswerDTO[]> {
+    let response: IAnswerDTO[] = await this._services.getAnswerAttemptsByAttempt(attemptId);
+    return response;
+  }
+
+  async postAnswerAttempt(data: AnswerAttemptRow): Promise<IAnswerDTO> {
+    let response = await this._services.postAnswerAttempt(data);
+    return response && response.length ? response[0] : null;
+  }
+  //#endregion AWNSWERS_ATTEMPTS
 
   //#region LOGS
-  getAllLogs(): Array<LogEntity> { return this.actionGetAll(this.dbLogs); }
-  searchLog(id: string, idfield = 'id'): LogEntity { return this.actionSearch(this.dbLogs, id, idfield); }
-  filterLogs(id: string, idfield = 'id'): Array<LogEntity> { return this.actionFilter(this.dbLogs, id, idfield); }
-  saveLog(data: string, type = 'log') {
-    const log: LogEntity = {
-      date: new Date().getTime(),
-      id: uuidv4(),
-      content: data,
-      type: type
-    }
-    return this.actionPost(this.dbLogs, log);
+  async getAllLogs(): Promise<ILogDTO> { 
+    return await this._services.getAllLogs();
   }
-  updateLog(id: string, data: any, idfield = 'id') { return this.actionPut(this.dbLogs, id, data, idfield); }
-  deleteLog(id: string, idfield = 'id') { return this.actionDelete(this.dbLogs, id, idfield); }
+
+  async getLogById(id: number): Promise<ILogDTO> { 
+    const response = await this._services.getLogById(id);
+    return response && response.length ? response[0] : null;
+  }
+
+  async postLog(data: LogRow): Promise<ILogDTO> { 
+    return await this._services.postLog(data);
+  }
+
+  async deleteLog(id: number): Promise<ILogDTO> { 
+    const response = await this._services.deleteLog(id);
+    return response && response.length ? response[0] : null;
+  }
   //#endregion LOGS
 
   //#region NAVIGATION
@@ -163,53 +257,6 @@ export class CommonServices {
   //#endregion PUBLIC METHODS
 
   //#region GENERIC
-  private promiseMock(data: any): Promise<any> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve(data);
-      }, 200);
-    });
-  }
-
-
-  private actionGetAllOld(tableName: string): any {
-    const db = new DBLocal(this.localDbName);
-    const response = db.get(tableName);
-    return this.promiseMock(response);
-  }
-
-  private actionSearchOld(tableName: string, id: any, idfield = 'id'): any {
-    const db = new DBLocal(this.localDbName);
-    const response = db.search(tableName, id, idfield);
-    return this.promiseMock(response);
-  }
-
-  private actionFilterOld(tableName: string, id: any, idfield = 'id'): any {
-    const db = new DBLocal(this.localDbName);
-    const response = db.filter(tableName, id, idfield);
-    return this.promiseMock(response);
-  }
-
-  private actionPostOld(tableName: string, data: any): any {
-    data.id = data.id ?? uuidv4();
-    const db = new DBLocal(this.localDbName);
-    const response = db.save(tableName, data);
-    return this.promiseMock(response);
-  }
-
-  private actionPutOld(tableName: string, id: any, data: any, idfield = 'id'): any {
-    const db = new DBLocal(this.localDbName);
-    const response = db.update(tableName, id, data, idfield);
-    return this.promiseMock(response);
-  }
-
-  private actionDeleteOld(tableName: string, id: any, idfield = 'id'): any {
-    const db = new DBLocal(this.localDbName);
-    const response = db.delete(tableName, id, idfield);
-    return this.promiseMock(response);
-  }
-
-
   private actionGetAll(fileName: string): any {
     return new Promise(async (resolve) => {
       try {
@@ -511,7 +558,7 @@ export class CommonServices {
       const data = await response.json();
       // Procesar la respuesta
       if (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
-        this.saveLog(data.candidates[0].content.parts[0].text);
+        // this.saveLog(data.candidates[0].content.parts[0].text);
         const generatedText = this.normalizeResponse(data.candidates[0].content.parts[0].text);
 
         try {

@@ -6,6 +6,7 @@ import { CommonServices } from '../shared/services/common.services';
 import { UiServices } from '../shared/services/ui.services';
 import { SettingsEntity, ThemeProps } from '../shared/data/entities/entities';
 import { DatabaseService } from '../shared/services/database/sql.database.service';
+import { ISettingsDTO } from '../shared/data/entities/dtos';
 
 @Component({
   selector: 'modules',
@@ -67,7 +68,6 @@ export class ModuleComponent implements OnInit, AfterViewInit {
   async loadDatabaseStructure() {
     await this.services.loadStructure();
     const structure = await this.services.getStructure();
-    console.log('structure: ', structure);
     if(!structure) {
       this._uiServices.notification("Error al establecer conexion SQL.")
     } else {
@@ -76,37 +76,34 @@ export class ModuleComponent implements OnInit, AfterViewInit {
   }
 
   async setupLanguage() {
-    this.translate.addLangs(this.availableLangs);
-    this.currentLang = 'es';
-    this.translate.setDefaultLang(this.currentLang);
+    const setting = await this._commonServices.getCurrentSettings();
+    if (setting) {
+      console.log('setting: ', setting);
+      const languages = [];
+      setting._languages.map((lan) => {
+        languages.push(lan.value);
+      })
+      this.translate.addLangs(languages);
+      this.translate.setDefaultLang(setting.language);
 
-    // const settings = await this._commonServices.getAllSettings();
-    // if (settings) {
-    //   const setting: SettingsEntity = settings[0];
-    //   const languages = [];
-    //   setting.availableLanguages.map((lan) => {
-    //     languages.push(lan.value);
-    //   })
-    //   this.translate.addLangs(languages);
-    //   this.translate.setDefaultLang(setting.language);
-
-    //   this.applyCurrentTheme(setting);
-    // } else {
-    //   this.translate.addLangs(this.availableLangs);
-    //   this.currentLang = 'es';
-    //   this.translate.setDefaultLang(this.currentLang);
-    // }
+      this.applyCurrentTheme(setting);
+    } else {
+      this.translate.addLangs(this.availableLangs);
+      this.currentLang = 'es';
+      this.translate.setDefaultLang(this.currentLang);
+    }
   }
 
   onChangeUI(event) {
     this.uisubstate = event.value;
   }
 
-  applyCurrentTheme(settings: SettingsEntity | any) {
-    settings.themeProps.dark.zoomLevel = '100%';
-    settings.themeProps.light.zoomLevel = '100%';
-    const theme = settings.themeProps[settings.theme.toLowerCase()];
-    this._uiServices.applyTheme(theme);
+  applyCurrentTheme(setting: ISettingsDTO) {
+    setting._themes.map(x => x.content.zoomLevel = '100%');
+    const theme = setting._themes.find(x => x.id == setting.theme);
+    if (theme) {
+      this._uiServices.applyTheme(theme);
+    }
   }
 
   async getLogs() {

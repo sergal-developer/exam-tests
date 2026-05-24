@@ -1,9 +1,10 @@
 import { Component, OnInit, ViewEncapsulation, } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { ProfileEntity, SettingsEntity, ThemeProps } from 'src/app/shared/data/entities/entities';
+import { ISettingsDTO, IThemePropsDTO, IUserDTO } from 'src/app/shared/data/entities/dtos';
+import { ProfileEntity, SettingsEntity } from 'src/app/shared/data/entities/entities';
 import { CommonServices } from 'src/app/shared/services/common.services';
+import { ThemeRow, UserRow } from 'src/app/shared/services/database/sql.database.service';
 import { UiServices } from 'src/app/shared/services/ui.services';
 
 @Component({
@@ -12,8 +13,8 @@ import { UiServices } from 'src/app/shared/services/ui.services';
   encapsulation: ViewEncapsulation.None,
 })
 export class SettingsComponent implements OnInit {
-  profile: ProfileEntity;
-  settings: SettingsEntity;
+  profile: IUserDTO;
+  settings: ISettingsDTO;
   pendingChanges: {
     profile?: ProfileEntity,
     settings?: SettingsEntity;
@@ -35,7 +36,7 @@ export class SettingsComponent implements OnInit {
     { url: "/assets/avatar-7.svg", selected: false },
     { url: "/assets/avatar-8.svg", selected: false },
   ];
-  availableThemes = ['light', 'dark']
+  availableThemes = ['light', 'dark', 'custom']
   form: FormGroup;
   themeProps: Array<{ name: string, value: string }> = null;
   customizeColorsMode = false;
@@ -52,20 +53,21 @@ export class SettingsComponent implements OnInit {
 
   //#region DATA
   async getSettings() {
-    // const settings = await this._commonServices.getAllSettings();
-    // this.settings = settings[0];
-    this.profile = await this._commonServices.getActiveProfile();
+    this.settings = await this._commonServices.getCurrentSettings();
+    this.profile = await this._commonServices.getCurrentUser();
 
     this.form = this.fb.group({
-        name: [this.profile.userName, Validators.required],
+      name: [this.profile.userName, Validators.required],
     });
     this.form.get('name').disable();
 
     try {
-      this.themeProps = this.getKeysThemeProps(this.settings.themeProps[this.settings.theme]);
+      const currentTheme = this.settings._themes.find(x => x.id == this.settings.theme);
+      if (currentTheme) {
+        this.themeProps = this.getKeysThemeProps(currentTheme.content);
+      }
     } catch (error) {
       console.log('error: ', error);
-
     }
   }
 
@@ -73,45 +75,56 @@ export class SettingsComponent implements OnInit {
     this.settings.permissions[id] = !this.settings.permissions[id];
     this.updatePermission();
   }
-
   async updatePermission() {
     if (this.updating) { return; }
     this.updating = true;
-    // await this._commonServices.updateSetting(this.settings.id, this.settings);
-    // const settings = await this._commonServices.getAllSettings();
-    // this.settings = settings[0];
 
-    // this._uiServices._notification('Permisos actualizados');
+    await this._commonServices.saveSettings({
+      language: this.settings.language,
+      permissions: this.settings.permissions,
+      theme: this.settings.theme,
+      settingId: this.settings.settingId
+    });
+    this.settings = await this._commonServices.getCurrentSettings();
+    this._uiServices.notification('Permisos actualizados');
     this.updating = false;
 
   }
 
   async changeLanguage(language) {
     const languages = [];
-    this.settings.availableLanguages.map((lan) => {
+    this.settings._languages.map((lan) => {
       languages.push(lan.value);
     })
     this.translate.addLangs(languages);
     this.settings.language = language;
 
     this.translate.setDefaultLang(this.settings.language);
-    // await this._commonServices.updateSetting(this.settings.id, this.settings);
+    await this._commonServices.saveSettings({
+      language: this.settings.language,
+      permissions: this.settings.permissions,
+      theme: this.settings.theme,
+      settingId: this.settings.settingId
+    });
   }
 
-  changeTheme(theme) {
+  async changeTheme(theme) {
     this.settings.theme = theme;
-    // if(!this.settings.themeProps) {
-      this.settings.themeProps = {
-        light: this._commonServices.defaultThemeLight,
-        dark: this._commonServices.defaultThemeDark
+    if (this.settings._themes.length) {
+      const theme = this.settings._themes.find(x => x.id == this.settings.theme);
+      if (theme) {
+        this._uiServices.applyTheme(theme);
+        await this._commonServices.saveSettings({
+          language: this.settings.language,
+          permissions: this.settings.permissions,
+          theme: this.settings.theme,
+          settingId: this.settings.settingId
+        });
+        try {
+          this.themeProps = this.getKeysThemeProps(theme.content);
+        } catch (error) { }
       }
-    // }
-    this._uiServices.applyTheme(this.settings.themeProps[this.settings.theme.toLowerCase()])
-    
-    try {
-      this.themeProps = this.getKeysThemeProps(this.settings.themeProps[this.settings.theme.toLowerCase()]);
-    } catch (error) {}
-
+    }
     this.updatePermission();
   }
   //#endregion DATA
@@ -121,16 +134,15 @@ export class SettingsComponent implements OnInit {
     this.defaultAvatars.map(image => {
       image.selected = image.url == item.url ? true : false;
     });
-    this.profile.avatar.url = item.url;
-
+    this.profile.avatarUrl = item.url;
     // SAVE DATA 
   }
 
   editAvatar() {
     this.profileUI.avatarEdit = !this.profileUI.avatarEdit;
-    if(this.profileUI.avatarEdit) {
+    if (this.profileUI.avatarEdit) {
       this.defaultAvatars.map((avatar) => {
-        avatar.selected = avatar.url == this.profile.avatar.url;
+        avatar.selected = avatar.url == this.profile.avatarUrl;
       });
     } else {
       this.saveDataProfile();
@@ -139,7 +151,7 @@ export class SettingsComponent implements OnInit {
 
   editUsername() {
     this.profileUI.usernameEdit = !this.profileUI.usernameEdit;
-    if(this.profileUI.usernameEdit) {
+    if (this.profileUI.usernameEdit) {
       this.form.get('name').enable();
     } else {
       this.form.get('name').disable();
@@ -149,7 +161,6 @@ export class SettingsComponent implements OnInit {
   editUsernameConfirm() {
     this.profile.userName = this.form.get('name').value;
     this.editUsername();
-
     this.saveDataProfile();
   }
 
@@ -162,18 +173,36 @@ export class SettingsComponent implements OnInit {
     this.customizeColorsMode = !this.customizeColorsMode;
   }
 
-  updateColors(prop: any ) {
+  async updateColors(prop: any) {
     const changes = this.buildKeysThemeProps(this.themeProps);
-    const base = this.settings.themeProps[this.settings.theme];
-    this.settings.themeProps[this.settings.theme] = { ...base, ...changes };
-
-    setTimeout(() => {
-      this._uiServices.applyTheme(this.settings.themeProps[this.settings.theme]);
-    }, 300);
+    console.log('changes: ', changes);
+    const theme = this.settings._themes.find(x => x.id == this.settings.theme);
+    if (theme) {
+      if (theme.id != 'custom') {
+        const themeRow: ThemeRow = {
+          id: 'custom',
+          content: { ...theme.content, ...changes }
+        }
+      } else {
+        theme.content = { ...theme.content, ...changes }
+      }
+      setTimeout(() => {
+        this._uiServices.applyTheme(theme);
+      }, 300);
+    }
   }
 
   async saveDataProfile() {
-    const result = await this._commonServices.updateProfile(this.profile.id, this.profile);
+    const user: UserRow = {
+      age: this.profile.age,
+      avatarBody: this.profile.avatarBody,
+      avatarUrl: this.profile.avatarUrl,
+      current: this.profile.current,
+      userName: this.profile.userName,
+      uuid: this.profile.uuid,
+      userId: this.profile.userId,
+    };
+    const result = await this._commonServices.postUser(user);
     return result;
   }
 
@@ -247,12 +276,12 @@ export class SettingsComponent implements OnInit {
     return success;
   }
 
-  getKeysThemeProps(ThemeProps: ThemeProps) {
-    if(!ThemeProps) return null;
+  getKeysThemeProps(ThemeProps: IThemePropsDTO) {
+    if (!ThemeProps) return null;
     const result = [];
     Object.keys(ThemeProps).map((key) => {
-      if(!ThemeProps[key].includes('px')) {
-        result.push({ name: key, value: ThemeProps[key], _style: `background: ${ ThemeProps[key] };` });
+      if (!ThemeProps[key].includes('px')) {
+        result.push({ name: key, value: ThemeProps[key], _style: `background: ${ThemeProps[key]};` });
       }
     });
     return result;

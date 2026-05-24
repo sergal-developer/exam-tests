@@ -1,10 +1,15 @@
-export const theme_table_script = 
-`CREATE TABLE IF NOT EXISTS [theme_table] (
+export const theme_table_script =
+  `CREATE TABLE IF NOT EXISTS [theme_table] (
   [id] TEXT PRIMARY KEY,
   [content] TEXT NOT NULL
 );`;
 
 export interface IThemeDTO {
+  id: string;
+  content: IThemePropsDTO
+}
+
+export interface IThemePropsDTO {
   appBackground?: String;
   appColor?: String;
   appFontSize?: String;

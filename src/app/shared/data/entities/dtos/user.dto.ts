@@ -10,7 +10,7 @@ export const user_table_script =
 );`;
 
 export interface IUserDTO {
-  userId?: string;
+  userId?: number;
   uuid: string;
   userName: string;
   age?: number;

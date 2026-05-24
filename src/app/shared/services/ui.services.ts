@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Utils } from '../data/utils/utils';
+import { IThemeDTO } from '../data/entities/dtos';
 
 @Injectable()
 export class UiServices {
@@ -56,12 +57,12 @@ export class UiServices {
     this._notification.show = false;
   }
 
-  applyTheme(theme: any) {
+  applyTheme(theme: IThemeDTO) {
     let root = document.documentElement;
     if(root) {
-      const keys = Object.keys(theme);
+      const keys = Object.keys(theme.content);
       keys.map((key) => {
-        root.style.setProperty(`--${key}`, theme[key]);
+        root.style.setProperty(`--${key}`, theme.content[key]);
       });
     }
   }

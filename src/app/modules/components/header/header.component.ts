@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, ViewEncapsulation, } from '@angular/core';
 import { Router } from '@angular/router';
+import { IUserDTO } from 'src/app/shared/data/entities/dtos';
 import { ProfileEntity } from 'src/app/shared/data/entities/entities';
 import { CommonServices } from 'src/app/shared/services/common.services';
 
@@ -13,7 +14,15 @@ export class HeaderComponent implements OnInit {
   @Input() title: string = '';
   @Input() dashbaordparent: string = null;
 
-  profile: ProfileEntity = null;
+  profile: IUserDTO = {
+    userId: null,
+    current: false,
+    userName: '',
+    uuid: '',
+    age: null,
+    avatarUrl: null,
+    avatarBody: null,
+  };
 
   constructor(private _commonService: CommonServices) { }
 
@@ -22,7 +31,7 @@ export class HeaderComponent implements OnInit {
   }
 
   async getCurrentProfile() {
-    this.profile = await this._commonService.getActiveProfile();
+    this.profile = await this._commonService.getCurrentUser();
   }
 
   gotoSettings() {

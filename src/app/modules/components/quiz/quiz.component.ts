@@ -55,7 +55,7 @@ export class QuizComponent implements OnInit {
   //#region DATA
   async getData() {
     if (this.id) {
-      this.attempt = await this.getAttemptData(this.id);
+      // this.attempt = await this.getAttemptData(this.id);
 
       if (this.attempt.state == 'completed') {
         this.attempt._score = this.attempt.score.toFixed(2);
@@ -95,7 +95,8 @@ export class QuizComponent implements OnInit {
   }
 
   async getAttemptData(id: string) {
-    const data = await this._commonService.searchAttempt(id, 'attemptId');
+    // const data = await this._commonService.searchAttempt(id, 'attemptId');
+    const data = [];
     if (!data) {
       this._uiService.notification('La información no pudo recuperarse correctamente');
       return null;
@@ -124,7 +125,7 @@ export class QuizComponent implements OnInit {
     this.attempt.updatedDate = new Date().getTime();
     this.readonly = this.attempt.state == AttemptState.completed;
 
-    await this._commonService.updateAttempt(this.attempt.attemptId, this.attempt, 'attemptId');
+    // await this._commonService.updateAttempt(this.attempt.attemptId, this.attempt, 'attemptId');
 
     if (this.attempt.state == AttemptState.completed) {
       this.showFinishPage();

@@ -63,6 +63,7 @@
   "permission_theme": "Tema",
   "permission_theme_light": "Claro",
   "permission_theme_dark": "Oscuro",
+  "permission_theme_custom": "Personalizado",
   "action_edit": "Editar",
   "action_delete": "Eliminar",
   "action_reset": "Reiniciar",

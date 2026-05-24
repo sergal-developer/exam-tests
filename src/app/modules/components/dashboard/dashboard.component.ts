@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation, } from '@angular/core';
+import { IQuizAttemptDTO, IQuizDTO, IUserDTO } from 'src/app/shared/data/entities/dtos';
 import { AnswerEntity, AttemptEntity, OptionEntity, QuizEntity } from 'src/app/shared/data/entities/entities';
 import { AttemptState } from 'src/app/shared/data/enumerables/enumerables';
 import { TransformData } from 'src/app/shared/data/utils/transformData';
@@ -13,16 +14,23 @@ import { v4 as uuidv4 } from 'uuid';
 })
 export class DashboardComponent implements OnInit {
   @Output() onChange = new EventEmitter();
-  @Input() selected: string = null;
+  @Input() selected: number = null;
 
-  listQuiz: QuizEntity[] = [];
-  currentQuiz: QuizEntity = null;
+  listQuiz: IQuizDTO[] = [];
+  currentQuiz: IQuizDTO = null;
   currentSection = 'show';
   listAttempts: AttemptEntity[] = [];
   uistate = 'init';
 
   transform = new TransformData();
-  settings = null;
+  user: IUserDTO = null;
+  permissions = {
+    create: false,
+    duplicate: false,
+    edit: false,
+    delete: false,
+    ai: false
+  }
 
   constructor(private _commonServices: CommonServices,
     private _uiServices: UiServices) { }
@@ -40,78 +48,85 @@ export class DashboardComponent implements OnInit {
   //#region DATA
   async init() {
     const list = await this._commonServices.getAllQuizs();
+    console.log('list: ', list);
     if(list) {
       this.listQuiz = this.normalizeQuiz(list);
     }
 
     if (this.selected) {
-      const quiz = this.listQuiz.find((quiz) => quiz.id == this.selected);
+      const quiz = this.listQuiz.find((quiz) => quiz.quizId == this.selected);
       this.showDetails(quiz);
     }
   }
 
   async getSettings() {
-    // this.settings = await this._commonServices.getActiveSettings();
+    const settings = await this._commonServices.setDefaultData();
+    this.user = await this._commonServices.getCurrentUser();
+    this.permissions = settings.permissions;
   }
 
-  async getAttempts(quiz: QuizEntity) {
-    const attempt = await this._commonServices.filterAttempts(quiz.id);
-    this.listAttempts = attempt && attempt.length ? this.normalizeAttempt(attempt) : [];
+  async getAttempts(quiz: IQuizDTO) {
+    // const attempt = await this._commonServices.filterAttempts(quiz.quizId);
+    // this.listAttempts = attempt && attempt.length ? this.normalizeAttempt(attempt) : [];
   }
 
   async createattempt() {
-    const data: AttemptEntity = {
-      id: this.currentQuiz.id,
-      attemptId: uuidv4(),
+    const data: IQuizAttemptDTO = {
+      attemptId: 0,
+      quizId: this.currentQuiz.quizId,
+      userId: this.user.userId,
       score: 0,
       state: AttemptState.new,
-      timeEnlapsed: 0,
+      timeEnlapsed: 0, 
       title: this.currentQuiz.title,
-      questions: this.currentQuiz.questions,
-      time: this.currentQuiz.time ? this.currentQuiz.time : 0,
-      creationDate: new Date().getTime(),
-      updatedDate: new Date().getTime(),
-      startDate: null
+      answers: [],
+      startedDate: new Date().getTime(),
+      finishedDate: new Date().getTime(),
+      // answers: this.currentQuiz.answers,
+      // time: this.currentQuiz.time ? this.currentQuiz.time : 0,
+      // creationDate: new Date().getTime(),
+      // updatedDate: new Date().getTime(),
+      // startDate: null
     }
 
     // DISCART INVALID ANSWERS
-    data.questions = this.validateQuestions(data.questions);
-    data.validTotalAnswers = data.questions.length;
+    // data.answers = this.validateQuestions(data.answers);
+    data.validTotalAnswers = data.answers.length;
 
     // clean selected elements
-    data.questions.map((question: AnswerEntity) => {
-      question.options.map((opt: OptionEntity) => {
-        opt.selected = false;
-      })
-    });
+    // data.questions.map((question: AnswerEntity) => {
+    //   question.options.map((opt: OptionEntity) => {
+    //     opt.selected = false;
+    //   })
+    // });
 
     // SHUFFLE ANSWERS
-    data.questions = this.transform.shuffleArray(data.questions);
+    // data.questions = this.transform.shuffleArray(data.questions);
 
     // SAVE DATA
-    await this._commonServices.saveAttempt(data);
-    const attempt = await this._commonServices.searchAttempt(data.attemptId, 'attemptId');
+    // await this._commonServices.saveAttempt(data);
+    // const attempt = await this._commonServices.searchAttempt(data.attemptId, 'attemptId');
 
-    if (attempt) {
-      this.goToCompleteAttempt(attempt);
-    } else {
-      // GLOBAL.service_error_attempt
-      this._uiServices._notification('Ocurrio un error al generar la evaluacion, intente nuvamente', { type: 'error' })
-    }
+    // if (attempt) {
+    //   this.goToCompleteAttempt(attempt);
+    // } else {
+    //   // GLOBAL.service_error_attempt
+    //   this._uiServices._notification('Ocurrio un error al generar la evaluacion, intente nuvamente', { type: 'error' })
+    // }
   }
 
   async deleteQuiz(quiz: QuizEntity) {
     this.listAttempts.map(async(attemp) => {
-      await this._commonServices.deleteAttempt(attemp.id);
+      // await this._commonServices.deleteAttempt(attemp.id);
     });
-    await this._commonServices.deleteQuiz(quiz.id);
+    // await this._commonServices.deleteQuiz(quiz.id);
     this.init();
     this.returnMain();
   }
 
   async resetAttemps(quiz: QuizEntity) {
     this.listAttempts.map(async(attemp) => {
-      await this._commonServices.deleteAttempt(attemp.id);
+      // await this._commonServices.deleteAttempt(attemp.id);
     });
     this.returnMain();
   }
@@ -140,9 +155,9 @@ export class DashboardComponent implements OnInit {
     this._commonServices.navigate('attemptreview', attempt.attemptId);
   }
 
-  async showDetails(quiz: QuizEntity) {
+  async showDetails(quiz: IQuizDTO) {
     this.listQuiz.map((item) => {
-      item._current = quiz.id == item.id;
+      item._current = quiz.quizId == item.quizId;
     });
     this.currentSection = 'show_2';
     this.currentQuiz = quiz;
@@ -155,7 +170,7 @@ export class DashboardComponent implements OnInit {
     });
 
     this.valueChange('secondary');
-    this._commonServices.navigate('dashboard', this.currentQuiz.id);
+    this._commonServices.navigate('dashboard', this.currentQuiz.quizId.toString());
   }
 
   returnMain() {
@@ -175,7 +190,7 @@ export class DashboardComponent implements OnInit {
   //#endregion EVENTS
 
   //#region CONVERTERS
-  normalizeQuiz(list: QuizEntity[]) {
+  normalizeQuiz(list: IQuizDTO[]) {
     list.map((item) => {
       item._attemptsValue = item._attemptsValue ?? '-';
       item._bestTimeValue = item._bestTimeValue ?? '-';

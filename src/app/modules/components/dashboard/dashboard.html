@@ -1,12 +1,12 @@
 <div class="_animation_state {{ uistate }}">
     <header [mode]="'dashboard'"></header>
 
-    <div class="root_container_collection" *ngIf="settings">
+    <div class="root_container_collection" *ngIf="permissions">
         <div class="root_container_mask {{ currentSection }}">
 
             <div class="root-container">
                 <div class="hero-section">
-                    <ng-container *ngIf="settings.permissions.create">
+                    <ng-container *ngIf="permissions.create">
                         <button (click)="createQuiz()" *ngIf="listQuiz.length">
                             <div class="inner">
                                 {{ 'new_quiz' | translate }} <span class="material-icons-outlined">
@@ -48,7 +48,7 @@
                     <h3>{{ 'empty_exam_title' | translate }}</h3>
                             <div>{{ 'empty_exam_subtitle' | translate }}</div>
 
-                            <ng-container *ngIf="settings.permissions.create">
+                            <ng-container *ngIf="permissions.create">
                                 <button (click)="createQuiz()" >
                                     <div class="inner">
                                         <span>{{ 'new_quiz' | translate }}</span>  <span class="material-icons-outlined">
@@ -73,17 +73,17 @@
                 </div>
 
                 <div class="exam-section-actions">
-                    <ng-container *ngIf="settings.permissions.duplicate">
+                    <ng-container *ngIf="permissions.duplicate">
                         <button class="link uppercase" (click)="duplicateQuiz(currentQuiz)">
                             <div class="inner"> {{ 'permission_duplicate' | translate }} <span class="material-icons _primary color">copy_all</span> </div>
                         </button>
                     </ng-container>
-                    <ng-container *ngIf="settings.permissions.edit">
+                    <ng-container *ngIf="permissions.edit">
                         <button class="link uppercase" (click)="editQuiz(currentQuiz)">
                             <div class="inner"> {{ 'action_edit' | translate }} <span class="material-icons _primary color">mode_edit</span> </div>
                         </button>
                     </ng-container>
-                    <ng-container *ngIf="settings.permissions.delete">
+                    <ng-container *ngIf="permissions.delete">
                         <button class="link uppercase" (click)="deleteQuiz(currentQuiz)">
                             <div class="inner"> {{ 'action_delete' | translate }} <span class="material-icons _primary color">delete</span> </div>
                         </button>

@@ -10,7 +10,7 @@ export const settings_table_script =
 );`;
 
 export interface ISettingsDTO {
-  settingId?: string;
+  settingId?: number;
   language: string;
   permissions: {
     create: boolean,

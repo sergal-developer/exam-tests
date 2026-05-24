@@ -217,12 +217,13 @@ export class QuizEditableComponent implements OnInit {
 
     // save or update data
     if (this.quiz.id) {
-      await this._commonService.updateQuiz(this.quiz.id, this.quiz);
+      // await this._commonService.updateQuiz(this.quiz.id, this.quiz);
     } else {
       this.quiz.id = uuidv4();
-      await this._commonService.saveQuiz(this.quiz);
+      // await this._commonService.saveQuiz(this.quiz);
     }
-    const data = await this._commonService.searchQuiz(this.quiz.id);
+    // const data = await this._commonService.searchQuiz(this.quiz.id);
+    const data = null;
     this.quiz = data;
 
     if (!data) {
@@ -231,7 +232,8 @@ export class QuizEditableComponent implements OnInit {
   }
 
   async getQuizData(id: string) {
-    const data = await this._commonService.searchQuiz(id);
+    // const data = await this._commonService.searchQuiz(id);
+    const data = null;
     if (!data) {
       this._uiService.notification(this.translateLabels.service_fail_get);
       return null;

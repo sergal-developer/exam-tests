@@ -30,6 +30,7 @@ export const quiz_attempt_table_script = `CREATE TABLE IF NOT EXISTS [quiz_attem
   [attemptId] INTEGER PRIMARY KEY,
   [quizId] INTEGER,
   [userId] INTEGER,
+  [title] TEXT,
   [startedDate] INTEGER,
   [finishedDate] INTEGER,
   [score] REAL,
@@ -49,7 +50,7 @@ export const answer_attempt_table_script = `CREATE TABLE IF NOT EXISTS [answer_a
 
 
 export interface IQuizDTO {
-  quizId?: string;
+  quizId?: number;
   title: string;
   time: number;
   creationDate: number;
@@ -100,6 +101,7 @@ export interface IQuizAttemptDTO {
   startedDate: number;
   finishedDate: number;
   score?: number;
+  title: string;
 
   // Generated
   answers: IAttemptAnswerDTO[];
