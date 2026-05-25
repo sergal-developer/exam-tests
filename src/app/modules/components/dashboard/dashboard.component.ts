@@ -1,11 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation, } from '@angular/core';
-import { IQuizAttemptDTO, IQuizDTO, IUserDTO } from 'src/app/shared/data/entities/dtos';
-import { AnswerEntity, AttemptEntity, OptionEntity, QuizEntity } from 'src/app/shared/data/entities/entities';
+import { AnswerDTO, PermissionsDTO, AttemptDTO, QuizDTO, UserDTO } from 'src/app/shared/data/entities/dtos';
 import { AttemptState } from 'src/app/shared/data/enumerables/enumerables';
 import { TransformData } from 'src/app/shared/data/utils/transformData';
 import { CommonServices } from 'src/app/shared/services/common.services';
 import { UiServices } from 'src/app/shared/services/ui.services';
-import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'dashboard',
@@ -16,14 +14,14 @@ export class DashboardComponent implements OnInit {
   @Output() onChange = new EventEmitter();
   @Input() selected: number = null;
 
-  listQuiz: IQuizDTO[] = [];
-  currentQuiz: IQuizDTO = null;
+  listQuiz: QuizDTO[] = [];
+  currentQuiz: QuizDTO = null;
   currentSection = 'show';
-  listAttempts: AttemptEntity[] = [];
+  listAttempts: AttemptDTO[] = [];
   uistate = 'init';
 
   transform = new TransformData();
-  user: IUserDTO = null;
+  user: UserDTO = null;
   permissions = {
     create: false,
     duplicate: false,
@@ -55,23 +53,25 @@ export class DashboardComponent implements OnInit {
 
     if (this.selected) {
       const quiz = this.listQuiz.find((quiz) => quiz.quizId == this.selected);
-      this.showDetails(quiz);
+      if(this.listQuiz.length && quiz) {
+        this.showDetails(quiz);
+      }
     }
   }
 
   async getSettings() {
     const settings = await this._commonServices.setDefaultData();
     this.user = await this._commonServices.getCurrentUser();
-    this.permissions = settings.permissions;
+    this.permissions = settings.permissions as PermissionsDTO;
   }
 
-  async getAttempts(quiz: IQuizDTO) {
+  async getAttempts(quiz: QuizDTO) {
     // const attempt = await this._commonServices.filterAttempts(quiz.quizId);
     // this.listAttempts = attempt && attempt.length ? this.normalizeAttempt(attempt) : [];
   }
 
   async createattempt() {
-    const data: IQuizAttemptDTO = {
+    const data: AttemptDTO = {
       attemptId: 0,
       quizId: this.currentQuiz.quizId,
       userId: this.user.userId,
@@ -80,8 +80,8 @@ export class DashboardComponent implements OnInit {
       timeEnlapsed: 0, 
       title: this.currentQuiz.title,
       answers: [],
-      startedDate: new Date().getTime(),
-      finishedDate: new Date().getTime(),
+      creationDate: new Date().getTime(),
+      updatedDate: new Date().getTime(),
       // answers: this.currentQuiz.answers,
       // time: this.currentQuiz.time ? this.currentQuiz.time : 0,
       // creationDate: new Date().getTime(),
@@ -115,7 +115,7 @@ export class DashboardComponent implements OnInit {
     // }
   }
 
-  async deleteQuiz(quiz: QuizEntity) {
+  async deleteQuiz(quiz: QuizDTO) {
     this.listAttempts.map(async(attemp) => {
       // await this._commonServices.deleteAttempt(attemp.id);
     });
@@ -124,7 +124,7 @@ export class DashboardComponent implements OnInit {
     this.returnMain();
   }
 
-  async resetAttemps(quiz: QuizEntity) {
+  async resetAttemps(quiz: QuizDTO) {
     this.listAttempts.map(async(attemp) => {
       // await this._commonServices.deleteAttempt(attemp.id);
     });
@@ -137,25 +137,25 @@ export class DashboardComponent implements OnInit {
     this._commonServices.navigate('quizcreate');
   }
 
-  editQuiz(quiz: QuizEntity) {
-    this._commonServices.navigate('quizedit', quiz.id);
+  editQuiz(quiz: QuizDTO) {
+    this._commonServices.navigate('quizedit', quiz.quizId.toString());
   }
 
-  duplicateQuiz(quiz: QuizEntity) {
+  duplicateQuiz(quiz: QuizDTO) {
     console.log('quiz: ', quiz);
     // this._commonServices.navigate('quizedit', quiz.id);
   }
   
 
-  goToCompleteAttempt(attempt: AttemptEntity) {
-    this._commonServices.navigate('attemptevalue',  attempt.attemptId);
+  goToCompleteAttempt(attempt: AttemptDTO) {
+    this._commonServices.navigate('attemptevalue',  attempt.attemptId.toString());
   }
 
-  goToReviewAttempt(attempt: AttemptEntity) {
-    this._commonServices.navigate('attemptreview', attempt.attemptId);
+  goToReviewAttempt(attempt: AttemptDTO) {
+    this._commonServices.navigate('attemptreview', attempt.attemptId.toString());
   }
 
-  async showDetails(quiz: IQuizDTO) {
+  async showDetails(quiz: QuizDTO) {
     this.listQuiz.map((item) => {
       item._current = quiz.quizId == item.quizId;
     });
@@ -190,7 +190,7 @@ export class DashboardComponent implements OnInit {
   //#endregion EVENTS
 
   //#region CONVERTERS
-  normalizeQuiz(list: IQuizDTO[]) {
+  normalizeQuiz(list: QuizDTO[]) {
     list.map((item) => {
       item._attemptsValue = item._attemptsValue ?? '-';
       item._bestTimeValue = item._bestTimeValue ?? '-';
@@ -201,7 +201,7 @@ export class DashboardComponent implements OnInit {
     return list;
   }
 
-  normalizeAttempt(list: AttemptEntity[]) {
+  normalizeAttempt(list: AttemptDTO[]) {
     list.map((item) => {
       item._creationDate = this.transform.toDate(new Date(item.creationDate), 'MMM/d/yy h:mm');
       item._updatedDate = this.transform.toDate(new Date(item.updatedDate), 'MMM/d/yy h:mm');
@@ -209,10 +209,10 @@ export class DashboardComponent implements OnInit {
     return list;
   }
 
-  validateQuestions(list: AnswerEntity[]) {
+  validateQuestions(list: AnswerDTO[]) {
     const validAnswers = [];
-    list.map((answer: AnswerEntity) => {
-      if (answer.question != '' && answer.correctAnswer != null) {
+    list.map((answer) => {
+      if (answer.title != '' && answer._selectedAnswer != null) {
         validAnswers.push(answer);
       }
     });

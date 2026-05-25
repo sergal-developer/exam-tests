@@ -1,14 +1,14 @@
-export const log_table_script = 
-`CREATE TABLE IF NOT EXISTS [log_table] (
+export const log_table_script =
+  `CREATE TABLE IF NOT EXISTS [log_table] (
   [id] INTEGER PRIMARY KEY AUTOINCREMENT,
   [date] INTEGER,
   [content] TEXT,
   [type] TEXT
 );`;
 
-export interface ILogDTO {
-  id?: string;
+export interface LogDTO {
+  id?: number;
   date?: number,
   content: any,
-  type?: string
+  type: string
 }

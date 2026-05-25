@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation, } from '@angular/core';
-import { AnswerEntity, AttemptEntity, OptionEntity } from 'src/app/shared/data/entities/entities';
+import { AnswerDTO, AnswerOptionDTO, AttemptDTO } from 'src/app/shared/data/entities/dtos';
 import { AttemptState, GradeState } from 'src/app/shared/data/enumerables/enumerables';
 import { CommonServices } from 'src/app/shared/services/common.services';
 import { UiServices } from 'src/app/shared/services/ui.services';
@@ -15,9 +15,9 @@ export class QuizComponent implements OnInit {
   @Output() onChange = new EventEmitter();
 
   //#region INTERNAL
-  attempt: AttemptEntity = null;
+  attempt: AttemptDTO = null;
   currentAnswerIndex = 0;
-  currentAnswer: AnswerEntity = null;
+  currentAnswer: AnswerDTO = null;
 
   readonly = false;
   progress = 0;
@@ -57,20 +57,20 @@ export class QuizComponent implements OnInit {
     if (this.id) {
       // this.attempt = await this.getAttemptData(this.id);
 
-      if (this.attempt.state == 'completed') {
-        this.attempt._score = this.attempt.score.toFixed(2);
-      } else {
-        const indedxLastResponse = this.attempt.questions.findIndex((item) => !item.selectedAnswer);
-        if (indedxLastResponse > 0) {
-          setTimeout(() => {
-            this.gotoQuestion(indedxLastResponse - 1);
-          }, 500);
-        }
-      }
+      // if (this.attempt.state == 'completed') {
+      //   this.attempt._score = this.attempt.score.toFixed(2);
+      // } else {
+      //   const indedxLastResponse = this.attempt.questions.findIndex((item) => !item.selectedAnswer);
+      //   if (indedxLastResponse > 0) {
+      //     setTimeout(() => {
+      //       this.gotoQuestion(indedxLastResponse - 1);
+      //     }, 500);
+      //   }
+      // }
 
-      if (!this.attempt.startDate) {
-        this.attempt.startDate = new Date().getTime();
-      }
+      // if (!this.attempt.startDate) {
+      //   this.attempt.startDate = new Date().getTime();
+      // }
 
       if (!this.attempt) {
         this._uiService.notification('Ocurrio un error al recuperar los datos', { type: 'error', closeTimer: 3000 });
@@ -83,7 +83,7 @@ export class QuizComponent implements OnInit {
   async setupComponent() {
     this.readonly = this.attempt.state == AttemptState.completed;
     this.currentAnswerIndex = 0;
-    this.currentAnswer = this.attempt.questions[this.currentAnswerIndex];
+    // this.currentAnswer = this.attempt.questions[this.currentAnswerIndex];
 
     this.getProgress();
 
@@ -136,19 +136,19 @@ export class QuizComponent implements OnInit {
   //#endregion DATA
 
   //#region EVENTS
-  selectOption(option: OptionEntity) {
+  selectOption(option: AnswerOptionDTO) {
     if (this.readonly) { return; }
 
-    if (option.selected) {
-      this.nextAnswer();
-    } else {
-      // reset all selections
-      this.currentAnswer.options.map(opt => {
-        opt.selected = opt.id == option.id ? true : false;
-      });
-    }
+    // if (option.selected) {
+    //   this.nextAnswer();
+    // } else {
+    //   // reset all selections
+    //   this.currentAnswer.options.map(opt => {
+    //     opt.selected = opt.id == option.id ? true : false;
+    //   });
+    // }
 
-    this.currentAnswer.selectedAnswer = option.id;
+    // this.currentAnswer.selectedAnswer = option.id;
   }
 
   prevAnswer() {
@@ -157,7 +157,7 @@ export class QuizComponent implements OnInit {
     }
 
     this.currentAnswerIndex = this.currentAnswerIndex - 1;
-    this.currentAnswer = this.attempt.questions[this.currentAnswerIndex];
+    // this.currentAnswer = this.attempt.questions[this.currentAnswerIndex];
     this.updateResults();
   }
 
@@ -167,7 +167,7 @@ export class QuizComponent implements OnInit {
     }
 
     this.currentAnswerIndex = this.currentAnswerIndex + 1;
-    this.currentAnswer = this.attempt.questions[this.currentAnswerIndex];
+    // this.currentAnswer = this.attempt.questions[this.currentAnswerIndex];
     this.updateResults();
   }
 
@@ -242,17 +242,17 @@ export class QuizComponent implements OnInit {
   getAssessment() {
     let score = 0;
     const correctAnswers = [];
-    const answerTotal = this.attempt.questions.length;
-    this.attempt.questions.map((item: AnswerEntity) => {
-      item.isCorrect = item.correctAnswer == item.selectedAnswer;
-      if (item.isCorrect) {
-        correctAnswers.push(item);
-      }
-    });
+    const answerTotal = this.attempt.answers.length;
+    // this.attempt.answers.map((item: AnswerDTO) => {
+    //   // item._isCorrect = item.correctAnswer == item.selectedAnswer;
+    //   // if (item.isCorrect) {
+    //   //   correctAnswers.push(item);
+    //   // }
+    // });
     score = (100 / answerTotal) * correctAnswers.length;
     this.attempt.score = score;
     // this.attempt._score = Math.floor(this.attempt.score).toString();
-    this.attempt._score = Math.floor(this.attempt.score) >= 8 ? Math.floor(this.attempt.score).toString() : this.attempt.score.toFixed(1);
+    // this.attempt._score = Math.floor(this.attempt.score) >= 8 ? Math.floor(this.attempt.score).toString() : this.attempt.score.toFixed(1);
     this.attempt.correctAnswers = correctAnswers.length;
     return this.attempt;
   }

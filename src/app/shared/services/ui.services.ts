@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Utils } from '../data/utils/utils';
-import { IThemeDTO } from '../data/entities/dtos';
+import { ThemeDTO } from '../data/entities/dtos';
 
 @Injectable()
 export class UiServices {
@@ -57,7 +57,7 @@ export class UiServices {
     this._notification.show = false;
   }
 
-  applyTheme(theme: IThemeDTO) {
+  applyTheme(theme: ThemeDTO) {
     let root = document.documentElement;
     if(root) {
       const keys = Object.keys(theme.content);

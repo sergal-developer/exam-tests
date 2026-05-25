@@ -1,7 +1,5 @@
 import { Component, Input, OnInit, ViewEncapsulation, } from '@angular/core';
-import { Router } from '@angular/router';
-import { IUserDTO } from 'src/app/shared/data/entities/dtos';
-import { ProfileEntity } from 'src/app/shared/data/entities/entities';
+import { UserDTO } from 'src/app/shared/data/entities/dtos';
 import { CommonServices } from 'src/app/shared/services/common.services';
 
 @Component({
@@ -14,7 +12,7 @@ export class HeaderComponent implements OnInit {
   @Input() title: string = '';
   @Input() dashbaordparent: string = null;
 
-  profile: IUserDTO = {
+  profile: UserDTO = {
     userId: null,
     current: false,
     userName: '',

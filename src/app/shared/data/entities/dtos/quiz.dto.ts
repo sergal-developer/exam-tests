@@ -31,9 +31,10 @@ export const quiz_attempt_table_script = `CREATE TABLE IF NOT EXISTS [quiz_attem
   [quizId] INTEGER,
   [userId] INTEGER,
   [title] TEXT,
-  [startedDate] INTEGER,
+  [creationDate] INTEGER,
   [finishedDate] INTEGER,
   [score] REAL,
+  [state] TEXT,
   FOREIGN KEY ([quizId]) REFERENCES [quiz_table] ([quizId]) ON DELETE CASCADE
 );`;
 
@@ -48,17 +49,19 @@ export const answer_attempt_table_script = `CREATE TABLE IF NOT EXISTS [answer_a
   FOREIGN KEY ([selectedOptionId]) REFERENCES [answer_option_table] ([optionId])
 );`;
 
-
-export interface IQuizDTO {
-  quizId?: number;
+//#region INTERFACES
+export interface QuizDTO {
+  quizId: number;
+  uuid?: string; 
   title: string;
   time: number;
   creationDate: number;
   updatedDate: number;
   startDate?: number;
 
-  // Generated
-  answers: IAnswerDTO[];
+  // GENERATED
+  answers?: AnswerDTO[];
+
   // varaibles for UI and format
   _showDetails?: boolean;
   _status?: string;
@@ -70,53 +73,61 @@ export interface IQuizDTO {
   _bestTimeValue?: string;
 }
 
-export interface IAnswerDTO {
+export interface AnswerDTO {
   answerId?: number;
   quizId?: number;
   title: string;
   updatedDate: number;
   
-  // Generated
-  options: IAnswerOptionDTO[];
-  correntOption: number | null;
-  answerText: string | null;
-  selectedAnswer?: number | string;
-  isEvaluated?: boolean;
-  isCorrect?: boolean;
+  // GENERATED
+  _options?: AnswerOptionDTO[];
+  _currentOption?: number | null;
+  _answerText?: string | null;
+
+  _selectedAnswer?: number | string;
+  _isEvaluated?: boolean;
+  _isCorrect?: boolean;
 }
 
-export interface IAnswerOptionDTO {
-  optionId: number;
+export interface AnswerOptionDTO {
+  optionId?: number;
   answerId: number;
   content: string;
   optionIndex: number;
   updatedDate: number;
-  isCorrect?: boolean;
+  isCorrect: boolean;
+
+  // GENERATED
+  _selected?: boolean;
 }
 
-export interface IQuizAttemptDTO {
+export interface AttemptDTO {
   attemptId: number;
   quizId: number;
   userId: number;
-  startedDate: number;
-  finishedDate: number;
-  score?: number;
   title: string;
-
-  // Generated
-  answers: IAttemptAnswerDTO[];
+  creationDate: number;
+  updatedDate?: number;
+  score: number;
   state: AttemptState;
+  
+
+  // GENERATED
+  answers?: AttemptAnswerDTO[];
   timeEnlapsed?: number;
   correctAnswers?: number;
   validTotalAnswers?: number;
   grade?: GradeState;
+
+  _creationDate?: string;
+  _updatedDate?: string;
 }
 
-export interface IAttemptAnswerDTO {
+export interface AttemptAnswerDTO {
   answerAttemptId: number;
   attemptId: number;
   answerId: number;
-  selectedOptionId: number;
+  selectedOptionId?: number;
   isCorrect: boolean;
 }
 
@@ -131,3 +142,5 @@ export enum GradeState {
     failed = 'failed',
     barely_passed = 'barely_passed',
 }
+
+//#endregion INTERFACES

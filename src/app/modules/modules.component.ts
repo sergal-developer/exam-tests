@@ -4,9 +4,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { ScreenEnum } from 'src/app/shared/data/enumerables/enumerables';
 import { CommonServices } from '../shared/services/common.services';
 import { UiServices } from '../shared/services/ui.services';
-import { SettingsEntity, ThemeProps } from '../shared/data/entities/entities';
 import { DatabaseService } from '../shared/services/database/sql.database.service';
-import { ISettingsDTO } from '../shared/data/entities/dtos';
+import { SettingsDTO, ThemeDTO } from '../shared/data/entities/dtos';
 
 @Component({
   selector: 'modules',
@@ -49,9 +48,6 @@ export class ModuleComponent implements OnInit, AfterViewInit {
           this.uistate = `__${this.screen}`;
           this.uisubstate = '';
         }, 500);
-
-        
-        console.log('this.screen: ', this.screen, this.submodule);
       }
     });
   }
@@ -78,7 +74,6 @@ export class ModuleComponent implements OnInit, AfterViewInit {
   async setupLanguage() {
     const setting = await this._commonServices.getCurrentSettings();
     if (setting) {
-      console.log('setting: ', setting);
       const languages = [];
       setting._languages.map((lan) => {
         languages.push(lan.value);
@@ -98,8 +93,8 @@ export class ModuleComponent implements OnInit, AfterViewInit {
     this.uisubstate = event.value;
   }
 
-  applyCurrentTheme(setting: ISettingsDTO) {
-    setting._themes.map(x => x.content.zoomLevel = '100%');
+  applyCurrentTheme(setting: SettingsDTO) {
+    setting._themes.map((x: ThemeDTO) => x.content['zoomLevel'] = '100%');
     const theme = setting._themes.find(x => x.id == setting.theme);
     if (theme) {
       this._uiServices.applyTheme(theme);

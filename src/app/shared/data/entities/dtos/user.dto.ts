@@ -9,12 +9,14 @@ export const user_table_script =
   [current] BOOLEAN
 );`;
 
-export interface IUserDTO {
+export interface UserDTO {
   userId?: number;
   uuid: string;
   userName: string;
   age?: number;
   avatarUrl?: string;
   avatarBody?: string;
-  current: boolean;
+  current: boolean| number;
+
+  // GENERATED
 }

@@ -4,12 +4,12 @@ export const theme_table_script =
   [content] TEXT NOT NULL
 );`;
 
-export interface IThemeDTO {
+export interface ThemeDTO {
   id: string;
-  content: IThemePropsDTO
+  content: ThemePropertiesDTO | string
 }
 
-export interface IThemePropsDTO {
+export interface ThemePropertiesDTO {
   appBackground?: String;
   appColor?: String;
   appFontSize?: String;

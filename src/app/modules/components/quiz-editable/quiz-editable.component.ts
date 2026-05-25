@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, ViewEncapsulation, } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { AnswerEntity, OptionEntity, QuizEntity } from 'src/app/shared/data/entities/entities';
+import { AnswerDTO, AnswerOptionDTO, QuizDTO, SettingsDTO } from 'src/app/shared/data/entities/dtos';
 import { CommonServices } from 'src/app/shared/services/common.services';
 import { UiServices } from 'src/app/shared/services/ui.services';
 import { v4 as uuidv4 } from 'uuid';
@@ -12,17 +12,27 @@ import { v4 as uuidv4 } from 'uuid';
   encapsulation: ViewEncapsulation.None,
 })
 export class QuizEditableComponent implements OnInit {
-  @Input() quizId: string = null;
+  @Input() quizId: number = null;
 
   //#region INTERNAL
   form: FormGroup;
-  formQuestion: FormGroup;
+
+  formQuestion: FormGroup = new FormGroup({
+    answerId: new FormControl(0, Validators.required),
+    quizId: new FormControl(0),
+    title: new FormControl('', Validators.required),
+    _options: new FormControl([], Validators.required),
+  })
+
+  formIAGenerated: FormGroup = new FormGroup({
+    topic: new FormControl('', Validators.required),
+    answquestionserTitle: new FormControl(2, Validators.required),
+    options: new FormControl(4, Validators.required),
+  })
+
   options: any = [];
-
-  formIAGenerated: FormGroup;
-
-  quiz: QuizEntity = null;
-  currentAnswer: AnswerEntity = null;
+  quiz: QuizDTO = null;
+  currentAnswer: AnswerDTO = null;
   currentAnswerIndex = 0;
 
   translateLabels = {
@@ -41,7 +51,7 @@ export class QuizEditableComponent implements OnInit {
   durationFormShow = false;
   showIAForm = false;
   loadingDataAi = false;
-  settings = null;
+  settings: SettingsDTO = null;
   isEdit = false;
   //#endregion INTERNAL
 
@@ -59,7 +69,7 @@ export class QuizEditableComponent implements OnInit {
   }
 
   async setupLanguage(next) {
-    // this.settings = await this._commonService.getActiveSettings();
+    this.settings = await this._commonService.getCurrentSettings();
     this.translate.setDefaultLang(this.settings.language);
     const keys = Object.keys(this.translateLabels);
     this.translate.get(keys).subscribe((res) => {
@@ -69,9 +79,16 @@ export class QuizEditableComponent implements OnInit {
   }
 
   //#region DATA
-  async setupComponent(injectData?: QuizEntity) {
+  async setupComponent(injectData?: QuizDTO) {
 
     this.isEdit = this.quizId ? true : false;
+    this.formIAGenerated = this.fb.group({
+      topic: ['', Validators.required],
+      questions: [2, Validators.required],
+      options: [4, Validators.required],
+    });
+    this.showIAForm = false;
+
 
     if (this.quizId && !injectData) {
       // no se esta injectando datos y recupera el examen solicitado
@@ -82,15 +99,47 @@ export class QuizEditableComponent implements OnInit {
         return;
       }
       // add blanck spaces in questions
-      this.quiz.questions.map((answer: AnswerEntity) => {
-        const length = this.quiz.questions.length || 0;
-        const newOption = {
-          id: length + 1,
-          text: '',
-          letter: this.getletter(length + 1),
-          selected: false
+      this.quiz.answers.map((answer: AnswerDTO) => {
+        const length = this.quiz.answers.length || 0;
+        const newOption: AnswerOptionDTO = {
+          answerId: answer.answerId,
+          content: '',
+          optionIndex: length + 1,
+          optionId: length + 1,
+          updatedDate: new Date().getTime(),
+          isCorrect: false
         }
-        answer.options.push(newOption);
+        answer._options.push(newOption);
+      });
+      // this.quiz.questions.push(this.getNewQuestion());
+      this.form = this.fb.group({
+        title: [this.quiz.title, Validators.required],
+        time: [this.quiz.time],
+      });
+
+      if (this.quiz.time != 0) {
+        this.durationFormShow = true;
+      }
+
+    } else if (injectData) {
+      // BACKUP OLD DATA 
+      const oldQuiz: QuizDTO = JSON.parse(JSON.stringify(this.quiz));
+      this.quiz = injectData;
+      console.log('this.quiz: ', this.quiz);
+      this.quiz.quizId = this.quizId;
+
+      // RECOVER OLD DATA
+      this.quiz.title = oldQuiz.title == '' ? this.quiz.title : oldQuiz.title;
+      this.quiz.answers = oldQuiz.answers.length > 1 ? [...oldQuiz.answers, ...this.quiz.answers] : this.quiz.answers;
+
+      this.quiz.answers.map((answer: AnswerDTO) => {
+        const length = this.quiz.answers.length || 0;
+        // answer._options.map((option: IAnswerOptionDTO) => {
+        //   option.letter = this.getletter(option.id + 1);
+        //   option.selected = false;
+        //   option.correctAnswer = option.id == answer.correctAnswer;
+        //   option.selected = option.id == answer.correctAnswer;
+        // });
       });
       // this.quiz.questions.push(this.getNewQuestion());
       this.form = this.fb.group({
@@ -103,91 +152,56 @@ export class QuizEditableComponent implements OnInit {
       }
 
     } else {
+      this.form = this.fb.group({
+        title: [this.translateLabels.new_quiz, Validators.required],
+        time: [''],
+      });
 
-      if (injectData) {
-        // BACKUP OLD DATA 
-        const oldQuiz: QuizEntity = JSON.parse(JSON.stringify(this.quiz));
-        this.quiz = injectData;
-        console.log('this.quiz: ', this.quiz);
-        this.quiz.id = this.quizId;
+      this.durationFormShow = false;
 
-        // RECOVER OLD DATA
-        this.quiz.title = oldQuiz.title == '' ? this.quiz.title : oldQuiz.title;
-        this.quiz.questions = oldQuiz.questions.length > 1 ? [...oldQuiz.questions, ...this.quiz.questions] : this.quiz.questions;
-
-        this.quiz.questions.map((answer: AnswerEntity) => {
-          const length = this.quiz.questions.length || 0;
-          answer.options.map((option: OptionEntity) => {
-            option.letter = this.getletter(option.id + 1);
-            option.selected = false;
-            option.correctAnswer = option.id == answer.correctAnswer;
-            option.selected = option.id == answer.correctAnswer;
-          });
-        });
-        // this.quiz.questions.push(this.getNewQuestion());
-        this.form = this.fb.group({
-          title: [this.quiz.title, Validators.required],
-          time: [this.quiz.time],
-        });
-
-        if (this.quiz.time != 0) {
-          this.durationFormShow = true;
-        }
-
-      } else {
-        this.form = this.fb.group({
-          title: [this.translateLabels.new_quiz, Validators.required],
-          time: [''],
-        });
-        this.durationFormShow = false;
-
-        this.quiz = {
-          title: '',
-          questions: [this.getNewQuestion()],
-          creationDate: new Date().getTime(),
-          updatedDate: new Date().getTime(),
-          time: 0,
-        }
+      this.quiz = {
+        quizId: -1,
+        title: '',
+        answers: [],
+        creationDate: new Date().getTime(),
+        updatedDate: new Date().getTime(),
+        time: 0,
       }
+      this.quiz.answers = [this.getNewQuestion()];
     }
-
+    
     this.currentAnswerIndex = 0;
     this.setCurrentAnswer();
-
-    this.formIAGenerated = this.fb.group({
-      topic: ['', Validators.required],
-      questions: [2, Validators.required],
-      options: [4, Validators.required],
-    });
-    this.showIAForm = false;
-
-    console.log('final quiz', this.quiz);
+    console.log('Quiz', this.quiz, this.formQuestion);
   }
 
   setCurrentAnswer() {
-    const values = this.quiz.questions[this.currentAnswerIndex];
+    const answerItem = this.quiz.answers[this.currentAnswerIndex];
+
     const optionArray = [];
-    values.options.map(opt => {
+    answerItem._options.map(opt => {
       optionArray.push(this.initOption(opt))
     });
 
     this.formQuestion = this.fb.group({
-      question: [values.question, Validators.required],
-      answerText: [values.answerText],
-      options: this.fb.array(optionArray)
+      answerId: [answerItem.answerId, Validators.required],
+      quizId: [answerItem.quizId],
+      title: [answerItem.title],
+      updatedDate: [answerItem.updatedDate],
+      _options: this.fb.array(optionArray)
     });
   }
 
   getOptions(): FormArray {
-    return this.formQuestion.get('options') as FormArray;
+    return this.formQuestion.get('_options') as FormArray;
   }
 
   get validActions(): boolean {
     const formValid = this.form.valid ?? false;
     const formQuestionValid = this.formQuestion.valid ?? false;
-    const question = this.formQuestion.value;
-    const questionsValid = question.options.length >= 3;
-    const selectedAwnser = question.options.find(opt => opt.selected);
+    const question: AnswerDTO = this.formQuestion.value;
+    const questionsValid = question._options.length >= 3;
+    const selectedAwnser = question._options.find(opt => opt._selected);
 
     return formValid && formQuestionValid && selectedAwnser && questionsValid;
   }
@@ -199,39 +213,40 @@ export class QuizEditableComponent implements OnInit {
     this.quiz.creationDate = new Date().getTime();
     this.quiz.updatedDate = new Date().getTime();
 
-    const valuePrev = this.quiz.questions[this.currentAnswerIndex];
+    const valuePrev = this.quiz.answers[this.currentAnswerIndex];
     const valueNew = this.formQuestion.value;
-    this.quiz.questions[this.currentAnswerIndex] = this.formQuestion.value;
+    this.quiz.answers[this.currentAnswerIndex] = this.formQuestion.value;
 
     if (cleanUnused) {
       // clean unused data
-      this.quiz.questions.map((question: AnswerEntity) => {
-        question.options = question.options.filter((opt: OptionEntity) => opt.text != '');
-        const correct = question.options.find((opt: OptionEntity) => opt.selected);
+      this.quiz.answers.map((question: AnswerDTO) => {
+        question._options = question._options.filter((opt: AnswerOptionDTO) => opt.content != '');
+        const correct = question._options.find((opt: AnswerOptionDTO) => opt['_selected']);
         if (correct) {
-          question.correctAnswer = correct.id;
+          question['correctAnswer'] = correct.optionId;
         }
       });
-      this.quiz.questions = this.quiz.questions.filter((question: AnswerEntity) => question.options.length > 0);
+      this.quiz.answers = this.quiz.answers.filter((question: AnswerDTO) => question._options.length > 0);
     }
 
     // save or update data
-    if (this.quiz.id) {
+    if (this.quiz.quizId) {
       // await this._commonService.updateQuiz(this.quiz.id, this.quiz);
     } else {
-      this.quiz.id = uuidv4();
+      this.quiz.quizId = 0;
       // await this._commonService.saveQuiz(this.quiz);
     }
+    console.log(' this.quiz: ',  this.quiz);
     // const data = await this._commonService.searchQuiz(this.quiz.id);
-    const data = null;
-    this.quiz = data;
+    // const data = null;
+    // this.quiz = data;
 
-    if (!data) {
+    if (!this.quiz) {
       this._uiService.notification(this.translateLabels.service_fail_update);
     }
   }
 
-  async getQuizData(id: string) {
+  async getQuizData(id: number) {
     // const data = await this._commonService.searchQuiz(id);
     const data = null;
     if (!data) {
@@ -245,25 +260,25 @@ export class QuizEditableComponent implements OnInit {
 
   //#region EVENTS
   selectAnswerCorrect(option: FormGroup) {
+    const _option = option.value as AnswerOptionDTO;
     // reset all items
-    this.formQuestion.value.options.map((opt, index) => {
-      this.getOptions().controls[index].get('selected').setValue(false);
+    this.formQuestion.value._options.map((opt, index) => {
+      this.getOptions().controls[index].get('_selected').setValue(false);
     });
 
     // assing correct
-    if (option.value.text) {
-      option.controls['selected'].setValue(true);
+    if (_option.content) {
+      option.controls['_selected'].setValue(true);
     }
   }
 
   onOptionChange(event: { control: string, value: any }) {
-    const lastIndex = this.formQuestion.value.options.length - 1;
-    const lastValue = this.formQuestion.value.options[lastIndex].text;
-
+    const lastIndex = this.formQuestion.value._options.length - 1;
+    const lastValue = this.formQuestion.value._options[lastIndex].content;
     if (lastIndex >= 0 && lastValue != '') {
       this.getOptions().push(this.initOption());
     } else if (lastIndex > 0 && lastValue == '') {
-      const postlastValue = this.formQuestion.value.options[lastIndex - 1].text;
+      const postlastValue = this.formQuestion.value._options[lastIndex - 1].content;
       if (postlastValue == '') {
         this.getOptions().removeAt(lastIndex);
       }
@@ -271,13 +286,13 @@ export class QuizEditableComponent implements OnInit {
   }
 
   gotoDashboard() {
-    this._commonService.navigate('dashboard', this.quiz.id );
+    this._commonService.navigate('dashboard', this.quiz.quizId.toString());
   }
 
   nextQuestion() {
-    if (this.currentAnswerIndex >= this.quiz.questions.length - 1) {
-      this.quiz.questions[this.currentAnswerIndex] = this.formQuestion.value;
-      this.quiz.questions.push(this.getNewQuestion());
+    if (this.currentAnswerIndex >= this.quiz.answers.length - 1) {
+      this.quiz.answers[this.currentAnswerIndex] = this.formQuestion.value;
+      this.quiz.answers.push(this.getNewQuestion());
     }
 
     this.updateQuiz();
@@ -326,7 +341,7 @@ export class QuizEditableComponent implements OnInit {
     data.language = this.settings.language == 'es' ? 'español' : 'ingles';
 
 
-    this._uiService.notification(`<h3><span class="material-icons">auto_awesome</span> ${this.translateLabels.generation_questions}</h3> <br> <p>${ this.translateLabels.ia_subtitle }</p>`, { closeTimer: -1, type: 'full-IA' });
+    this._uiService.notification(`<h3><span class="material-icons">auto_awesome</span> ${this.translateLabels.generation_questions}</h3> <br> <p>${this.translateLabels.ia_subtitle}</p>`, { closeTimer: -1, type: 'full-IA' });
     // const response: any = await this.mockDataAI();
     const response: any = await this._commonService.geminiGenerate(data);
 
@@ -336,16 +351,17 @@ export class QuizEditableComponent implements OnInit {
       this._uiService.notification(`${this.translateLabels.service_sucess_generation} ${response.questions.length} ${this.translateLabels.generation_questions_questions}.`, { closeTimer: 2500 });
 
       setTimeout(() => {
-        const quiz: QuizEntity = {
+        const quiz: QuizDTO = {
+          quizId: 0,
           title: data.topic,
           time: 0,
-          questions: response.questions,
+          answers: response.questions,
           creationDate: new Date().getTime(),
           updatedDate: new Date().getTime()
         }
         this.setupComponent(quiz);
 
-        if(!this.isEdit) {
+        if (!this.isEdit) {
           this.finishCreation();
         }
       }, 1000);
@@ -1380,23 +1396,32 @@ export class QuizEditableComponent implements OnInit {
   //#endregion EVENTS
 
   //#region CONVERTERS
-  initOption(optionValue?: OptionEntity) {
-    let option: OptionEntity = null;
+  initOption(optionValue?: AnswerOptionDTO) {
+    const question = this.quiz.answers[this.currentAnswerIndex];
+    const option: AnswerOptionDTO = {
+      answerId: question.answerId,
+      content: '',
+      optionId: question._options.length + 1,
+      optionIndex: question._options.length + 1,
+      updatedDate: new Date().getTime(),
+      // GENERATED
+      isCorrect: false,
+      _selected: false,
+    };
+
     if (!optionValue) {
-      const length = this.formQuestion ? this.formQuestion.value.options.length : 0;
-      option = {
-        id: length + 1,
-        text: '',
-        letter: this.getletter(length + 1),
-        selected: false
-      }
+      const length = this.formQuestion ? this.formQuestion.value._options.length : 0;
+      
+      option.optionIndex = length + 1;
     } else {
-      option = {
-        id: optionValue.id,
-        text: optionValue.text,
-        letter: optionValue.letter,
-        selected: optionValue.selected
-      }
+        option.answerId = optionValue.answerId;
+        option.content = optionValue.content;
+        option.optionId = optionValue.optionId;
+        option.optionIndex = optionValue.optionIndex;
+        option.updatedDate = optionValue.updatedDate;
+        // GENERATED
+        option.isCorrect = optionValue.isCorrect;
+        option._selected = optionValue._selected;
     }
     return this.fb.group(option)
   }
@@ -1409,19 +1434,29 @@ export class QuizEditableComponent implements OnInit {
   }
 
   getNewQuestion() {
-    const option: OptionEntity = {
-      id: 1,
-      text: '',
-      letter: 'A',
-      selected: false
-    };
-
-    const question: AnswerEntity = {
-      question: '',
-      options: [option],
-      correctAnswer: 0,
-      answerText: ''
+    const question: AnswerDTO = {
+      answerId: this.quiz.answers.length + 1,
+      quizId: this.quiz.quizId,
+      title: '',
+      updatedDate: new Date().getTime(),
+      
+      // GENERATED
+      _options: [],
+      _currentOption: null,
     }
+
+    const option: AnswerOptionDTO = {
+      answerId: question.answerId,
+      content: '',
+      optionId: question._options.length + 1,
+      optionIndex: question._options.length + 1,
+      updatedDate: new Date().getTime(),
+
+      // GENERATED
+      isCorrect: false,
+      _selected: false,
+    };
+    question._options = [option]
     return question;
   }
   //#endregion CONVERTERS

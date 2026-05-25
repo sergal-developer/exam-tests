@@ -1,10 +1,8 @@
 import { Component, OnInit, ViewEncapsulation, } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { ISettingsDTO, IThemePropsDTO, IUserDTO } from 'src/app/shared/data/entities/dtos';
-import { ProfileEntity, SettingsEntity } from 'src/app/shared/data/entities/entities';
+import { SettingsDTO, ThemeDTO, ThemePropertiesDTO, UserDTO } from 'src/app/shared/data/entities/dtos';
 import { CommonServices } from 'src/app/shared/services/common.services';
-import { ThemeRow, UserRow } from 'src/app/shared/services/database/sql.database.service';
 import { UiServices } from 'src/app/shared/services/ui.services';
 
 @Component({
@@ -13,11 +11,11 @@ import { UiServices } from 'src/app/shared/services/ui.services';
   encapsulation: ViewEncapsulation.None,
 })
 export class SettingsComponent implements OnInit {
-  profile: IUserDTO;
-  settings: ISettingsDTO;
+  profile: UserDTO;
+  settings: SettingsDTO;
   pendingChanges: {
-    profile?: ProfileEntity,
-    settings?: SettingsEntity;
+    profile?: UserDTO,
+    settings?: SettingsDTO;
   }
   profileUI = {
     avatarEdit: false,
@@ -64,7 +62,7 @@ export class SettingsComponent implements OnInit {
     try {
       const currentTheme = this.settings._themes.find(x => x.id == this.settings.theme);
       if (currentTheme) {
-        this.themeProps = this.getKeysThemeProps(currentTheme.content);
+        this.themeProps = this.getKeysThemeProps(currentTheme.content as ThemePropertiesDTO);
       }
     } catch (error) {
       console.log('error: ', error);
@@ -121,7 +119,7 @@ export class SettingsComponent implements OnInit {
           settingId: this.settings.settingId
         });
         try {
-          this.themeProps = this.getKeysThemeProps(theme.content);
+          this.themeProps = this.getKeysThemeProps(theme.content as ThemePropertiesDTO);
         } catch (error) { }
       }
     }
@@ -175,16 +173,17 @@ export class SettingsComponent implements OnInit {
 
   async updateColors(prop: any) {
     const changes = this.buildKeysThemeProps(this.themeProps);
-    console.log('changes: ', changes);
     const theme = this.settings._themes.find(x => x.id == this.settings.theme);
+    const themeContent: ThemePropertiesDTO = theme.content as ThemePropertiesDTO;
     if (theme) {
       if (theme.id != 'custom') {
-        const themeRow: ThemeRow = {
+
+        const themeRow: ThemeDTO = {
           id: 'custom',
-          content: { ...theme.content, ...changes }
+          content: { ...themeContent, ...changes }
         }
       } else {
-        theme.content = { ...theme.content, ...changes }
+        theme.content = { ...themeContent, ...changes }
       }
       setTimeout(() => {
         this._uiServices.applyTheme(theme);
@@ -193,7 +192,7 @@ export class SettingsComponent implements OnInit {
   }
 
   async saveDataProfile() {
-    const user: UserRow = {
+    const user: UserDTO = {
       age: this.profile.age,
       avatarBody: this.profile.avatarBody,
       avatarUrl: this.profile.avatarUrl,
@@ -276,7 +275,7 @@ export class SettingsComponent implements OnInit {
     return success;
   }
 
-  getKeysThemeProps(ThemeProps: IThemePropsDTO) {
+  getKeysThemeProps(ThemeProps: ThemePropertiesDTO) {
     if (!ThemeProps) return null;
     const result = [];
     Object.keys(ThemeProps).map((key) => {

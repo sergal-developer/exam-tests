@@ -1,12 +1,33 @@
 import { Injectable } from "@angular/core";
 import { WebSqlite } from 'angular-web-sqlite';
-import { answer_attempt_table_script, answer_option_table_script, answer_table_script, language_table_script, log_table_script, quiz_attempt_table_script, quiz_table_script, settings_table_script, theme_table_script, user_table_script } from "../../data/entities/dtos";
+import {
+    answer_attempt_table_script,
+    answer_option_table_script,
+    answer_table_script,
+    AnswerDTO,
+    AnswerOptionDTO,
+    language_table_script,
+    LanguageDTO,
+    log_table_script,
+    LogDTO,
+    quiz_attempt_table_script,
+    quiz_table_script,
+    AttemptAnswerDTO,
+    AttemptDTO,
+    QuizDTO,
+    settings_table_script,
+    SettingsDTO,
+    theme_table_script,
+    ThemeDTO,
+    user_table_script,
+    UserDTO
+} from "../../data/entities/dtos";
 
 @Injectable({
     providedIn: 'root'
 })
 export class DatabaseService {
-    private dbName = 'sinexamSQL_temp0000003';
+    private dbName = 'sinexamSQL_temp0000004';
     private initialized = false;
     private isWeb: boolean = false;
 
@@ -16,8 +37,7 @@ export class DatabaseService {
     async initDataBase(): Promise<void> {
         if (this.initialized) return;
         try {
-            const db = await this.webSqlite.init(this.dbName);
-            console.log('db: ', db);
+            await this.webSqlite.init(this.dbName);
             this.initialized = true;
         } catch (error) {
             console.error('Error al inicializar SQLite:', error);
@@ -103,7 +123,7 @@ export class DatabaseService {
         return await this.executeQuery(query, [id]);
     }
 
-    async postLog(log: LogRow) {
+    async postLog(log: LogDTO) {
         const query = `
         INSERT INTO log_table (id, date, content, type) 
         VALUES (?, ?, ?, ?) 
@@ -131,7 +151,7 @@ export class DatabaseService {
         return await this.executeQuery(query, [value]);
     }
 
-    async postLanguage(lang: LanguageRow) {
+    async postLanguage(lang: LanguageDTO) {
         const query = `
         INSERT INTO language_table (value, name) 
         VALUES (?, ?) 
@@ -161,7 +181,7 @@ export class DatabaseService {
         return await this.executeQuery(query);
     }
 
-    async postUser(user: UserRow) {
+    async postUser(user: UserDTO) {
         const currentVal = user.current ? 1 : 0; // Convertir booleano a entero para SQLite
         const query = `
         INSERT INTO user_table (userId, uuid, userName, age, avatarUrl, avatarBody, current) 
@@ -186,11 +206,11 @@ export class DatabaseService {
     private normalizeSettings(datalist: Array<any>) {
         if (datalist && datalist.length) {
             datalist.map(x => {
-                x.permissions = x.permissions ? this.stringToObject(x.permissions) : { };
+                x.permissions = x.permissions ? this.stringToObject(x.permissions) : {};
                 x._languages = x._languages ? this.stringToObject(x._languages) : [];
                 x._themes = x._themes ? this.stringToObject(x._themes) : [];
 
-                if(x._themes.length) {
+                if (x._themes.length) {
                     x._themes.map(y => {
                         y.content = y.content ? this.stringToObject(y.content) : [];
                     })
@@ -213,7 +233,7 @@ export class DatabaseService {
     }
 
     async getSettingCompleteById(settingId: number) {
-        const query = 
+        const query =
             `SELECT 
                 q.settingId,
                 q.language,
@@ -241,7 +261,7 @@ export class DatabaseService {
         return this.normalizeSettings(response);
     }
 
-    async postSetting(setting: SettingRow) {
+    async postSetting(setting: SettingsDTO) {
         setting.permissions = this.objectToString(setting.permissions)
         const query = `
         INSERT INTO settings_table (settingId, language, permissions, theme) 
@@ -270,7 +290,7 @@ export class DatabaseService {
         return await this.executeQuery(query, [id]);
     }
 
-    async postTheme(theme: ThemeRow) {
+    async postTheme(theme: ThemeDTO) {
         theme.content = this.objectToString(theme.content);
         const query = `
         INSERT INTO theme_table (id, content) 
@@ -353,7 +373,7 @@ export class DatabaseService {
         }
     }
 
-    async postQuiz(quiz: QuizRow) {
+    async postQuiz(quiz: QuizDTO) {
         const query = `
         INSERT INTO quiz_table (quizId, uuid, title, time, creationDate, updatedDate, startDate) 
         VALUES (?, ?, ?, ?, ?, ?, ?) 
@@ -386,7 +406,7 @@ export class DatabaseService {
         return await this.executeQuery(query, [quizId]);
     }
 
-    async postAnswer(answer: AnswerRow) {
+    async postAnswer(answer: AnswerDTO) {
         const query = `
         INSERT INTO answer_table (answerId, quizId, title, updatedDate) 
         VALUES (?, ?, ?, ?) 
@@ -409,7 +429,7 @@ export class DatabaseService {
         return await this.executeQuery(query, [answerId]);
     }
 
-    async postAnswerOption(option: AnswerOptionRow) {
+    async postAnswerOption(option: AnswerOptionDTO) {
         const correctVal = option.isCorrect ? 1 : 0;
         const query = `
         INSERT INTO answer_option_table (optionId, answerId, content, optionIndex, updatedDate, isCorrect) 
@@ -440,17 +460,19 @@ export class DatabaseService {
         return await this.executeQuery(query, [attemptId]);
     }
 
-    async postQuizAttempt(attempt: QuizAttemptRow) {
+    async postQuizAttempt(attempt: AttemptDTO) {
         const query = `
-        INSERT INTO quiz_attempt_table (attemptId, quizId, userId, startedDate, finishedDate, score) 
-        VALUES (?, ?, ?, ?, ?, ?) 
+        INSERT INTO quiz_attempt_table (attemptId, quizId, userId, title, creationDate, updatedDate, score, state) 
+        VALUES (?, ?, ?, ?, ?, ?, ?) 
         ON CONFLICT(attemptId) DO UPDATE SET 
             quizId = excluded.quizId, 
-            userId = excluded.userId, 
-            startedDate = excluded.startedDate, 
-            finishedDate = excluded.finishedDate, 
-            score = excluded.score;`;
-        return await this.executeQuery(query, [attempt.attemptId ?? null, attempt.quizId, attempt.userId, attempt.startedDate, attempt.finishedDate, attempt.score]);
+            userId = excluded.userId,
+            title = excluded.title,
+            creationDate = excluded.creationDate, 
+            updatedDate = excluded.updatedDate, 
+            score = excluded.score,
+            state = excluded.state;`;
+        return await this.executeQuery(query, [attempt.attemptId ?? null, attempt.quizId, attempt.userId, attempt.creationDate, attempt.updatedDate, attempt.score]);
     }
 
     async deleteQuizAttempt(attemptId: number) {
@@ -465,7 +487,7 @@ export class DatabaseService {
         return await this.executeQuery(query, [attemptId]);
     }
 
-    async postAnswerAttempt(ansAttempt: AnswerAttemptRow) {
+    async postAnswerAttempt(ansAttempt: AttemptAnswerDTO) {
         const correctVal = ansAttempt.isCorrect ? 1 : 0;
         const query = `
         INSERT INTO answer_attempt_table (answerAttemptId, attemptId, answerId, selectedOptionId, isCorrect) 
@@ -492,18 +514,3 @@ export class DatabaseService {
     //#endregion CONVERTERS
 
 }
-
-
-//#region INTERFACES
-export interface LogRow { id?: number; date: number; content: string; type: string; }
-export interface LanguageRow { value: string; name: string; }
-export interface UserRow { userId?: number; uuid: string; userName: string; age: number; avatarUrl: string; avatarBody: string; current: boolean | number; }
-export interface SettingRow { settingId?: number; language: string; theme: string; permissions: string | object; }
-export interface ThemeRow { id: string; content: string | object; }
-export interface QuizRow { quizId?: number; uuid: string; title: string; time: number; creationDate: number; updatedDate: number; startDate: number; }
-export interface AnswerRow { answerId?: number; quizId: number; title: string; updatedDate: number; }
-export interface AnswerOptionRow { optionId?: number; answerId: number; content: string; optionIndex: number; updatedDate: number; isCorrect: boolean | number; }
-export interface QuizAttemptRow { attemptId?: number; quizId: number; userId: number; startedDate: number; finishedDate: number; score: number; }
-export interface AnswerAttemptRow { answerAttemptId?: number; attemptId: number; answerId: number; selectedOptionId: number; isCorrect: boolean | number; }
-
-//#endregion

@@ -1,5 +1,5 @@
-import { ILanguageDTO } from "./language.dto";
-import { IThemeDTO } from "./theme.dto";
+import { LanguageDTO } from "./language.dto"
+import { ThemeDTO } from "./theme.dto";
 
 export const settings_table_script = 
 `CREATE TABLE IF NOT EXISTS [settings_table] (
@@ -9,20 +9,22 @@ export const settings_table_script =
   [theme] TEXT
 );`;
 
-export interface ISettingsDTO {
+export interface SettingsDTO {
   settingId?: number;
   language: string;
-  permissions: {
+  theme?: string;
+  permissions: string | PermissionsDTO,
+
+  // GENERATED
+  _languages?: LanguageDTO[],
+  _themes?: ThemeDTO[],
+  _colors?: Array<any>
+}
+
+export interface PermissionsDTO {
     create: boolean,
     duplicate: boolean,
     edit: boolean,
     delete: boolean,
     ai: boolean,
-  },
-  theme?: string;
-
-  // GENERATED
-  _languages?: ILanguageDTO[],
-  _themes?: IThemeDTO[],
-  _colors?: Array<any>
 }

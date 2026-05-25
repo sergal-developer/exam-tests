@@ -1,86 +1,50 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { v4 as uuidv4 } from 'uuid';
-import { AttemptEntity, LogEntity, ProfileEntity, QuizEntity, SettingsEntity, ThemeProps } from '../data/entities/entities';
+import { AnswerDTO, AnswerOptionDTO, LogDTO, AttemptAnswerDTO, AttemptDTO, QuizDTO, SettingsDTO, ThemeDTO, UserDTO, ThemePropertiesDTO } from '../data/entities/dtos';
 import { Utils } from '../data/utils/utils';
-import { DBLocal } from './storage/db-storage';
+import {DatabaseService } from './database/sql.database.service';
 import { FileStorage } from './storage/file-storage';
-import { AnswerAttemptRow, AnswerOptionRow, AnswerRow, DatabaseService, LogRow, QuizAttemptRow, QuizRow, SettingRow, ThemeRow, UserRow } from './database/sql.database.service';
-import { IAnswerDTO, IAnswerOptionDTO, ILogDTO, IQuizAttemptDTO, IQuizDTO, ISettingsDTO, IThemeDTO, IUserDTO } from '../data/entities/dtos';
 
 @Injectable()
 export class CommonServices {
   private utils = new Utils();
-  private localDbName = 'simexamapp';
-  private dbSettings = 'settings';
-  private dbProfiles = 'profiles';
-  private dbQuizs = 'quiz';
-  private dbAttempts = 'attempts';
-  private dbLogs = 'logs';
-
-  private fileStorage = new FileStorage();
-  private fileSettings = 'settings.json';
-  private fileProfiles = 'profile.json';
-  private fileQuizs = 'templateQuiz.json';
-  private fileAttempts = 'attempts.json';
-  private fileLogs = 'logs.json';
-  private fileObject = { data: [] };
 
   constructor(private _router: Router, private _services: DatabaseService) { }
 
   //#region PUBLIC METHODS
 
-  async checkFiles() {
-    const settings = await this.fileStorage.checkFile(this.fileSettings);
-    if (!settings) {
-      this.fileStorage.saveFile(this.fileSettings, this.fileObject);
-    }
-    const profile = await this.fileStorage.checkFile(this.fileProfiles);
-    if (!profile) {
-      this.fileStorage.saveFile(this.fileProfiles, this.fileObject);
-    }
-    const quiz = await this.fileStorage.checkFile(this.fileQuizs);
-    if (!quiz) {
-      this.fileStorage.saveFile(this.fileQuizs, this.fileObject);
-    }
-    const attempts = await this.fileStorage.checkFile(this.fileAttempts);
-    if (!attempts) {
-      this.fileStorage.saveFile(this.fileAttempts, this.fileObject);
-    }
-
-  }
-
-  async clearDB() {
-    await this.fileStorage.deleteFile(this.fileSettings);
-    await this.fileStorage.deleteFile(this.fileProfiles);
-    await this.fileStorage.deleteFile(this.fileQuizs);
-    await this.fileStorage.deleteFile(this.fileAttempts);
-  }
-
   //#region SETTINGS
-  async getAllSettings(): Promise<ISettingsDTO[]> { return await this._services.getAllSettings(); }
-  async getCurrentSettings(): Promise<ISettingsDTO> {
+  async getAllSettings(): Promise<SettingsDTO[]> { 
+    return await this._services.getAllSettings(); 
+  }
+
+  async getCurrentSettings(): Promise<SettingsDTO> {
     const response = await this._services.getSettingCompleteById(0);
     return response && response.length ? response[0] : null;
   }
-  async getSettingById(id: number): Promise<ISettingsDTO> {
+
+  async getSettingById(id: number): Promise<SettingsDTO> {
     const response = await this._services.getSettingCompleteById(id);
     return response && response.length ? response[0] : null;
   }
-  async saveSettings(data: SettingRow): Promise<ISettingsDTO[]> {
+
+  async saveSettings(data: SettingsDTO): Promise<SettingsDTO[]> {
     const response = await this._services.postSetting(data);
     return response;
   }
-  async updateSettings(data: SettingRow): Promise<ISettingsDTO> {
+
+  async updateSettings(data: SettingsDTO): Promise<SettingsDTO> {
     await this._services.postSetting(data);
     return this.getSettingById(data.settingId);
   }
   //#endregion SETTINGS
 
   //#region THEMES
-  async getThemes(): Promise<IThemeDTO[]> { return await this._services.getAllThemes(); }
+  async getThemes(): Promise<ThemeDTO[]> { 
+    return await this._services.getAllThemes();
+  }
 
-  async saveTheme(data: ThemeRow): Promise<IThemeDTO> {
+  async saveTheme(data: ThemeDTO): Promise<ThemeDTO> {
     const response = await this._services.postTheme(data);
     return response;
   }
@@ -96,12 +60,12 @@ export class CommonServices {
     return response && response.length ? response[0] : null;
   }
 
-  async getCurrentUser(): Promise<IUserDTO> {
+  async getCurrentUser(): Promise<UserDTO> {
     let response = await this._services.getCurrentUser();
     return response && response.length ? response[0] : null;
   }
 
-  async postUser(user: UserRow) {
+  async postUser(user: UserDTO) {
     let response = await this._services.postUser(user);
     return response && response.length ? response[0] : null;
   }
@@ -113,114 +77,114 @@ export class CommonServices {
   //#endregion USERS
 
   //#region QUIZ
-  async getAllQuizs(): Promise<IQuizDTO[]> {
-    let response: IQuizDTO[] = await this._services.getAllQuizzes();
+  async getAllQuizs(): Promise<QuizDTO[]> {
+    let response: QuizDTO[] = await this._services.getAllQuizzes();
     return response;
   }
 
-  async getQuizById(quizId: number): Promise<IQuizDTO> {
+  async getQuizById(quizId: number): Promise<QuizDTO> {
     let response = await this._services.getQuizById(quizId);
     return response && response.length ? response[0] : null;
   }
 
-  async saveQuiz(quiz: QuizRow): Promise<IQuizDTO> {
+  async saveQuiz(quiz: QuizDTO): Promise<QuizDTO> {
     let response = await this._services.postQuiz(quiz);
     return response && response.length ? response[0] : null;
   }
 
-  async deleteQuiz(quizId: number): Promise<IQuizDTO> {
+  async deleteQuiz(quizId: number): Promise<QuizDTO> {
     let response = await this._services.deleteQuiz(quizId);
     return response && response.length ? response[0] : null;
   }
   //#endregion QUIZ
 
   //#region QUIZ_AWNSWERS
-  async getAllAnswers(): Promise<IAnswerDTO[]> {
-    let response: IAnswerDTO[] = await this._services.getAllAnswers();
+  async getAllAnswers(): Promise<AnswerDTO[]> {
+    let response: AnswerDTO[] = await this._services.getAllAnswers();
     return response;
   }
 
-  async getAnswersByQuiz(quizId: number): Promise<IAnswerDTO> {
+  async getAnswersByQuiz(quizId: number): Promise<AnswerDTO> {
     let response = await this._services.getAnswersByQuiz(quizId);
     return response && response.length ? response[0] : null;
   }
 
-  async saveAnswer(data: AnswerRow): Promise<IAnswerDTO> {
+  async saveAnswer(data: AnswerDTO): Promise<AnswerDTO> {
     let response = await this._services.postAnswer(data);
     return response && response.length ? response[0] : null;
   }
 
-  async deleteAnswer(id: number): Promise<IAnswerDTO> {
+  async deleteAnswer(id: number): Promise<AnswerDTO> {
     let response = await this._services.deleteAnswer(id);
     return response && response.length ? response[0] : null;
   }
   //#endregion QUIZ_AWNSWERS
 
   //#region AWNSWERS_OPTIONS
-  async getOptionsByAnswer(answerId: number): Promise<IAnswerOptionDTO[]> {
+  async getOptionsByAnswer(answerId: number): Promise<AnswerOptionDTO[]> {
     return await this._services.getOptionsByAnswer(answerId);
   }
 
-  async saveAnswerOption(data: AnswerOptionRow): Promise<IAnswerOptionDTO> {
+  async saveAnswerOption(data: AnswerOptionDTO): Promise<AnswerOptionDTO> {
     let response = await this._services.postAnswerOption(data);
     return response && response.length ? response[0] : null;
   }
 
-  async deleteAnswerOption(id: number): Promise<IAnswerOptionDTO> {
+  async deleteAnswerOption(id: number): Promise<AnswerOptionDTO> {
     let response = await this._services.deleteAnswerOption(id);
     return response && response.length ? response[0] : null;
   }
   //#endregion AWNSWERS_OPTIONS
 
   //#region QUIZ_ATTEMPS
-  async getAttemptsByUser(userId: number): Promise<IQuizAttemptDTO[]> {
-    let response: IQuizAttemptDTO[] = await this._services.getAttemptsByUser(userId);
+  async getAttemptsByUser(userId: number): Promise<AttemptDTO[]> {
+    let response: AttemptDTO[] = await this._services.getAttemptsByUser(userId);
     return response;
   }
 
-  async getAttemptById(attemptId: number): Promise<IQuizAttemptDTO[]> {
-    let response: IQuizAttemptDTO[] = await this._services.getAttemptById(attemptId);
+  async getAttemptById(attemptId: number): Promise<AttemptDTO[]> {
+    let response: AttemptDTO[] = await this._services.getAttemptById(attemptId);
     return response;
   }
 
-  async saveQuizAttempt(data: QuizAttemptRow): Promise<IQuizAttemptDTO> {
+  async saveQuizAttempt(data: AttemptDTO): Promise<AttemptDTO> {
     let response = await this._services.postQuizAttempt(data);
     return response && response.length ? response[0] : null;
   }
 
-  async deleteQuizAttempt(attemptId: number): Promise<IQuizDTO> {
+  async deleteQuizAttempt(attemptId: number): Promise<QuizDTO> {
     let response = await this._services.deleteQuizAttempt(attemptId);
     return response && response.length ? response[0] : null;
   }
   //#endregion QUIZ_ATTEMPS
 
   //#region AWNSWERS_ATTEMPTS
-  async getAnswerAttemptsByAttempt(attemptId: number): Promise<IAnswerDTO[]> {
-    let response: IAnswerDTO[] = await this._services.getAnswerAttemptsByAttempt(attemptId);
+  async getAnswerAttemptsByAttempt(attemptId: number): Promise<AnswerDTO[]> {
+    let response: AnswerDTO[] = await this._services.getAnswerAttemptsByAttempt(attemptId);
     return response;
   }
 
-  async postAnswerAttempt(data: AnswerAttemptRow): Promise<IAnswerDTO> {
+  async postAnswerAttempt(data: AttemptAnswerDTO): Promise<AnswerDTO> {
     let response = await this._services.postAnswerAttempt(data);
     return response && response.length ? response[0] : null;
   }
   //#endregion AWNSWERS_ATTEMPTS
 
   //#region LOGS
-  async getAllLogs(): Promise<ILogDTO> { 
+  async getAllLogs(): Promise<LogDTO> { 
     return await this._services.getAllLogs();
   }
 
-  async getLogById(id: number): Promise<ILogDTO> { 
+  async getLogById(id: number): Promise<LogDTO> { 
     const response = await this._services.getLogById(id);
     return response && response.length ? response[0] : null;
   }
 
-  async postLog(data: LogRow): Promise<ILogDTO> { 
+  async postLog(data: LogDTO): Promise<LogDTO> { 
     return await this._services.postLog(data);
   }
 
-  async deleteLog(id: number): Promise<ILogDTO> { 
+  async deleteLog(id: number): Promise<LogDTO> { 
     const response = await this._services.deleteLog(id);
     return response && response.length ? response[0] : null;
   }
@@ -256,113 +220,9 @@ export class CommonServices {
 
   //#endregion PUBLIC METHODS
 
-  //#region GENERIC
-  private actionGetAll(fileName: string): any {
-    return new Promise(async (resolve) => {
-      try {
-        const data = await this.fileStorage.readFile(fileName);
-        if (data) {
-          resolve(data.data.length ? data.data : null);
-        } else {
-          resolve(null);
-        }
-      } catch (error) {
-        console.warn(error)
-        resolve(null);
-      }
-    });
-  }
-
-  private actionSearch(fileName: string, id: any, idfield = 'id'): any {
-    return new Promise(async (resolve) => {
-      try {
-        const data = await this.actionGetAll(fileName);
-        if (data) {
-          const search = this.fileStorage.search(data, id, idfield);
-          resolve(search);
-        } else {
-          resolve(null);
-        }
-      } catch (error) {
-        console.warn(error)
-        resolve(null);
-      }
-    });
-  }
-
-  private actionFilter(fileName: string, id: any, idfield = 'id'): any {
-    return new Promise(async (resolve) => {
-      try {
-        const data = await this.actionGetAll(fileName);
-        if (data) {
-          const search = this.fileStorage.filter(data, id, idfield);
-          resolve(search);
-        } else {
-          resolve(null);
-        }
-      } catch (error) {
-        console.warn(error)
-        resolve(null);
-      }
-    });
-  }
-
-  private actionPost(fileName: string, data: any): any {
-    data.id = data.id ?? uuidv4();
-    return new Promise(async (resolve) => {
-      try {
-        const db = await this.actionGetAll(fileName);
-        const fileObject = JSON.parse(JSON.stringify(this.fileObject));
-        if (db) { fileObject.data = db; }
-        fileObject.data.push(data);
-        await this.fileStorage.saveFile(fileName, fileObject);
-        resolve(data);
-
-      } catch (error) {
-        console.warn(error)
-        resolve(null);
-      }
-    });
-  }
-
-  private actionPut(fileName: string, id: any, data: any, idfield = 'id'): any {
-    return new Promise(async (resolve) => {
-      try {
-        const db = await this.actionGetAll(fileName);
-        const fileObject = JSON.parse(JSON.stringify(this.fileObject));
-        if (db) { fileObject.data = db; }
-        fileObject.data = this.fileStorage.update(fileObject.data, id, data, idfield);
-        await this.fileStorage.saveFile(fileName, fileObject);
-        resolve(data);
-
-      } catch (error) {
-        console.warn(error)
-        resolve(null);
-      }
-    });
-  }
-
-  private actionDelete(fileName: string, id: any, idfield = 'id'): any {
-    return new Promise(async (resolve) => {
-      try {
-        const db = await this.actionGetAll(fileName);
-        const fileObject = JSON.parse(JSON.stringify(this.fileObject));
-        if (db) { fileObject.data = db; }
-        fileObject.data = this.fileStorage.delete(db, id, idfield);
-        await this.fileStorage.saveFile(fileName, fileObject);
-        resolve(true);
-      } catch (error) {
-        console.warn(error)
-        resolve(null);
-      }
-    });
-  }
-  //#endregion GENERIC
-
-
 
   //#region DEFAULT_DATA
-  defaultThemeLight: ThemeProps = {
+  defaultThemeLight: ThemePropertiesDTO = {
     appBackground: '#bebebe',
     appColor: '#2d2d2d',
     appFontSize: '16px',
@@ -424,7 +284,7 @@ export class CommonServices {
     stadisticBackground: 'rgba(193, 191, 191, 0.5)'
   };
 
-  defaultThemeDark: ThemeProps = {
+  defaultThemeDark: ThemePropertiesDTO = {
     appBackground: '#000000',
     appColor: '#d0d0d0',
     appFontSize: '16px',
@@ -490,9 +350,9 @@ export class CommonServices {
     return await this._services.getStructure();
   }
 
-  async setDefaultData(): Promise<ISettingsDTO> {
+  async setDefaultData(): Promise<SettingsDTO> {
     let settings = await this._services.getSettingCompleteById(0);
-    let response: ISettingsDTO = null;
+    let response: SettingsDTO = null;
 
     if (!settings.length) {
       await this._services.postLanguage({ name: 'Español', value: 'es' });

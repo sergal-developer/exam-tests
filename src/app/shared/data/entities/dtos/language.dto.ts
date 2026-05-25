@@ -4,7 +4,7 @@ export const language_table_script =
   [name] TEXT
 );`;
 
-export interface ILanguageDTO {
+export interface LanguageDTO {
   value: string;
   name: string;
 }
