@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AnswerDTO, AnswerOptionDTO, LogDTO, AttemptAnswerDTO, AttemptDTO, QuizDTO, SettingsDTO, ThemeDTO, UserDTO, ThemePropertiesDTO } from '../data/entities/dtos';
 import { Utils } from '../data/utils/utils';
-import {DatabaseService } from './database/sql.database.service';
-import { FileStorage } from './storage/file-storage';
+import { DatabaseService } from './database/sql.database.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class CommonServices {
@@ -14,23 +14,20 @@ export class CommonServices {
   //#region PUBLIC METHODS
 
   //#region SETTINGS
-  async getAllSettings(): Promise<SettingsDTO[]> { 
-    return await this._services.getAllSettings(); 
+  async getAllSettings(): Promise<SettingsDTO[]> {
+    return await this._services.getAllSettings();
   }
 
   async getCurrentSettings(): Promise<SettingsDTO> {
-    const response = await this._services.getSettingCompleteById(0);
-    return response && response.length ? response[0] : null;
+    return await this._services.getSettingCompleteById(0);
   }
 
   async getSettingById(id: number): Promise<SettingsDTO> {
-    const response = await this._services.getSettingCompleteById(id);
-    return response && response.length ? response[0] : null;
+    return await this._services.getSettingCompleteById(id)
   }
 
-  async saveSettings(data: SettingsDTO): Promise<SettingsDTO[]> {
-    const response = await this._services.postSetting(data);
-    return response;
+  async saveSettings(data: SettingsDTO): Promise<SettingsDTO> {
+    return await this._services.postSetting(data);
   }
 
   async updateSettings(data: SettingsDTO): Promise<SettingsDTO> {
@@ -40,13 +37,12 @@ export class CommonServices {
   //#endregion SETTINGS
 
   //#region THEMES
-  async getThemes(): Promise<ThemeDTO[]> { 
+  async getThemes(): Promise<ThemeDTO[]> {
     return await this._services.getAllThemes();
   }
 
   async saveTheme(data: ThemeDTO): Promise<ThemeDTO> {
-    const response = await this._services.postTheme(data);
-    return response;
+    return await this._services.postTheme(data);
   }
   //#endregion THEMES
 
@@ -56,18 +52,15 @@ export class CommonServices {
   }
 
   async getUserById(userId: number) {
-    let response = await this._services.getUserById(userId);
-    return response && response.length ? response[0] : null;
+    return await this._services.getUserById(userId);
   }
 
   async getCurrentUser(): Promise<UserDTO> {
-    let response = await this._services.getCurrentUser();
-    return response && response.length ? response[0] : null;
+    return await this._services.getCurrentUser();
   }
 
-  async postUser(user: UserDTO) {
-    let response = await this._services.postUser(user);
-    return response && response.length ? response[0] : null;
+  async saveUser(user: UserDTO) {
+    return await this._services.saveUser(user);
   }
 
   async deleteUser(userId: number) {
@@ -83,18 +76,371 @@ export class CommonServices {
   }
 
   async getQuizById(quizId: number): Promise<QuizDTO> {
-    let response = await this._services.getQuizById(quizId);
-    return response && response.length ? response[0] : null;
+    return await this._services.getQuizById(quizId);
+  }
+
+  async getQuizCompleteById(quizId: number): Promise<QuizDTO> {
+    return await this._services.getQuizCompleteById(quizId);
   }
 
   async saveQuiz(quiz: QuizDTO): Promise<QuizDTO> {
-    let response = await this._services.postQuiz(quiz);
-    return response && response.length ? response[0] : null;
+    return await this._services.saveQuiz(quiz);
   }
 
   async deleteQuiz(quizId: number): Promise<QuizDTO> {
+
     let response = await this._services.deleteQuiz(quizId);
     return response && response.length ? response[0] : null;
+  }
+
+  async saveAllQuiz(quiz: QuizDTO): Promise<QuizDTO> {
+    // quiz = quiz || this.mockquiz();
+    let data = this.prepareQueryAnswersOptions(quiz);
+
+    const responseQuiz: QuizDTO = await this._services.saveQuiz(data.quiz);
+    quiz.quizId = responseQuiz.quizId;
+
+    data = this.prepareQueryAnswersOptions(quiz);
+    quiz.answers.map(async(answer: AnswerDTO) => {
+      const responseAnswer = await this._services.saveAnswer(answer);
+      answer.answerId = responseAnswer.answerId;
+
+      answer._options.map(async(option: AnswerOptionDTO) => {
+        option.answerId = answer.answerId;
+        const responseOption = await this._services.saveAnswerOption(option);
+
+        option.optionId = responseOption.optionId;
+      });
+    });
+
+    return quiz;
+  }
+
+  mockquiz(): QuizDTO {
+    return {
+      "quizId": -1,
+      "title": "Crear Examen",
+      "answers": [
+        {
+          "answerId": 1,
+          "quizId": -1,
+          "title": "qwdqwdqwdqwdqwd",
+          "updatedDate": 1779717585125,
+          "_options": [
+            {
+              "answerId": 1,
+              "content": "qwdqwdqwd",
+              "optionId": 1,
+              "optionIndex": 1,
+              "updatedDate": 1779717585125,
+              "isCorrect": false,
+              "_selected": false
+            },
+            {
+              "answerId": 1,
+              "content": "qwdqwd",
+              "optionId": 2,
+              "optionIndex": 2,
+              "updatedDate": 1779717588593,
+              "isCorrect": false,
+              "_selected": true
+            },
+            {
+              "answerId": 1,
+              "content": "",
+              "optionId": 2,
+              "optionIndex": 3,
+              "updatedDate": 1779717589533,
+              "isCorrect": false,
+              "_selected": false
+            }
+          ]
+        },
+        {
+          "answerId": 2,
+          "quizId": -1,
+          "title": "qwdqwdqwd",
+          "updatedDate": 1779717591456,
+          "_options": [
+            {
+              "answerId": 2,
+              "content": "qwdqwdwq",
+              "optionId": 1,
+              "optionIndex": 1,
+              "updatedDate": 1779717591456,
+              "isCorrect": false,
+              "_selected": true
+            },
+            {
+              "answerId": 2,
+              "content": "qwdqwd",
+              "optionId": 2,
+              "optionIndex": 2,
+              "updatedDate": 1779717593579,
+              "isCorrect": false,
+              "_selected": false
+            },
+            {
+              "answerId": 2,
+              "content": "",
+              "optionId": 2,
+              "optionIndex": 3,
+              "updatedDate": 1779717595341,
+              "isCorrect": false,
+              "_selected": false
+            }
+          ]
+        },
+        {
+          "answerId": 3,
+          "quizId": -1,
+          "title": "wqdqwdwqd",
+          "updatedDate": 1779717597358,
+          "_options": [
+            {
+              "answerId": 3,
+              "content": "qwdqwd",
+              "optionId": 1,
+              "optionIndex": 1,
+              "updatedDate": 1779717597359,
+              "isCorrect": false,
+              "_selected": false
+            },
+            {
+              "answerId": 3,
+              "content": "qwdqwd",
+              "optionId": 2,
+              "optionIndex": 2,
+              "updatedDate": 1779717598400,
+              "isCorrect": false,
+              "_selected": true
+            },
+            {
+              "answerId": 3,
+              "content": "",
+              "optionId": 2,
+              "optionIndex": 3,
+              "updatedDate": 1779717600211,
+              "isCorrect": false,
+              "_selected": false
+            }
+          ]
+        },
+        {
+          "answerId": 4,
+          "quizId": -1,
+          "title": "wfef",
+          "updatedDate": 1779717796181,
+          "_options": [
+            {
+              "answerId": 4,
+              "content": "ewfwfwef",
+              "optionId": 1,
+              "optionIndex": 1,
+              "updatedDate": 1779717796181,
+              "isCorrect": false,
+              "_selected": true
+            },
+            {
+              "answerId": 4,
+              "content": "wefwfwe",
+              "optionId": 2,
+              "optionIndex": 2,
+              "updatedDate": 1779717798031,
+              "isCorrect": false,
+              "_selected": false
+            },
+            {
+              "answerId": 4,
+              "content": "",
+              "optionId": 2,
+              "optionIndex": 3,
+              "updatedDate": 1779717799403,
+              "isCorrect": false,
+              "_selected": false
+            }
+          ]
+        },
+        {
+          "answerId": 5,
+          "quizId": -1,
+          "title": "wefweffwef",
+          "updatedDate": 1779717837001,
+          "_options": [
+            {
+              "answerId": 5,
+              "content": "wefwefwe",
+              "optionId": 1,
+              "optionIndex": 1,
+              "updatedDate": 1779717837001,
+              "isCorrect": false,
+              "_selected": false
+            },
+            {
+              "answerId": 5,
+              "content": "fwew",
+              "optionId": 2,
+              "optionIndex": 2,
+              "updatedDate": 1779717841570,
+              "isCorrect": false,
+              "_selected": false
+            },
+            {
+              "answerId": 5,
+              "content": "efwef",
+              "optionId": 2,
+              "optionIndex": 3,
+              "updatedDate": 1779717842306,
+              "isCorrect": false,
+              "_selected": false
+            },
+            {
+              "answerId": 5,
+              "content": "wefwe",
+              "optionId": 2,
+              "optionIndex": 4,
+              "updatedDate": 1779717842814,
+              "isCorrect": false,
+              "_selected": true
+            },
+            {
+              "answerId": 5,
+              "content": "wef",
+              "optionId": 2,
+              "optionIndex": 5,
+              "updatedDate": 1779717843599,
+              "isCorrect": false,
+              "_selected": false
+            },
+            {
+              "answerId": 5,
+              "content": "",
+              "optionId": 2,
+              "optionIndex": 6,
+              "updatedDate": 1779717844444,
+              "isCorrect": false,
+              "_selected": false
+            }
+          ]
+        },
+        {
+          "answerId": 6,
+          "quizId": -1,
+          "title": "wefwe",
+          "updatedDate": 1779717846937,
+          "_options": [
+            {
+              "answerId": 6,
+              "content": "wfwef",
+              "optionId": 1,
+              "optionIndex": 1,
+              "updatedDate": 1779717846937,
+              "isCorrect": false,
+              "_selected": false
+            },
+            {
+              "answerId": 6,
+              "content": "wefwef",
+              "optionId": 2,
+              "optionIndex": 2,
+              "updatedDate": 1779717862060,
+              "isCorrect": false,
+              "_selected": true
+            },
+            {
+              "answerId": 6,
+              "content": "wfwefewfewfew",
+              "optionId": 2,
+              "optionIndex": 3,
+              "updatedDate": 1779717863855,
+              "isCorrect": false,
+              "_selected": false
+            },
+            {
+              "answerId": 6,
+              "content": "",
+              "optionId": 2,
+              "optionIndex": 4,
+              "updatedDate": 1779717865815,
+              "isCorrect": false,
+              "_selected": false
+            }
+          ]
+        },
+        {
+          "answerId": 7,
+          "quizId": -1,
+          "title": "wdfqddqwd",
+          "updatedDate": 1779720933589,
+          "_options": [
+            {
+              "answerId": 7,
+              "content": "qwdqwdqw",
+              "optionId": 1,
+              "optionIndex": 1,
+              "updatedDate": 1779720933589,
+              "isCorrect": false,
+              "_selected": true
+            },
+            {
+              "answerId": 7,
+              "content": "qwdqwdqwdqwd",
+              "optionId": 2,
+              "optionIndex": 2,
+              "updatedDate": 1779720945294,
+              "isCorrect": false,
+              "_selected": false
+            },
+            {
+              "answerId": 7,
+              "content": "",
+              "optionId": 2,
+              "optionIndex": 3,
+              "updatedDate": 1779720947400,
+              "isCorrect": false,
+              "_selected": false
+            }
+          ]
+        }
+      ],
+      "creationDate": 1779720952856,
+      "updatedDate": 1779720952856,
+      "time": null
+    }
+  }
+
+  prepareQueryAnswersOptions(quiz: QuizDTO): {quiz: QuizDTO, answers: AnswerDTO[], answerOptions: AnswerOptionDTO[]} {
+    const _quiz: QuizDTO = {
+      quizId : quiz.quizId == -1 ? null : quiz.quizId,
+      uuid: quiz.uuid || uuidv4(),
+      title: quiz.title,
+      time: quiz.time || 0,
+      creationDate: quiz.creationDate,
+      updatedDate: quiz.updatedDate,
+      startDate: quiz.startDate || 0,
+    };
+    const answers = [];
+    const answerOptions = [];
+
+    quiz.answers.map(answer => {
+      answer.answerId = answer.answerId == -1 ? null : answer.answerId;
+      answer.quizId = quiz.quizId;
+      if(answer.title != '') {
+        answers.push(answer);
+      }
+
+      answer._options.map(option => {
+        option.answerId = answer.answerId;
+        option.optionId = option.optionId == -1 ? null : option.optionId;
+        option.isCorrect = option._selected == true;
+
+        if(answer.title != '' || option.content != '') {
+          answerOptions.push(option);
+        }
+      });
+    })
+
+    return { quiz: _quiz, answers: answers, answerOptions: answerOptions };
   }
   //#endregion QUIZ
 
@@ -105,13 +451,11 @@ export class CommonServices {
   }
 
   async getAnswersByQuiz(quizId: number): Promise<AnswerDTO> {
-    let response = await this._services.getAnswersByQuiz(quizId);
-    return response && response.length ? response[0] : null;
+    return await this._services.getAnswersByQuiz(quizId);
   }
 
   async saveAnswer(data: AnswerDTO): Promise<AnswerDTO> {
-    let response = await this._services.postAnswer(data);
-    return response && response.length ? response[0] : null;
+    return await this._services.saveAnswer(data);
   }
 
   async deleteAnswer(id: number): Promise<AnswerDTO> {
@@ -126,8 +470,7 @@ export class CommonServices {
   }
 
   async saveAnswerOption(data: AnswerOptionDTO): Promise<AnswerOptionDTO> {
-    let response = await this._services.postAnswerOption(data);
-    return response && response.length ? response[0] : null;
+    return await this._services.saveAnswerOption(data);
   }
 
   async deleteAnswerOption(id: number): Promise<AnswerOptionDTO> {
@@ -138,55 +481,48 @@ export class CommonServices {
 
   //#region QUIZ_ATTEMPS
   async getAttemptsByUser(userId: number): Promise<AttemptDTO[]> {
-    let response: AttemptDTO[] = await this._services.getAttemptsByUser(userId);
-    return response;
+    return await this._services.getAttemptsByUser(userId);
   }
 
-  async getAttemptById(attemptId: number): Promise<AttemptDTO[]> {
-    let response: AttemptDTO[] = await this._services.getAttemptById(attemptId);
-    return response;
+  async getAttemptById(attemptId: number): Promise<AttemptDTO> {
+    return await this._services.getAttemptById(attemptId);
   }
 
   async saveQuizAttempt(data: AttemptDTO): Promise<AttemptDTO> {
-    let response = await this._services.postQuizAttempt(data);
-    return response && response.length ? response[0] : null;
+    return await this._services.saveQuizAttempt(data);
   }
 
-  async deleteQuizAttempt(attemptId: number): Promise<QuizDTO> {
-    let response = await this._services.deleteQuizAttempt(attemptId);
-    return response && response.length ? response[0] : null;
+  async deleteQuizAttempt(attemptId: number): Promise<AttemptDTO[]> {
+    return await this._services.deleteQuizAttempt(attemptId);
   }
   //#endregion QUIZ_ATTEMPS
 
   //#region AWNSWERS_ATTEMPTS
-  async getAnswerAttemptsByAttempt(attemptId: number): Promise<AnswerDTO[]> {
-    let response: AnswerDTO[] = await this._services.getAnswerAttemptsByAttempt(attemptId);
-    return response;
+  async getAnswerAttemptsByAttempt(attemptId: number): Promise<AttemptAnswerDTO[]> {
+    return await this._services.getAnswerAttemptsByAttempt(attemptId);
   }
 
-  async postAnswerAttempt(data: AttemptAnswerDTO): Promise<AnswerDTO> {
-    let response = await this._services.postAnswerAttempt(data);
-    return response && response.length ? response[0] : null;
+  async saveAnswerAttempt(data: AttemptAnswerDTO): Promise<AttemptAnswerDTO> {
+    return await this._services.saveAnswerAttempt(data);
   }
   //#endregion AWNSWERS_ATTEMPTS
 
   //#region LOGS
-  async getAllLogs(): Promise<LogDTO> { 
+  async getAllLogs(): Promise<LogDTO[]> {
     return await this._services.getAllLogs();
   }
 
-  async getLogById(id: number): Promise<LogDTO> { 
+  async getLogById(id: number): Promise<LogDTO> {
     const response = await this._services.getLogById(id);
     return response && response.length ? response[0] : null;
   }
 
-  async postLog(data: LogDTO): Promise<LogDTO> { 
+  async postLog(data: LogDTO): Promise<LogDTO> {
     return await this._services.postLog(data);
   }
 
-  async deleteLog(id: number): Promise<LogDTO> { 
-    const response = await this._services.deleteLog(id);
-    return response && response.length ? response[0] : null;
+  async deleteLog(id: number): Promise<LogDTO[]> {
+    return await this._services.deleteLog(id);
   }
   //#endregion LOGS
 
@@ -352,9 +688,8 @@ export class CommonServices {
 
   async setDefaultData(): Promise<SettingsDTO> {
     let settings = await this._services.getSettingCompleteById(0);
-    let response: SettingsDTO = null;
 
-    if (!settings.length) {
+    if (!settings) {
       await this._services.postLanguage({ name: 'Español', value: 'es' });
       await this._services.postLanguage({ name: 'English', value: 'en' });
       await this._services.postTheme({ id: 'light', content: this.defaultThemeLight });
@@ -371,9 +706,7 @@ export class CommonServices {
       await this._services.postSetting({ settingId: 0, language: 'en', theme: 'dark', permissions: permissions });
       settings = await this._services.getSettingCompleteById(0);
     }
-
-    response = settings && settings.length ? settings[0] : null;
-    return response;
+    return settings;
   }
 
   async getActiveUser() {

@@ -69,7 +69,7 @@ export class RegisterComponent implements OnInit {
     const { name, image } = this.form.value;
     const id = uuidv4();
     const data: UserDTO = {
-      userId: 0,
+      userId: null,
       uuid: id,
       userName: name,
       age: 0,
@@ -77,9 +77,8 @@ export class RegisterComponent implements OnInit {
       avatarBody: '',
       current: true,
     };
-    console.log('registerdata: ', data);
 
-    await this._commonServices.postUser(data);    
+    await this._commonServices.saveUser(data);    
 
     let user = await this._commonServices.getCurrentUser();
     if (user) {

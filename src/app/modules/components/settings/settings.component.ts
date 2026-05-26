@@ -65,7 +65,7 @@ export class SettingsComponent implements OnInit {
         this.themeProps = this.getKeysThemeProps(currentTheme.content as ThemePropertiesDTO);
       }
     } catch (error) {
-      console.log('error: ', error);
+      console.info('error: ', error);
     }
   }
 
@@ -201,14 +201,13 @@ export class SettingsComponent implements OnInit {
       uuid: this.profile.uuid,
       userId: this.profile.userId,
     };
-    const result = await this._commonServices.postUser(user);
+    const result = await this._commonServices.saveUser(user);
     return result;
   }
 
   // #region IMPORT/EXPORTS
   export() {
     const exams = this._commonServices.getAllQuizs();
-    console.log('exams: ', exams);
     this.copyClipboard(JSON.stringify(exams));
     this.downloadJSON(JSON.stringify(exams), 'collection-exam.json');
   }

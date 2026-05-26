@@ -1,5 +1,5 @@
 export const quiz_table_script = `CREATE TABLE IF NOT EXISTS [quiz_table] (
-  [quizId] INTEGER PRIMARY KEY,
+  [quizId] INTEGER PRIMARY KEY AUTOINCREMENT,
   [uuid] TEXT,
   [title] TEXT,
   [time] INTEGER,
@@ -9,7 +9,7 @@ export const quiz_table_script = `CREATE TABLE IF NOT EXISTS [quiz_table] (
 );`;
 
 export const answer_table_script = `CREATE TABLE IF NOT EXISTS [answer_table] (
-  [answerId] INTEGER PRIMARY KEY,
+  [answerId] INTEGER PRIMARY KEY AUTOINCREMENT,
   [quizId] INTEGER,
   [title] TEXT,
   [updatedDate] INTEGER,

@@ -46,7 +46,6 @@ export class DashboardComponent implements OnInit {
   //#region DATA
   async init() {
     const list = await this._commonServices.getAllQuizs();
-    console.log('list: ', list);
     if(list) {
       this.listQuiz = this.normalizeQuiz(list);
     }
@@ -142,7 +141,7 @@ export class DashboardComponent implements OnInit {
   }
 
   duplicateQuiz(quiz: QuizDTO) {
-    console.log('quiz: ', quiz);
+    console.info('quiz: ', quiz);
     // this._commonServices.navigate('quizedit', quiz.id);
   }
   

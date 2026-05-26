@@ -103,7 +103,6 @@ export class ModuleComponent implements OnInit, AfterViewInit {
 
   async getLogs() {
     const logs = await this._commonServices.getAllLogs();
-    console.log('logs: ', logs);
   }
 
   getPropsScreen() {
