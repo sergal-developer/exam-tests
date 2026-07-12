@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
@@ -42,6 +42,12 @@ export function initializeApp(dbService: DatabaseService) {
     WebSqlite,
     DatabaseService,
     { provide: APP_BASE_HREF, useValue: '/' },
+    // {
+    //   provide: APP_INITIALIZER,
+    //   useFactory: initializeApp,
+    //   deps: [DatabaseService],
+    //   multi: true
+    // }
   ],
   bootstrap: [AppComponent]
 })

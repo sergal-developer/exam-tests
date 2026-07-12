@@ -29,6 +29,9 @@
     "skipLibCheck": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
+    "paths": {
+      "crypto": ["node_modules/crypto-browserify"]
+    }
   },
   "noImplicitReturns": true,
   "noImplicitAny": false,

@@ -1,19 +1,20 @@
 import { Injectable } from "@angular/core";
-import { WebSqlite } from 'angular-web-sqlite';
+import { CapacitorSQLite, SQLiteConnection, SQLiteDBConnection } from '@capacitor-community/sqlite';
+import { Capacitor } from '@capacitor/core';
 import {
     answer_attempt_table_script,
     answer_option_table_script,
     answer_table_script,
     AnswerDTO,
     AnswerOptionDTO,
+    AttemptAnswerDTO,
+    AttemptDTO,
     language_table_script,
     LanguageDTO,
     log_table_script,
     LogDTO,
     quiz_attempt_table_script,
     quiz_table_script,
-    AttemptAnswerDTO,
-    AttemptDTO,
     QuizDTO,
     settings_table_script,
     SettingsDTO,
@@ -22,47 +23,150 @@ import {
     user_table_script,
     UserDTO
 } from "../../data/entities/dtos";
+import { UiServices } from "../ui.services";
 
 @Injectable({
     providedIn: 'root'
 })
 export class DatabaseService {
+
     private dbName = 'sinexamSQL_temp0000005';
     private initialized = false;
-    private isWeb: boolean = false;
+    private isAndroid: boolean = false;
 
-    constructor(private webSqlite: WebSqlite) { }
+    private db: SQLiteDBConnection;
+    private sqliteConnection!: SQLiteConnection;
+
+    constructor(
+        private _uiServices: UiServices,
+    ) {
+        this.isAndroid = Capacitor.getPlatform() === 'android';
+        this.sqliteConnection = new SQLiteConnection(CapacitorSQLite);
+    }
 
     //#region CONFIG
-    async initDataBase(): Promise<void> {
-        if (this.initialized) return;
+    private async _initWebStore(): Promise<boolean> {
         try {
-            await this.webSqlite.init(this.dbName);
-            this.initialized = true;
+            if (!this.isAndroid) {
+                const jeepEl = document.querySelector('jeep-sqlite');
+                if (jeepEl) {
+                    await this.sqliteConnection.initWebStore();
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } catch (err: any) {
+            return Promise.reject(`initWebStore: ${err}`);
+        }
+    }
+
+    private async _openDatabase(dbName: string, encrypted: boolean, mode: string, version: number, readonly: boolean): Promise<any> {
+        const retCC = (await this.sqliteConnection.checkConnectionsConsistency()).result;
+        let isConn = (await this.sqliteConnection.isConnection(dbName, readonly)).result;
+        console.log('retCC: ', retCC, 'isConn: ', isConn);
+        if (retCC && isConn) {
+            this.db = await this.sqliteConnection.retrieveConnection(dbName, readonly);
+        } else {
+            this.db = await this.sqliteConnection.createConnection(dbName, encrypted, mode, version, readonly);
+        }
+        await this.db.open();
+        return this.db;
+    }
+
+    async initDataBaseold(): Promise<void> {
+        // if (this.initialized) return;
+
+        await this._initWebStore().then(async () => {
+
+        });
+
+        console.log('this.isAndroid: ', this.isAndroid);
+        try {
+            if (!this.isAndroid) {
+
+                // await this.webSqlite.init(this.dbName);
+
+                const jeepEl = document.querySelector('jeep-sqlite');
+                if (jeepEl) {
+                    try {
+                        await this.sqliteConnection.initWebStore();
+                    } catch (err: any) {
+                        const msg = err.message ? err.message : err;
+                        return Promise.reject(`initWebStore: ${err}`);
+                    }
+                }
+                this.initialized = true;
+            } else {
+                // Crear o recuperar la conexión a la base de datos
+                this.db = await this.sqliteConnection.createConnection(
+                    this.dbName,
+                    false,          // encrypted
+                    'no-encryption',
+                    1,              // version
+                    false           // readonly
+                );
+
+                await this.db.open();
+                this.initialized = true;
+            }
+
         } catch (error) {
             console.error('Error al inicializar SQLite:', error);
+            this._uiServices.notification('ERROR SQLLite: ' + JSON.stringify(error))
             throw error;
+        }
+    }
+
+    async initDataBase() {
+        await this._initWebStore().then(async (webConnection) => {
+            await this._openDatabase(this.dbName,
+                false,          // encrypted
+                'no-encryption',
+                1,              // version
+                false           // readonly
+            );
+            if (!this.isAndroid && webConnection) {
+                await this.sqliteConnection.saveToStore(this.dbName);
+            }
+        });
+
+    }
+
+    async initDB() {
+        this.sqliteConnection = new SQLiteConnection(CapacitorSQLite);
+        this.db = await this.sqliteConnection.createConnection(this.dbName, false, 'no-encryption', 1, false);
+        await this.db.open();
+
+        if (Capacitor.getPlatform() === 'web') {
+            await this.sqliteConnection.saveToStore(this.dbName); // Now it works
         }
     }
 
     async executeQuery(query: string, parameters: any[] = []): Promise<any[]> {
         try {
             await this.initDataBase();
-            const result = await this.webSqlite.executeSql(query, parameters);
-            return result && result.rows ? result.rows : null;
+            const request = await this.db.query(query, parameters);
+            console.log('request: ', request);
+            return request && request.values ? request.values : null;
         } catch (error) {
             console.info('ERROR:', error);
+            this._uiServices.notification('ERROR EXEC: ' + JSON.stringify(error))
             return null
         }
+
     }
 
     async executeQueryBatch(queryBatch: [string, any[]][], parameters: any = {}): Promise<any[]> {
         try {
             await this.initDataBase();
-            await this.webSqlite.batchSql(queryBatch);
+            // await this.nativeDb.batchSql(queryBatch);
             return await this.getStructure();
         } catch (error) {
             console.info('ERROR:', error);
+            this._uiServices.notification('ERROR EXEC: ' + JSON.stringify(error))
             return null
         }
     }
@@ -92,7 +196,9 @@ export class DatabaseService {
 
     async getStructure() {
         const query = `SELECT * FROM sqlite_master WHERE type='table';`;
-        return await this.executeQuery(query);
+        const data = await this.executeQuery(query);
+        console.log('data: ', data);
+        return data;
     }
 
     async deleteStructure() {
@@ -211,7 +317,7 @@ export class DatabaseService {
         const currentVal = user.current ? 1 : 0; // Convertir booleano a entero para SQLite
         const query = `
         INSERT INTO user_table (userId, uuid, userName, age, avatarUrl, avatarBody, current) 
-        VALUES (?, ?, ?, ?, ?, ?, ?) 
+        VALUES (${ user.userId ?? null }, ${ user.uuid }, ${ user.userName }, ${ user.age }, ${ user.avatarUrl }, ${ user.avatarBody }, ${ currentVal }) 
         ON CONFLICT(userId) DO UPDATE SET 
             uuid = excluded.uuid,
             userName = excluded.userName, 
@@ -220,13 +326,13 @@ export class DatabaseService {
             avatarBody = excluded.avatarBody, 
             current = excluded.current
         RETURNING *;`;
-        const response = await this.executeQuery(query, [user.userId ?? null, user.uuid, user.userName, user.age, user.avatarUrl, user.avatarBody, currentVal]);
+        const response = await this.executeQuery(query);
         return response && response.length ? response[0] : null;
     }
 
     async deleteUser(userId: number): Promise<UserDTO[]> {
-        const query = `DELETE FROM user_table WHERE userId = ?;`;
-        return await this.executeQuery(query, [userId]);
+        const query = `DELETE FROM user_table WHERE userId = ${ userId };`;
+        return await this.executeQuery(query);
     }
     //#endregion
 
@@ -255,8 +361,8 @@ export class DatabaseService {
     }
 
     async getSettingById(settingId: number): Promise<SettingsDTO> {
-        const query = `SELECT * FROM settings_table WHERE settingId = ?;`;
-        let response = await this.executeQuery(query, [settingId]);
+        const query = `SELECT * FROM settings_table WHERE settingId = ${ settingId };`;
+        let response = await this.executeQuery(query,);
         response = this.normalizeSettings(response);
         return response && response.length ? response[0] : null;
     }
@@ -285,8 +391,8 @@ export class DatabaseService {
                     ) FROM theme_table t
                 ) as _themes
             FROM settings_table q 
-            WHERE q.settingId = ?;`;
-        let response = await this.executeQuery(query, [settingId]);
+            WHERE q.settingId = ${ settingId };`;
+        let response = await this.executeQuery(query);
         response = this.normalizeSettings(response);
         return response && response.length ? response[0] : null;
     }

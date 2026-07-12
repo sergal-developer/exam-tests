@@ -64,6 +64,7 @@ export class ModuleComponent implements OnInit, AfterViewInit {
   async loadDatabaseStructure() {
     await this.services.loadStructure();
     const structure = await this.services.getStructure();
+    console.log('structure: ', structure);
     if(!structure) {
       this._uiServices.notification("Error al establecer conexion SQL.")
     } else {
@@ -73,6 +74,7 @@ export class ModuleComponent implements OnInit, AfterViewInit {
 
   async setupLanguage() {
     const setting = await this._commonServices.getCurrentSettings();
+    console.log('setting: ', setting);
     if (setting) {
       const languages = [];
       setting._languages.map((lan) => {

@@ -30,6 +30,11 @@
               "src/assets",
               "src/data",
               {
+                "glob": "sql-wasm.wasm",
+                "input": "node_modules/sql.js/dist",
+                "output": "./assets"
+              },
+              {
                 "glob": "**/*.js",
                 "input": "./node_modules/angular-web-sqlite/src/lib/assets",
                 "output": "./sqlite-client/"
