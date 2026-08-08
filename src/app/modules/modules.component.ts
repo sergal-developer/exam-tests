@@ -2,10 +2,10 @@ import { AfterViewInit, Component, OnInit, ViewEncapsulation } from '@angular/co
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { ScreenEnum } from 'src/app/shared/data/enumerables/enumerables';
-import { CommonServices } from '../shared/services/common.services';
-import { UiServices } from '../shared/services/ui.services';
-import { DatabaseService } from '../shared/services/database/sql.database.service';
 import { SettingsDTO, ThemeDTO } from '../shared/data/entities/dtos';
+import { CommonServices } from '../shared/services/common.services';
+import { DatabaseService } from '../shared/services/database/sql.database.service';
+import { UiServices } from '../shared/services/ui.services';
 
 @Component({
   selector: 'modules',
@@ -53,41 +53,46 @@ export class ModuleComponent implements OnInit, AfterViewInit {
   }
 
   async ngOnInit() {
-    await this.loadDatabaseStructure();
     this.getPropsScreen();
-    this.setupLanguage();
+    const existStructure = await this.loadDatabaseStructure();
+    this.setupLanguage(existStructure);
   }
 
   async ngAfterViewInit() {
   }
 
   async loadDatabaseStructure() {
-    await this.services.loadStructure();
-    const structure = await this.services.getStructure();
-    if(!structure) {
-      this._uiServices.notification("Error al establecer conexion SQL.")
+    const structure = await this.services.initialDatabase();
+    console.log('LOAD_STRUCTURE: ', structure);
+    if (!structure) {
+      this._uiServices.notification("Error al establecer conexion SQL.", { type: 'error', closeTimer: 0 })
+    }
+    return structure ? true : false;
+  }
+
+  async setupLanguage(existDatabaseStructure = false) {
+    if (existDatabaseStructure) {
+      const setting = await this._commonServices.getCurrentSettings();
+      if (setting) {
+        const languages = [];
+        setting._languages.map((lan) => {
+          languages.push(lan.value);
+        })
+        this.translate.addLangs(languages);
+        this.translate.setDefaultLang(setting.language);
+        this.applyCurrentTheme(setting);
+      } else {
+        this.setDefaultSettings();
+      }
     } else {
-      this._uiServices.notification("Conexion estable con base de datos.")
+      this.setDefaultSettings();
     }
   }
 
-  async setupLanguage() {
-    const setting = await this._commonServices.getCurrentSettings();
-    console.log('setting: ', setting);
-    if (setting) {
-      const languages = [];
-      setting._languages.map((lan) => {
-        languages.push(lan.value);
-      })
-      this.translate.addLangs(languages);
-      this.translate.setDefaultLang(setting.language);
-
-      this.applyCurrentTheme(setting);
-    } else {
-      this.translate.addLangs(this.availableLangs);
-      this.currentLang = 'es';
-      this.translate.setDefaultLang(this.currentLang);
-    }
+  private setDefaultSettings() {
+    this.translate.addLangs(this.availableLangs);
+    this.currentLang = 'es';
+    this.translate.setDefaultLang(this.currentLang);
   }
 
   onChangeUI(event) {

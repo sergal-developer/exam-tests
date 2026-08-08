@@ -292,8 +292,11 @@ export class SettingsComponent implements OnInit {
     });
     return result;
   }
+
+  
   //#endregion
 
+  
   //#endregion EVENTS
 
 }

@@ -1,2 +1,28 @@
 /* You can add global styles to this file, and also import other style files */
 @import 'resources/main.scss';
+
+
+.log-button {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: black;
+    color: #fff;
+    z-index: 9000;
+}
+
+.log-component {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    z-index: -2;
+    &.show {
+        z-index: 8000;
+        width: 100vw;
+        height: 100vh;
+        background: #0000002b;
+        backdrop-filter: blur(4px);
+    }
+}

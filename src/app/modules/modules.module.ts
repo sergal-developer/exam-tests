@@ -16,6 +16,7 @@ import { RegisterComponent } from './components/register/register.component';
 import { SettingsComponent } from './components/settings/settings.component';
 import { SplashComponent } from './components/splash/splash.component';
 import { ModuleComponent } from './modules.component';
+import { LogComponent } from '../shared/components/log/log.component';
 
 @NgModule({
   imports: [
@@ -41,6 +42,7 @@ import { ModuleComponent } from './modules.component';
     RegisterComponent,
     SettingsComponent,
     SplashComponent,
+    LogComponent,
   ],
   exports: [
     ModuleComponent,
@@ -51,6 +53,7 @@ import { ModuleComponent } from './modules.component';
     RegisterComponent,
     SettingsComponent,
     SplashComponent,
+    LogComponent,
   ],
   providers: [EventBusService, CommonServices, UiServices],
 })

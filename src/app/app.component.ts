@@ -2,15 +2,20 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Fullscreen } from '@boengli/capacitor-fullscreen';
 import { ScreenOrientation } from '@capacitor/screen-orientation';
 import { Platform } from '@ionic/angular';
-import { DatabaseService } from './shared/services/database/sql.database.service';
 
 @Component({
   selector : 'exam-app',
-  template : `<router-outlet></router-outlet>`,
+  template : `
+        <button class="log-button" (click)="showLogs()">logs</button>
+        <div class="log-component" [ngClass]="{'show': _showLogComponent}">
+          <log-component [show]="_showLogComponent"></log-component>
+        </div>
+        <router-outlet></router-outlet>`,
   encapsulation : ViewEncapsulation.None
 })
 export class AppComponent implements OnInit{
-  constructor(public platform: Platform ) {}
+  constructor(public platform: Platform
+   ) {}
 
   async ngOnInit() {
     this.activeFullscreen();
@@ -32,4 +37,10 @@ export class AppComponent implements OnInit{
       // console.error('Error activando fullscreen:', error);
     }
   }
+
+  _showLogComponent = false;
+  showLogs() {
+    this._showLogComponent = !this._showLogComponent;
+  }
 }
+

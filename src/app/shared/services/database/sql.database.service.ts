@@ -63,7 +63,7 @@ export class DatabaseService {
         }
     }
 
-    private async _openDatabase(dbName: string, encrypted: boolean, mode: string, version: number, readonly: boolean): Promise<any> {
+    private async _openDatabase(dbName: string, encrypted: boolean = false, mode: string = 'no-encryption', version: number = 1, readonly: boolean = false): Promise<any> {
         const retCC = (await this.sqliteConnection.checkConnectionsConsistency()).result;
         let isConn = (await this.sqliteConnection.isConnection(dbName, readonly)).result;
         if (retCC && isConn) {
@@ -75,29 +75,66 @@ export class DatabaseService {
         return this.db;
     }
 
-    async initDataBase() {
+    private async _openDatabaseCreate(dbName: string, encrypted: boolean = false, mode: string = 'no-encryption', version: number = 1, readonly: boolean = false): Promise<any> {
+        const isConn = (await this.sqliteConnection.isConnection(dbName, readonly)).result;
+        if (isConn) {
+            this.db = await this.sqliteConnection.retrieveConnection(dbName, readonly);
+        } else {
+            this.db = await this.sqliteConnection.createConnection(dbName, encrypted, mode, version, readonly);
+        }
+        await this.db.open();
+        return this.db;
+    }
+
+    async initDataBase(): Promise<any> {
         await this._initWebStore().then(async (webConnection) => {
-            await this._openDatabase(this.dbName,
-                false,          // encrypted
-                'no-encryption',
-                1,              // version
-                false           // readonly
-            );
+            // this.db = await this._openDatabase(this.dbName);
+            this.db = await this._openDatabaseCreate(this.dbName);
             if (!this.isAndroid && webConnection) {
                 await this.sqliteConnection.saveToStore(this.dbName);
             }
         });
-
+        return this.db;
     }
 
-    async executeSQL(query: string): Promise<any[]> {
+    async executeSQL(statementSql: string): Promise<any> {
         try {
-            await this.initDataBase();
-            const request = await this.db.execute(query);
+            this.db = await this.initDataBase();
+            const request = await this.db.execute(statementSql);
             if (!this.isAndroid) {
                 await this.sqliteConnection.saveToStore(this.dbName);
             }
-            return request && request.changes ? request.changes.values : null;
+            return request;
+        } catch (error) {
+            console.info('ERROR:', error);
+            this._uiServices.notification('ERROR EXEC: ' + JSON.stringify(error))
+            return null
+        }
+    }
+
+    async executeActionSQL(statementSql: string, parameters: any[] = []): Promise<any> {
+        try {
+            this.db = await this.initDataBase();
+            const request = await this.db.run(statementSql, parameters);
+            if (!this.isAndroid) {
+                await this.sqliteConnection.saveToStore(this.dbName);
+            }
+            return request;
+        } catch (error) {
+            console.info('ERROR:', error);
+            this._uiServices.notification('ERROR EXEC: ' + JSON.stringify(error))
+            return null
+        }
+    }
+
+    async executeSelectSQL(statementSql: string, parameters: any[] = []): Promise<any> {
+        try {
+            this.db = await this.initDataBase();
+            const request = await this.db.query(statementSql, parameters);
+            if (!this.isAndroid) {
+                await this.sqliteConnection.saveToStore(this.dbName);
+            }
+            return request;
         } catch (error) {
             console.info('ERROR:', error);
             this._uiServices.notification('ERROR EXEC: ' + JSON.stringify(error))
@@ -109,7 +146,6 @@ export class DatabaseService {
         try {
             await this.initDataBase();
             const request = await this.db.query(query, parameters);
-            console.log('querySQL: ', request);
             if (!this.isAndroid) {
                 await this.sqliteConnection.saveToStore(this.dbName);
             }
@@ -134,10 +170,20 @@ export class DatabaseService {
         }
     }
 
-    async loadStructure() {
-        await this.initDataBase();
+
+    async initialDatabase() {
+        await this.createDataStructure();
+        const structure = await this.getStructure();
+        console.log('structure: ', structure);
+        if (!structure) {
+            this._uiServices.notification("Error al establecer conexion SQL.", { type: 'error', closeTimer: 0 })
+        }
+        return structure ? true : false;
+    }
+
+    async createDataStructure() {
         try {
-            await this.db.execute('PRAGMA foreign_keys = ON;');
+            const pragma = await this.executeSQL('PRAGMA foreign_keys = ON;');
             const fullScript =
                 log_table_script +
                 language_table_script +
@@ -150,18 +196,18 @@ export class DatabaseService {
                 quiz_attempt_table_script +
                 answer_attempt_table_script;
 
-            return await this.executeSQL(fullScript);
-            
+            const result = await this.executeSQL(fullScript);
+            return true;
+
         } catch (error) {
             console.info('ERROR:', error);
-            return null
+            return null;
         }
     }
 
     async getStructure() {
         const query = `SELECT * FROM sqlite_master WHERE type='table';`;
-        const data = await this.querySQL(query);
-        console.log('data: ', data);
+        const data = await this.executeSelectSQL(query);
         return data;
     }
 
@@ -254,7 +300,6 @@ export class DatabaseService {
     async getCurrentUser(): Promise<UserDTO> {
         const query = `SELECT * FROM user_table WHERE current = 1 LIMIT 1;`;
         const response = await this.querySQL(query);
-        console.log('response: ', response);
         return response && response.length ? response[0] : null;
     }
 
@@ -269,28 +314,27 @@ export class DatabaseService {
     }
 
     private async _postUser(user: UserDTO): Promise<UserDTO> {
-        
+
         const query = `
         INSERT INTO user_table (uuid, userName, age, avatarUrl, avatarBody, current) 
         VALUES (?, ?, ?, ?, ?, ?)
         RETURNING *;`;
 
         const values = [
-            user.uuid ?? null, 
-            user.userName, 
-            user.age ?? null, 
+            user.uuid ?? null,
+            user.userName,
+            user.age ?? null,
             user.avatarUrl ?? null,                 // Evita el undefined
             user.avatarBody ? JSON.stringify(user.avatarBody) : null, // Por si es objeto
             user.current ? 1 : 0                    // Booleano a Entero (1 o 0)
         ];
 
-        const response = await this.querySQL(query, values);
-        console.log('response: ', response);
+        const response = await this.executeActionSQL(query, values);
         return response && response.length ? response[0] : null;
     }
 
     private async _putUser(user: UserDTO): Promise<UserDTO> {
-        
+
         const query = `
         INSERT INTO user_table (userId, uuid, userName, age, avatarUrl, avatarBody, current) 
         VALUES (?, ?, ?, ?, ?, ?, ?) 
@@ -305,21 +349,20 @@ export class DatabaseService {
 
         const values = [
             user.userId ?? null,
-            user.uuid ?? null, 
-            user.userName, 
-            user.age ?? null, 
+            user.uuid ?? null,
+            user.userName,
+            user.age ?? null,
             user.avatarUrl ?? null,                 // Evita el undefined
             user.avatarBody ? JSON.stringify(user.avatarBody) : null, // Por si es objeto
             user.current ? 1 : 0                    // Booleano a Entero (1 o 0)
         ];
 
         const response = await this.querySQL(query, values);
-        console.log('response: ', response);
         return response && response.length ? response[0] : null;
     }
 
     async deleteUser(userId: number): Promise<UserDTO[]> {
-        const query = `DELETE FROM user_table WHERE userId = ${ userId };`;
+        const query = `DELETE FROM user_table WHERE userId = ${userId};`;
         return await this.querySQL(query);
     }
     //#endregion
@@ -349,7 +392,7 @@ export class DatabaseService {
     }
 
     async getSettingById(settingId: number): Promise<SettingsDTO> {
-        const query = `SELECT * FROM settings_table WHERE settingId = ${ settingId };`;
+        const query = `SELECT * FROM settings_table WHERE settingId = ${settingId};`;
         let response = await this.querySQL(query,);
         response = this.normalizeSettings(response);
         return response && response.length ? response[0] : null;
@@ -379,7 +422,7 @@ export class DatabaseService {
                     ) FROM theme_table t
                 ) as _themes
             FROM settings_table q 
-            WHERE q.settingId = ${ settingId };`;
+            WHERE q.settingId = ${settingId};`;
         let response = await this.querySQL(query);
         response = this.normalizeSettings(response);
         return response && response.length ? response[0] : null;
