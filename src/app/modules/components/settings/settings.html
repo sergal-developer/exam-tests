@@ -184,7 +184,7 @@
                     <div class="description full">
                         <div class="description-title">{{ 'permission_delete' | translate }}</div>
                     </div>
-                    <div class="action" (click)="tooglePermission('delete')"
+                    <div class="action clickable" (click)="tooglePermission('delete')"
                         [ngClass]="{'active': settings.permissions.delete }">
                         <span class="material-icons" *ngIf="settings.permissions.delete">toggle_on</span>
                         <span class="material-icons" *ngIf="!settings.permissions.delete">toggle_off</span>

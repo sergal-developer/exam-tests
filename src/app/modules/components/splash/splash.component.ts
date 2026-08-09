@@ -24,7 +24,6 @@ export class SplashComponent implements OnInit {
 
   async loadDatabaseStructure() {
     const structure = await this.services.initialDatabase();
-    console.log('LOAD_STRUCTURE: ', structure);
     if (!structure) {
       this._uiServices.notification("Error al establecer conexion SQL.", { type: 'error', closeTimer: 0 })
     }

@@ -63,7 +63,6 @@ export class ModuleComponent implements OnInit, AfterViewInit {
 
   async loadDatabaseStructure() {
     const structure = await this.services.initialDatabase();
-    console.log('LOAD_STRUCTURE: ', structure);
     if (!structure) {
       this._uiServices.notification("Error al establecer conexion SQL.", { type: 'error', closeTimer: 0 })
     }
@@ -105,10 +104,6 @@ export class ModuleComponent implements OnInit, AfterViewInit {
     if (theme) {
       this._uiServices.applyTheme(theme);
     }
-  }
-
-  async getLogs() {
-    const logs = await this._commonServices.getAllLogs();
   }
 
   getPropsScreen() {
