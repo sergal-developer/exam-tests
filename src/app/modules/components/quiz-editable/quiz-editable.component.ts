@@ -226,6 +226,14 @@ export class QuizEditableComponent implements OnInit {
     const valueNew = this.formQuestion.value;
     this.quiz.answers[this.currentAnswerIndex] = this.formQuestion.value;
 
+    console.log(' this.quiz: ', this.quiz);
+    this.quiz = await this._commonService.saveAllQuiz(this.quiz);
+    console.log('this.quiz: ', this.quiz);
+
+    if (!this.quiz) {
+      this._uiService.notification(this.translateLabels.service_fail_update);
+    }
+
     if (cleanUnused) {
       // clean unused data
       this.quiz.answers.map((question: AnswerDTO) => {
@@ -238,9 +246,6 @@ export class QuizEditableComponent implements OnInit {
       this.quiz.answers = this.quiz.answers.filter((question: AnswerDTO) => question._options.length > 0);
     }
 
-    console.log(' this.quiz: ', this.quiz);
-    await this._commonService.saveAllQuiz(this.quiz);
-
     // // save or update data
     // if (this.quiz.quizId) {
     //   // await this._commonService.updateQuiz(this.quiz.id, this.quiz);
@@ -248,14 +253,12 @@ export class QuizEditableComponent implements OnInit {
     //   this.quiz.quizId = -1;
     //   // await this._commonService.saveQuiz(this.quiz);
     // }
-    console.log(' this.quiz: ', this.quiz);
+    
     // const data = await this._commonService.searchQuiz(this.quiz.id);
     // const data = null;
     // this.quiz = data;
 
-    if (!this.quiz) {
-      this._uiService.notification(this.translateLabels.service_fail_update);
-    }
+    
   }
 
   async getQuizData(id: number) {
@@ -272,6 +275,7 @@ export class QuizEditableComponent implements OnInit {
   //#region EVENTS
   selectAnswerCorrect(option: FormGroup) {
     const _option = option.value as AnswerOptionDTO;
+     console.log('lastValue: ', _option);
     // reset all items
     this.formQuestion.value._options.map((opt, index) => {
       this.getOptions().controls[index].get('_selected').setValue(false);
@@ -297,26 +301,22 @@ export class QuizEditableComponent implements OnInit {
   }
 
   gotoDashboard() {
-    this._commonService.navigate('dashboard', this.quiz.quizId.toString());
+    this._commonService.navigate('dashboard', this.quiz.quizId ? this.quiz.quizId.toString() : '');
   }
 
   nextQuestion() {
     if (this.currentAnswerIndex >= this.quiz.answers.length - 1) {
       this.quiz.answers[this.currentAnswerIndex] = this.formQuestion.value;
       this.quiz.answers.push(this.getNewQuestion());
+      // this.updateQuiz();
+      this.currentAnswerIndex = this.currentAnswerIndex + 1;
+      this.setCurrentAnswer();
     }
-
-    this.updateQuiz();
-
-    this.currentAnswerIndex = this.currentAnswerIndex + 1;
-    this.setCurrentAnswer();
-
-
   }
 
   prevQuestion() {
     if (this.currentAnswerIndex != 0) {
-      this.updateQuiz();
+      // this.updateQuiz();
 
       this.currentAnswerIndex = this.currentAnswerIndex - 1;
       this.setCurrentAnswer();

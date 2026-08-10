@@ -97,21 +97,27 @@ export class CommonServices {
     // quiz = quiz || this.mockquiz();
     let data = this.prepareQueryAnswersOptions(quiz);
 
+    // Guardar el quiz primero
     const responseQuiz: QuizDTO = await this._services.saveQuiz(data.quiz);
     quiz.quizId = responseQuiz.quizId;
 
+    // Preparar nuevamente los datos con el quizId
     data = this.prepareQueryAnswersOptions(quiz);
-    quiz.answers.map(async(answer: AnswerDTO) => {
-      const responseAnswer = await this._services.saveAnswer(answer);
-      answer.answerId = responseAnswer.answerId;
 
-      answer._options.map(async(option: AnswerOptionDTO) => {
-        option.answerId = answer.answerId;
-        const responseOption = await this._services.saveAnswerOption(option);
+    await Promise.all(
+      quiz.answers.map(async (answer: AnswerDTO) => {
+        const responseAnswer = await this._services.saveAnswer(answer);
+        answer.answerId = responseAnswer.answerId;
 
-        option.optionId = responseOption.optionId;
-      });
-    });
+        // Guardar todas las opciones y esperar a que terminen
+        await Promise.all(answer._options.map(async (option: AnswerOptionDTO) => {
+          option.answerId = answer.answerId;
+          const responseOption = await this._services.saveAnswerOption(option);
+          option.optionId = responseOption.optionId;
+        }))
+      })
+    );
+
 
     return quiz;
   }
@@ -409,9 +415,9 @@ export class CommonServices {
     }
   }
 
-  prepareQueryAnswersOptions(quiz: QuizDTO): {quiz: QuizDTO, answers: AnswerDTO[], answerOptions: AnswerOptionDTO[]} {
+  prepareQueryAnswersOptions(quiz: QuizDTO): { quiz: QuizDTO, answers: AnswerDTO[], answerOptions: AnswerOptionDTO[] } {
     const _quiz: QuizDTO = {
-      quizId : quiz.quizId == -1 ? null : quiz.quizId,
+      quizId: quiz.quizId == -1 ? null : quiz.quizId,
       uuid: quiz.uuid || uuidv4(),
       title: quiz.title,
       time: quiz.time || 0,
@@ -425,7 +431,7 @@ export class CommonServices {
     quiz.answers.map(answer => {
       answer.answerId = answer.answerId == -1 ? null : answer.answerId;
       answer.quizId = quiz.quizId;
-      if(answer.title != '') {
+      if (answer.title != '') {
         answers.push(answer);
       }
 
@@ -434,7 +440,7 @@ export class CommonServices {
         option.optionId = option.optionId == -1 ? null : option.optionId;
         option.isCorrect = option._selected == true;
 
-        if(answer.title != '' || option.content != '') {
+        if (answer.title != '' && option.content != '') {
           answerOptions.push(option);
         }
       });

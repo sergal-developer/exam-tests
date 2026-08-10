@@ -43,7 +43,7 @@
         </div>
     </ng-container>
 
-    <div class="timer-status-input" [ngClass]="{'buttonmode': !durationFormShow}" *ngIf="settings.permissions.ai">
+    <!-- <div class="timer-status-input" [ngClass]="{'buttonmode': !durationFormShow}" *ngIf="settings.permissions.ai">
         <button (click)="enableIA()">
             <div class="inner">
                 <ng-container *ngIf="!showIAForm">
@@ -54,7 +54,7 @@
                 </ng-container>
             </div>
         </button>
-    </div>
+    </div> -->
 </div>
 
 <div class="root-container">
@@ -128,7 +128,7 @@
         </div>
     </ng-container>
 
-    <ng-container *ngIf="showIAForm">
+    <!-- <ng-container *ngIf="showIAForm">
         <div class="simple-section" *ngIf="formIAGenerated">
             <div class="_question" [ngClass]="{'loading_noclick': loadingDataAi }">
                 <div class="gray-backdrop drop-padding">
@@ -159,6 +159,6 @@
                 </div>
             </div>
         </div>
-    </ng-container>
+    </ng-container> -->
 
 </div>
