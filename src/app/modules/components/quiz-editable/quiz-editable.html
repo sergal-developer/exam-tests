@@ -118,6 +118,12 @@
                         </div>
                     </button>
 
+                    <button class="primary" (click)="saveQuiz()" *ngIf="quiz && quiz.answers.length > 1">
+                        <div class="inner">
+                            {{ 'action_save' | translate }}
+                        </div>
+                    </button>
+
                     <button class="primary" (click)="finishCreation()" *ngIf="quiz && quiz.answers.length > 1">
                         <div class="inner">
                             {{ 'action_finish' | translate }}

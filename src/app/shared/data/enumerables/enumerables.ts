@@ -15,6 +15,7 @@ export enum ScreenEnum {
     attemptevalue = 'attemptevalue',
     attemptreview = 'attemptreview',
     quizresults = 'quizresults',
+    dbclient = 'dbclient',
 
     
     exam = 'exam',

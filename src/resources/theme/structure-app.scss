@@ -75,6 +75,10 @@ h6 {
         &.__attemptreview {
             margin-left: -600vw;
         }
+
+        &.__dbclient {
+            margin-left: -700vw;
+        }
     }
 
     .screen {
@@ -806,10 +810,11 @@ h6 {
 
         ._question_text {
             line-height: 1.2;
-
         }
 
-
+        ._question_title {
+            line-height: 1;
+        }
 
         ._answer_collection {
             display: flex;
@@ -854,6 +859,30 @@ h6 {
             .mat-label {
                 background: var(--matLabelBackground) !important;
             }
+        }
+
+        ._question_title {
+            line-height: 1;
+            font-weight: normal;
+            font-size: rem(13px);
+
+            .mat-label {
+                background: var(--matLabelContrastBackground) !important;
+            }
+        }
+
+        ._precode {
+            line-height: 1;
+            font-weight: normal;
+            font-size: rem(13px);
+        }
+
+        ._error_message {
+            background: var(--answerIncorrectBorderColor);
+            color: var(--answerCorrectColor);
+            font-size: rem(16px);        
+            padding: 5px 10px;
+            border-radius: 10px;
         }
 
         ._question_text_collection {

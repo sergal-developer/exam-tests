@@ -81,6 +81,7 @@ export class DashboardComponent implements OnInit {
       answers: [],
       creationDate: new Date().getTime(),
       updatedDate: new Date().getTime(),
+      time: 0,
       // answers: this.currentQuiz.answers,
       // time: this.currentQuiz.time ? this.currentQuiz.time : 0,
       // creationDate: new Date().getTime(),
@@ -91,6 +92,7 @@ export class DashboardComponent implements OnInit {
     // DISCART INVALID ANSWERS
     // data.answers = this.validateQuestions(data.answers);
     data.validTotalAnswers = data.answers.length;
+    console.log('createattempt: ', data);
 
     // clean selected elements
     // data.questions.map((question: AnswerEntity) => {
@@ -103,18 +105,19 @@ export class DashboardComponent implements OnInit {
     // data.questions = this.transform.shuffleArray(data.questions);
 
     // SAVE DATA
-    // await this._commonServices.saveAttempt(data);
+    const attempt = await this._commonServices.saveQuizAttempt(data);
     // const attempt = await this._commonServices.searchAttempt(data.attemptId, 'attemptId');
 
-    // if (attempt) {
-    //   this.goToCompleteAttempt(attempt);
-    // } else {
-    //   // GLOBAL.service_error_attempt
-    //   this._uiServices._notification('Ocurrio un error al generar la evaluacion, intente nuvamente', { type: 'error' })
-    // }
+    if (attempt) {
+      this.goToCompleteAttempt(attempt);
+    } else {
+      // GLOBAL.service_error_attempt
+      this._uiServices.notification('Ocurrio un error al generar la evaluacion, intente nuvamente', { type: 'error' })
+    }
   }
 
   async deleteQuiz(quiz: QuizDTO) {
+    console.log('quiz: ', quiz);
     this.listAttempts.map(async(attemp) => {
       // await this._commonServices.deleteAttempt(attemp.id);
     });

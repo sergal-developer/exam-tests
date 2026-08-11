@@ -31,7 +31,7 @@ export class ModuleComponent implements OnInit, AfterViewInit {
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
     public _uiServices: UiServices,
-    private _commonServices: CommonServices,
+    private _commonService: CommonServices,
     private translate: TranslateService,
     private services: DatabaseService) {
 
@@ -40,12 +40,14 @@ export class ModuleComponent implements OnInit, AfterViewInit {
         this.module = this._activatedRoute.snapshot.paramMap.get('module');
         if (this.module) {
           this.screen = this._screen[this.module];
+          console.log('this.screen: ', this.screen);
         }
 
         this.submodule = this._activatedRoute.snapshot.queryParamMap.get('action');
 
         setTimeout(() => {
           this.uistate = `__${this.screen}`;
+          console.log('this.uistate: ', this.uistate);
           this.uisubstate = '';
         }, 500);
       }
@@ -71,7 +73,7 @@ export class ModuleComponent implements OnInit, AfterViewInit {
 
   async setupLanguage(existDatabaseStructure = false) {
     if (existDatabaseStructure) {
-      const setting = await this._commonServices.getCurrentSettings();
+      const setting = await this._commonService.getCurrentSettings();
       if (setting) {
         const languages = [];
         setting._languages.map((lan) => {
@@ -114,5 +116,9 @@ export class ModuleComponent implements OnInit, AfterViewInit {
     this.screenheight = window.innerHeight
       || document.documentElement.clientHeight
       || document.body.clientHeight;
+  }
+
+  showSQL() {
+      this._commonService.navigate('dbclient');
   }
 }

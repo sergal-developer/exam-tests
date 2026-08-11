@@ -3,14 +3,6 @@ import { Fullscreen } from '@boengli/capacitor-fullscreen';
 import { ScreenOrientation } from '@capacitor/screen-orientation';
 import { Platform } from '@ionic/angular';
 
-/*
- template : `<button class="log-button" (click)="showLogs()">logs</button>
-        <div class="log-component" [ngClass]="{'show': _showLogComponent}">
-          <log-component [show]="_showLogComponent"></log-component>
-        </div>
-  <router-outlet></router-outlet>`,
-*/
-
 @Component({
   selector : 'exam-app',
   template : `<router-outlet></router-outlet>`,

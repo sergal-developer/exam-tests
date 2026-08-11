@@ -94,6 +94,9 @@ export class QuizEditableComponent implements OnInit {
       // no se esta injectando datos y recupera el examen solicitado
       this.quiz = await this.getQuizData(this.quizId);
 
+      let data = this._commonService.prepareQueryAnswersOptions(this.quiz);
+      console.log('setupComponent: ', data);
+
       if (!this.quiz) {
         this._uiService.notification(this.translateLabels.service_fail_get, { type: 'error', closeTimer: 3000 });
         return;
@@ -311,6 +314,9 @@ export class QuizEditableComponent implements OnInit {
       // this.updateQuiz();
       this.currentAnswerIndex = this.currentAnswerIndex + 1;
       this.setCurrentAnswer();
+
+      let data = this._commonService.prepareQueryAnswersOptions(this.quiz);
+      console.log('data: ', data);
     }
   }
 
@@ -320,12 +326,18 @@ export class QuizEditableComponent implements OnInit {
 
       this.currentAnswerIndex = this.currentAnswerIndex - 1;
       this.setCurrentAnswer();
+      let data = this._commonService.prepareQueryAnswersOptions(this.quiz);
+      console.log('data: ', data);
     }
   }
 
   finishCreation() {
     this.updateQuiz(true);
     this.gotoDashboard();
+  }
+
+  saveQuiz() {
+    this.updateQuiz();
   }
 
   editDuration() {

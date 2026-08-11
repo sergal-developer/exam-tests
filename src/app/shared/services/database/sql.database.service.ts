@@ -2,25 +2,25 @@ import { Injectable } from "@angular/core";
 import { CapacitorSQLite, DBSQLiteValues, SQLiteConnection, SQLiteDBConnection } from '@capacitor-community/sqlite';
 import { Capacitor } from '@capacitor/core';
 import {
-    answer_attempt_table_script,
-    answer_option_table_script,
-    answer_table_script,
+    answer_attempt_querys,
+    answer_option_querys,
+    answer_querys,
     AnswerDTO,
     AnswerOptionDTO,
     AttemptAnswerDTO,
     AttemptDTO,
-    language_table_script,
+    language_querys,
     LanguageDTO,
-    log_table_script,
+    log_querys,
     LogDTO,
-    quiz_attempt_table_script,
-    quiz_table_script,
+    quiz_attempt_querys,
+    quiz_querys,
     QuizDTO,
-    settings_table_script,
+    settings_querys,
     SettingsDTO,
-    theme_table_script,
+    theme_querys,
     ThemeDTO,
-    user_table_script,
+    user_querys,
     UserDTO
 } from "../../data/entities/dtos";
 import { UiServices } from "../ui.services";
@@ -31,7 +31,6 @@ import { UiServices } from "../ui.services";
 export class DatabaseService {
 
     private dbName = 'sinexamSQL_temp';
-    private initialized = false;
     private isAndroid: boolean = false;
 
     private db: SQLiteDBConnection;
@@ -61,18 +60,6 @@ export class DatabaseService {
         } catch (err: any) {
             return Promise.reject(`initWebStore: ${err}`);
         }
-    }
-
-    private async _openDatabase(dbName: string, encrypted: boolean = false, mode: string = 'no-encryption', version: number = 1, readonly: boolean = false): Promise<any> {
-        const retCC = (await this.sqliteConnection.checkConnectionsConsistency()).result;
-        let isConn = (await this.sqliteConnection.isConnection(dbName, readonly)).result;
-        if (retCC && isConn) {
-            this.db = await this.sqliteConnection.retrieveConnection(dbName, readonly);
-        } else {
-            this.db = await this.sqliteConnection.createConnection(dbName, encrypted, mode, version, readonly);
-        }
-        await this.db.open();
-        return this.db;
     }
 
     private async _openDatabaseCreate(dbName: string, encrypted: boolean = false, mode: string = 'no-encryption', version: number = 1, readonly: boolean = false): Promise<any> {
@@ -178,17 +165,26 @@ export class DatabaseService {
      * @param parameters Valores que serán utilizados para reemplazar los placeholders.
      * @returns retorna un Arrglo de datos o un nulo si no hay valores
      */
-    async executeSelectSQL(statementSql: string, parameters: any[] = []): Promise<any> {
+    async executeInSQL(statementSql: string, parameters: any[] = [], log: Function = null): Promise<any> {
+        let _log = '';
         try {
             this.db = await this.initDataBase();
             const request = await this.db.query(statementSql, parameters);
             if (!this.isAndroid) {
                 await this.sqliteConnection.saveToStore(this.dbName);
             }
+
+            if (log) {
+                log(null);
+            }
             return request && request.values ? request.values : null;
         } catch (error) {
             console.info('ERROR:', error);
-            this._uiServices.notification('ERROR EXEC: ' + JSON.stringify(error))
+            this._uiServices.notification('ERROR EXEC: ' + error);
+
+            if (log) {
+                log(error);
+            }
             return null
         }
     }
@@ -207,16 +203,16 @@ export class DatabaseService {
             await this.executeSQL('PRAGMA foreign_keys = ON;');
 
             const tableScripts = [
-                log_table_script,
-                language_table_script,
-                user_table_script,
-                settings_table_script,
-                theme_table_script,
-                quiz_table_script,
-                answer_table_script,
-                answer_option_table_script,
-                quiz_attempt_table_script,
-                answer_attempt_table_script,
+                log_querys.createTable.query,
+                language_querys.createTable.query,
+                user_querys.createTable.query,
+                settings_querys.createTable.query,
+                theme_querys.createTable.query,
+                quiz_querys.createTable.query,
+                answer_querys.createTable.query,
+                answer_option_querys.createTable.query,
+                quiz_attempt_querys.createTable.query,
+                answer_attempt_querys.createTable.query,
             ];
 
             for (const script of tableScripts) {
@@ -235,22 +231,24 @@ export class DatabaseService {
 
     async getStructure() {
         const query = `SELECT * FROM sqlite_master WHERE type='table';`;
-        const data = await this.executeSelectSQL(query);
+        const data = await this.executeActionSQL(query);
         return data;
     }
 
     async deleteStructure() {
-         try {
+        try {
 
             const tableScripts = [
-                'DELETE FROM quiz_attempt_table;',
-                'DELETE FROM answer_attempt_table;',
-                'DELETE FROM answer_option_table;',
-                'DELETE FROM answer_table;',
-                'DELETE FROM quiz_table;',
-                'DELETE FROM theme_table;',
-                'DELETE FROM language_table;',
-                'DELETE FROM settings_table;',
+                answer_attempt_querys.deleteTable.query,
+                quiz_attempt_querys.deleteTable.query,
+                answer_option_querys.deleteTable.query,
+                answer_querys.deleteTable.query,
+                quiz_querys.deleteTable.query,
+                language_querys.deleteTable.query,
+                theme_querys.deleteTable.query,
+                settings_querys.deleteTable.query,
+                user_querys.deleteTable.query,
+                log_querys.deleteTable.query,
             ];
 
             for (const script of tableScripts) {
@@ -273,79 +271,55 @@ export class DatabaseService {
 
     //#region Logs (log_table)
     async getAllLogs(): Promise<LogDTO[]> {
-        const query = `SELECT * FROM log_table;`;
-        return await this.executeActionSQL(query);
+        return await this.executeActionSQL(log_querys.select.query);
     }
 
     async getLogById(id: number): Promise<LogDTO[]> {
-        const query = `SELECT * FROM log_table WHERE id = ?;`;
-        return await this.executeActionSQL(query, [id]);
+        return await this.executeActionSQL(log_querys.selectById.query, [id]);
     }
 
     async postLog(log: LogDTO): Promise<LogDTO> {
-        const query = `
-        INSERT INTO log_table (id, date, content, type) 
-        VALUES (?, ?, ?, ?) 
-        ON CONFLICT(id) DO UPDATE SET 
-            date = excluded.date, 
-            content = excluded.content, 
-            type = excluded.type
-        RETURNING *;`;
-        const response = await this.executeActionSQL(query, [log.id ?? null, log.date, log.content, log.type]);
+        const response = await this.executeActionSQL(log_querys.post.query, [log.id ?? null, log.date, log.content, log.type]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteLog(id: number): Promise<LogDTO[]> {
-        const query = `DELETE FROM log_table WHERE id = ?;`;
-        return await this.executeActionSQL(query, [id]);
+        return await this.executeActionSQL(log_querys.deleteById.query, [id]);
     }
     //#endregion
 
     //#region Languages (language_table)
     async getAllLanguages(): Promise<LanguageDTO[]> {
-        const query = `SELECT * FROM language_table;`;
-        return await this.executeActionSQL(query);
+        return await this.executeActionSQL(language_querys.select.query);
     }
 
     async getLanguageByValue(value: string): Promise<LanguageDTO> {
-        const query = `SELECT * FROM language_table WHERE value = ?;`;
-        const response = await this.executeActionSQL(query, [value]);
+        const response = await this.executeActionSQL(language_querys.selectById.query, [value]);
         return response && response.length ? response[0] : null;
     }
 
     async postLanguage(lang: LanguageDTO): Promise<LanguageDTO[]> {
-        const query = `
-        INSERT INTO language_table (value, name) 
-        VALUES (?, ?) 
-        ON CONFLICT(value) DO UPDATE SET name = excluded.name
-        RETURNING *;`;
-        const response = await this.executeActionSQL(query, [lang.value, lang.name]);
+        const response = await this.executeActionSQL(language_querys.post.query, [lang.value, lang.name]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteLanguage(value: string): Promise<LanguageDTO[]> {
-        const query = `DELETE FROM language_table WHERE value = ?;`;
-        return await this.executeActionSQL(query, [value]);
+        return await this.executeActionSQL(language_querys.deleteById.query, [value]);
     }
     //#endregion
 
     //#region Users (user_table)
     async getAllUsers(): Promise<UserDTO[]> {
-        const query = `SELECT * FROM user_table;`;
-        console.log('query: ', query);
-        return await this.executeActionSQL(query);
+        return await this.executeActionSQL(user_querys.select.query);
     }
 
     async getUserById(userId: number): Promise<UserDTO> {
-        const query = `SELECT * FROM user_table WHERE userId = ?;`;
-        const response = await this.executeActionSQL(query, [userId]);
+        const response = await this.executeActionSQL(user_querys.selectById.query, [userId]);
         return response && response.length ? response[0] : null;
     }
 
     async getCurrentUser(): Promise<UserDTO> {
-        const query = `SELECT * FROM user_table WHERE current = 1 LIMIT 1;`;
-        const response = await this.executeActionSQL(query);
-        console.log('response: ', response);
+        const response = await this.executeActionSQL(user_querys.selectByCurrent.query);
         return response && response.length ? response[0] : null;
     }
 
@@ -360,12 +334,6 @@ export class DatabaseService {
     }
 
     private async _postUser(user: UserDTO): Promise<UserDTO> {
-
-        const query = `
-        INSERT INTO user_table (uuid, userName, age, avatarUrl, avatarBody, current) 
-        VALUES (?, ?, ?, ?, ?, ?)
-        RETURNING *;`;
-
         const values = [
             user.uuid ?? null,
             user.userName,
@@ -375,24 +343,11 @@ export class DatabaseService {
             user.current ? 1 : 0                    // Booleano a Entero (1 o 0)
         ];
 
-        const response = await this.executeActionSQL(query, values);
+        const response = await this.executeActionSQL(user_querys.post.query, values);
         return response && response.length ? response[0] : null;
     }
 
     private async _putUser(user: UserDTO): Promise<UserDTO> {
-
-        const query = `
-        INSERT INTO user_table (userId, uuid, userName, age, avatarUrl, avatarBody, current) 
-        VALUES (?, ?, ?, ?, ?, ?, ?) 
-        ON CONFLICT(userId) DO UPDATE SET 
-            uuid = excluded.uuid,
-            userName = excluded.userName, 
-            age = excluded.age, 
-            avatarUrl = excluded.avatarUrl, 
-            avatarBody = excluded.avatarBody, 
-            current = excluded.current
-        RETURNING *;`;
-
         const values = [
             user.userId ?? null,
             user.uuid ?? null,
@@ -403,13 +358,12 @@ export class DatabaseService {
             user.current ? 1 : 0                    // Booleano a Entero (1 o 0)
         ];
 
-        const response = await this.executeActionSQL(query, values);
+        const response = await this.executeActionSQL(user_querys.put.query, values);
         return response && response.length ? response[0] : null;
     }
 
     async deleteUser(userId: number): Promise<UserDTO[]> {
-        const query = `DELETE FROM user_table WHERE userId = ${userId};`;
-        return await this.executeActionSQL(query);
+        return await this.executeActionSQL(user_querys.deleteById.query, [userId]);
     }
     //#endregion
 
@@ -432,150 +386,67 @@ export class DatabaseService {
     }
 
     async getAllSettings(): Promise<SettingsDTO[]> {
-        const query = `SELECT * FROM settings_table;`;
-        const response = await this.executeActionSQL(query);
+        const response = await this.executeActionSQL(settings_querys.select.query);
         return this.normalizeSettings(response);
     }
 
     async getSettingById(settingId: number): Promise<SettingsDTO> {
-        const query = `SELECT * FROM settings_table WHERE settingId = ${settingId};`;
-        let response = await this.executeActionSQL(query,);
+        let response = await this.executeActionSQL(settings_querys.selectById.query, [settingId]);
         response = this.normalizeSettings(response);
         return response && response.length ? response[0] : null;
     }
 
     async getSettingCompleteById(settingId: number): Promise<SettingsDTO> {
-        const query =
-            `SELECT 
-                q.settingId,
-                q.language,
-                q.permissions,
-                q.theme,
-                (
-                    SELECT json_group_array(
-                        json_object(
-                            'value', l.value,
-                            'name', l.name
-                        )
-                    ) FROM language_table l
-                ) as _languages,
-                (
-                    SELECT json_group_array(
-                        json_object(
-                            'id', t.id,
-                            'content', t.content
-                        )
-                    ) FROM theme_table t
-                ) as _themes
-            FROM settings_table q 
-            WHERE q.settingId = ${settingId};`;
-        let response = await this.executeActionSQL(query);
+        let response = await this.executeActionSQL(settings_querys.selectWithRelationsById.query, [settingId]);
         response = this.normalizeSettings(response);
         return response && response.length ? response[0] : null;
     }
 
     async postSetting(setting: SettingsDTO): Promise<SettingsDTO> {
         setting.permissions = this.objectToString(setting.permissions)
-        const query = `
-        INSERT INTO settings_table (settingId, language, permissions, theme) 
-        VALUES (?, ?, ?, ?) 
-        ON CONFLICT(settingId) DO UPDATE SET 
-            language = excluded.language, 
-            permissions = excluded.permissions, 
-            theme = excluded.theme
-        RETURNING *;`;
-        const response = await this.executeActionSQL(query, [setting.settingId ?? null, setting.language, setting.permissions, setting.theme]);
+        const response = await this.executeActionSQL(settings_querys.post.query, [setting.settingId ?? null, setting.language, setting.permissions, setting.theme]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteSetting(settingId: number): Promise<SettingsDTO[]> {
-        const query = `DELETE FROM settings_table WHERE settingId = ?;`;
-        return await this.executeActionSQL(query, [settingId]);
+        return await this.executeActionSQL(settings_querys.deleteById.query, [settingId]);
     }
     //#endregion
 
     //#region Themes (theme_table)
     async getAllThemes(): Promise<ThemeDTO[]> {
-        const query = `SELECT * FROM theme_table;`;
-        return await this.executeActionSQL(query);
+        return await this.executeActionSQL(theme_querys.select.query);
     }
 
     async getTheme(id: string): Promise<ThemeDTO> {
-        const query = `SELECT * FROM theme_table WHERE id = ?;`;
-        const response = await this.executeActionSQL(query, [id]);
+        const response = await this.executeActionSQL(theme_querys.selectById.query, [id]);
         return response && response.length ? response[0] : null;
     }
 
     async postTheme(theme: ThemeDTO): Promise<ThemeDTO> {
         theme.content = this.objectToString(theme.content);
-        const query = `
-        INSERT INTO theme_table (id, content) 
-        VALUES (?, ?) 
-        ON CONFLICT(id) DO UPDATE SET content = excluded.content
-        RETURNING *;`;
-        const response = await this.executeActionSQL(query, [theme.id, theme.content]);
+        const response = await this.executeActionSQL(theme_querys.post.query, [theme.id, theme.content]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteTheme(id: string): Promise<ThemeDTO[]> {
-        const query = `DELETE FROM theme_table WHERE id = ?;`;
-        return await this.executeActionSQL(query, [id]);
+        return await this.executeActionSQL(theme_querys.deleteById.query, [id]);
     }
     //#endregion
 
     //#region Quizzes (quiz_table)
     async getAllQuizzes(): Promise<QuizDTO[]> {
-        const query = `SELECT * FROM quiz_table;`;
-        return await this.executeActionSQL(query);
+        return await this.executeActionSQL(quiz_querys.select.query);
     }
 
     async getQuizById(quizId: number): Promise<QuizDTO> {
-        const query = `SELECT * FROM quiz_table WHERE quizId = ?;`;
-        const response = await this.executeActionSQL(query, [quizId]);
+        const response = await this.executeActionSQL(quiz_querys.selectById.query, [quizId]);
         return response && response.length ? response[0] : null;
     }
 
     async getQuizCompleteById(quizId: number): Promise<QuizDTO> {
-        const query = `
-        SELECT 
-            q.quizId,
-            q.uuid,
-            q.title,
-            q.time,
-            q.creationDate,
-            q.updatedDate,
-            q.startDate,
-            (
-                SELECT json_group_array(
-                    json_object(
-                        'answerId', a.answerId,
-                        'quizId', a.quizId,
-                        'title', a.title,
-                        'updatedDate', a.updatedDate,
-                        '_options', (
-                            SELECT json_group_array(
-                                json_object(
-                                    'optionId', o.optionId,
-                                    'answerId', o.answerId,
-                                    'content', o.content,
-                                    'optionIndex', o.optionIndex,
-                                    'updatedDate', o.updatedDate,
-                                    'isCorrect', o.isCorrect
-                                )
-                            )
-                            FROM answer_option_table o
-                            WHERE o.answerId = a.answerId
-                        )
-                    )
-                )qq
-                FROM answer_table a
-                WHERE a.quizId = q.quizId
-            ) as answers
-        FROM quiz_table q
-        WHERE q.quizId = ?;`;
-
         try {
-            const result = await this.executeActionSQL(query, [quizId]);
+            const result = await this.executeActionSQL(quiz_querys.selectWithRelations.query, [quizId]);
 
             if (result && result.length > 0) {
                 const quiz = result[0];
@@ -604,47 +475,27 @@ export class DatabaseService {
     }
 
     private async _postQuiz(quiz: QuizDTO): Promise<QuizDTO> {
-        const query = `
-        INSERT INTO quiz_table (uuid, title, time, creationDate, updatedDate, startDate) 
-        VALUES (?, ?, ?, ?, ?, ?)
-        RETURNING *;`;
-        const response = await this.executeActionSQL(query, [quiz.uuid, quiz.title, quiz.time, quiz.creationDate, quiz.updatedDate, quiz.startDate]);
+        const response = await this.executeActionSQL(quiz_querys.post.query, [quiz.uuid, quiz.title, quiz.time, quiz.creationDate, quiz.updatedDate, quiz.startDate]);
         return response && response.length ? response[0] : null;
     }
 
     private async _putQuiz(quiz: QuizDTO): Promise<QuizDTO> {
-        const query = `
-        INSERT INTO quiz_table (quizId, uuid, title, time, creationDate, updatedDate, startDate) 
-        VALUES (?, ?, ?, ?, ?, ?, ?) 
-        ON CONFLICT(quizId) DO UPDATE SET 
-            uuid = excluded.uuid,
-            title = excluded.title, 
-            time = excluded.time, 
-            creationDate = excluded.creationDate, 
-            updatedDate = excluded.updatedDate, 
-            startDate = excluded.startDate
-        RETURNING *;`;
-        const response = await this.executeActionSQL(query, [quiz.quizId ?? null, quiz.uuid, quiz.title, quiz.time, quiz.creationDate, quiz.updatedDate, quiz.startDate]);
+        const response = await this.executeActionSQL(quiz_querys.put.query, [quiz.quizId ?? null, quiz.uuid, quiz.title, quiz.time, quiz.creationDate, quiz.updatedDate, quiz.startDate]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteQuiz(quizId: number): Promise<QuizDTO[]> {
-        // Nota: Debido a ON DELETE CASCADE en tu SQL, esto también borrará automáticamente
-        // las preguntas (answers) y opciones vinculadas a este examen.
-        const query = `DELETE FROM quiz_table WHERE quizId = ?;`;
-        return await this.executeActionSQL(query, [quizId]);
+        return await this.executeActionSQL(quiz_querys.deleteById.query, [quizId]);
     }
     //#endregion
 
     //#region Answers (answer_table)
     async getAllAnswers(): Promise<AnswerDTO[]> {
-        const query = `SELECT * FROM answer_table;`;
-        return await this.executeActionSQL(query);
+        return await this.executeActionSQL(answer_querys.select.query);
     }
 
     async getAnswersByQuiz(quizId: number): Promise<AnswerDTO> {
-        const query = `SELECT * FROM answer_table WHERE quizId = ?;`;
-        const response = await this.executeActionSQL(query, [quizId]);
+        const response = await this.executeActionSQL(answer_querys.selectById.query, [quizId]);
         return response && response.length ? response[0] : null;
     }
 
@@ -659,37 +510,24 @@ export class DatabaseService {
     }
 
     private async _postAnswer(answer: AnswerDTO): Promise<AnswerDTO> {
-        const query = `
-        INSERT INTO answer_table (quizId, title, updatedDate) 
-        VALUES (?, ?, ?)
-        RETURNING *;`;
-        const response = await this.executeActionSQL(query, [answer.quizId, answer.title, answer.updatedDate]);
+        const response = await this.executeActionSQL(answer_querys.post.query, [answer.quizId, answer.title, answer.updatedDate]);
         return response && response.length ? response[0] : null;
     }
 
     private async _putAnswer(answer: AnswerDTO): Promise<AnswerDTO> {
-        const query = `
-        INSERT INTO answer_table (answerId, quizId, title, updatedDate) 
-        VALUES (?, ?, ?, ?) 
-        ON CONFLICT(answerId) DO UPDATE SET 
-            quizId = excluded.quizId, 
-            title = excluded.title, 
-            updatedDate = excluded.updatedDate
-        RETURNING *;`;
-        const response = await this.executeActionSQL(query, [answer.answerId ?? null, answer.quizId, answer.title, answer.updatedDate]);
+        const response = await this.executeActionSQL(answer_querys.put.query, [answer.answerId ?? null, answer.quizId, answer.title, answer.updatedDate]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteAnswer(answerId: number): Promise<AnswerDTO[]> {
-        const query = `DELETE FROM answer_table WHERE answerId = ?;`;
-        return await this.executeActionSQL(query, [answerId]);
+        const query = ``;
+        return await this.executeActionSQL(answer_querys.deleteById.query, [answerId]);
     }
     //#endregion
 
     //#region Answer Options (answer_option_table)
     async getOptionsByAnswer(answerId: number): Promise<AnswerOptionDTO[]> {
-        const query = `SELECT * FROM answer_option_table WHERE answerId = ? ORDER BY optionIndex ASC;`;
-        return await this.executeActionSQL(query, [answerId]);
+        return await this.executeActionSQL(answer_option_querys.selectByAnswer.query, [answerId]);
     }
 
     async saveAnswerOption(option: AnswerOptionDTO): Promise<AnswerOptionDTO> {
@@ -704,45 +542,33 @@ export class DatabaseService {
 
     private async _postAnswerOption(option: AnswerOptionDTO): Promise<AnswerOptionDTO> {
         const correctVal = option.isCorrect ? 1 : 0;
-        const query = `
-        INSERT INTO answer_option_table (answerId, content, optionIndex, updatedDate, isCorrect) 
-        VALUES (?, ?, ?, ?, ?)
-        RETURNING *;`;
-        const response = await this.executeActionSQL(query, [option.answerId, option.content, option.optionIndex, option.updatedDate, correctVal]);
+        const response = await this.executeActionSQL(answer_option_querys.post.query, [option.answerId, option.content, option.optionIndex, option.updatedDate, correctVal]);
         return response && response.length ? response[0] : null;
     }
 
     private async _putAnswerOption(option: AnswerOptionDTO): Promise<AnswerOptionDTO> {
         const correctVal = option.isCorrect ? 1 : 0;
-        const query = `
-        INSERT INTO answer_option_table (optionId, answerId, content, optionIndex, updatedDate, isCorrect) 
-        VALUES (?, ?, ?, ?, ?, ?) 
-        ON CONFLICT(optionId) DO UPDATE SET 
-            answerId = excluded.answerId, 
-            content = excluded.content, 
-            optionIndex = excluded.optionIndex, 
-            updatedDate = excluded.updatedDate, 
-            isCorrect = excluded.isCorrect
-        RETURNING *;`;
-        const response = await this.executeActionSQL(query, [option.optionId ?? null, option.answerId, option.content, option.optionIndex, option.updatedDate, correctVal]);
+        const response = await this.executeActionSQL(answer_option_querys.put.query, [option.optionId ?? null, option.answerId, option.content, option.optionIndex, option.updatedDate, correctVal]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteAnswerOption(optionId: number): Promise<AnswerOptionDTO[]> {
-        const query = `DELETE FROM answer_option_table WHERE optionId = ?;`;
-        return await this.executeActionSQL(query, [optionId]);
+        return await this.executeActionSQL(answer_option_querys.deleteById.query, [optionId]);
     }
     //#endregion
 
     //#region Quiz Attempts (quiz_attempt_table)
     async getAttemptsByUser(userId: number): Promise<AttemptDTO[]> {
-        const query = `SELECT * FROM quiz_attempt_table WHERE userId = ?;`;
-        return await this.executeActionSQL(query, [userId]);
+        return await this.executeActionSQL(quiz_attempt_querys.selectByUser.query, [userId]);
     }
 
     async getAttemptById(attemptId: number): Promise<AttemptDTO> {
-        const query = `SELECT * FROM quiz_attempt_table WHERE attemptId = ?;`;
-        const response = await this.executeActionSQL(query, [attemptId]);
+        const response = await this.executeActionSQL(quiz_attempt_querys.selectById.query, [attemptId]);
+        return response && response.length ? response[0] : null;
+    }
+
+    async getAttemptWithChildsById(attemptId: number): Promise<AttemptDTO> {
+        const response = await this.executeActionSQL(quiz_attempt_querys.selectWithRelationsById.query, [attemptId]);
         return response && response.length ? response[0] : null;
     }
 
@@ -757,41 +583,23 @@ export class DatabaseService {
     }
 
     private async _postQuizAttempt(attempt: AttemptDTO): Promise<AttemptDTO> {
-        const query = `
-        INSERT INTO quiz_attempt_table (quizId, userId, title, creationDate, updatedDate, score, state) 
-        VALUES (?, ?, ?, ?, ?, ?)
-        RETURNING *;`;
-        const response = await this.executeActionSQL(query, [attempt.quizId, attempt.userId, attempt.creationDate, attempt.updatedDate, attempt.score]);
+        const response = await this.executeActionSQL(quiz_attempt_querys.post.query, [attempt.quizId, attempt.userId, attempt.title, attempt.creationDate, attempt.updatedDate, attempt.score, attempt.state]);
         return response && response.length ? response[0] : null;
     }
 
     private async _putQuizAttempt(attempt: AttemptDTO): Promise<AttemptDTO> {
-        const query = `
-        INSERT INTO quiz_attempt_table (attemptId, quizId, userId, title, creationDate, updatedDate, score, state) 
-        VALUES (?, ?, ?, ?, ?, ?, ?) 
-        ON CONFLICT(attemptId) DO UPDATE SET 
-            quizId = excluded.quizId, 
-            userId = excluded.userId,
-            title = excluded.title,
-            creationDate = excluded.creationDate, 
-            updatedDate = excluded.updatedDate, 
-            score = excluded.score,
-            state = excluded.state
-        RETURNING *;`;
-        const response = await this.executeActionSQL(query, [attempt.attemptId ?? null, attempt.quizId, attempt.userId, attempt.creationDate, attempt.updatedDate, attempt.score]);
+        const response = await this.executeActionSQL(quiz_attempt_querys.put.query, [attempt.attemptId ?? null, attempt.quizId, attempt.userId, attempt.title, attempt.creationDate, attempt.updatedDate, attempt.score, attempt.state]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteQuizAttempt(attemptId: number): Promise<AttemptDTO[]> {
-        const query = `DELETE FROM quiz_attempt_table WHERE attemptId = ?;`;
-        return await this.executeActionSQL(query, [attemptId]);
+        return await this.executeActionSQL(quiz_attempt_querys.deleteById.query, [attemptId]);
     }
     //#endregion
 
     //#region Answer Attempts (answer_attempt_table)
     async getAnswerAttemptsByAttempt(attemptId: number): Promise<AttemptAnswerDTO[]> {
-        const query = `SELECT * FROM answer_attempt_table WHERE attemptId = ?;`;
-        return await this.executeActionSQL(query, [attemptId]);
+        return await this.executeActionSQL(answer_attempt_querys.selectByAttemptId.query, [attemptId]);
     }
 
     async saveAnswerAttempt(ansAttempt: AttemptAnswerDTO): Promise<AttemptAnswerDTO> {
@@ -806,27 +614,18 @@ export class DatabaseService {
 
     private async _postAnswerAttempt(ansAttempt: AttemptAnswerDTO): Promise<AttemptAnswerDTO> {
         const correctVal = ansAttempt.isCorrect ? 1 : 0;
-        const query = `
-        INSERT INTO answer_attempt_table (attemptId, answerId, selectedOptionId, isCorrect) 
-        VALUES (?, ?, ?, ?)
-        RETURNING *;`;
-        const response = await this.executeActionSQL(query, [ansAttempt.attemptId, ansAttempt.answerId, ansAttempt.selectedOptionId, correctVal]);
+        const response = await this.executeActionSQL(answer_attempt_querys.post.query, [ansAttempt.attemptId, ansAttempt.answerId, ansAttempt.selectedOptionId, correctVal]);
         return response && response.length ? response[0] : null;
     }
 
     private async _putAnswerAttempt(ansAttempt: AttemptAnswerDTO): Promise<AttemptAnswerDTO> {
         const correctVal = ansAttempt.isCorrect ? 1 : 0;
-        const query = `
-        INSERT INTO answer_attempt_table (answerAttemptId, attemptId, answerId, selectedOptionId, isCorrect) 
-        VALUES (?, ?, ?, ?, ?) 
-        ON CONFLICT(answerAttemptId) DO UPDATE SET 
-            attemptId = excluded.attemptId, 
-            answerId = excluded.answerId, 
-            selectedOptionId = excluded.selectedOptionId, 
-            isCorrect = excluded.isCorrect
-        RETURNING *;`;
-        const response = await this.executeActionSQL(query, [ansAttempt.answerAttemptId ?? null, ansAttempt.attemptId, ansAttempt.answerId, ansAttempt.selectedOptionId, correctVal]);
+        const response = await this.executeActionSQL(answer_attempt_querys.put.query, [ansAttempt.answerAttemptId ?? null, ansAttempt.attemptId, ansAttempt.answerId, ansAttempt.selectedOptionId, correctVal]);
         return response && response.length ? response[0] : null;
+    }
+
+    async deleteAnswerAttemptById(attemptId: number): Promise<AttemptDTO[]> {
+        return await this.executeActionSQL(answer_attempt_querys.deleteById.query, [attemptId]);
     }
     //#endregion
 

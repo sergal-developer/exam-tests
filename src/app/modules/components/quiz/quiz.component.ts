@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation, } from '@angular/core';
-import { AnswerDTO, AnswerOptionDTO, AttemptDTO } from 'src/app/shared/data/entities/dtos';
+import { AnswerDTO, AnswerOptionDTO, AttemptDTO, QuizDTO } from 'src/app/shared/data/entities/dtos';
 import { AttemptState, GradeState } from 'src/app/shared/data/enumerables/enumerables';
 import { CommonServices } from 'src/app/shared/services/common.services';
 import { UiServices } from 'src/app/shared/services/ui.services';
@@ -10,7 +10,7 @@ import { UiServices } from 'src/app/shared/services/ui.services';
   encapsulation: ViewEncapsulation.None,
 })
 export class QuizComponent implements OnInit {
-  @Input() id: string = null;
+  @Input() id: number = null;
   @Input() review: boolean = false;
   @Output() onChange = new EventEmitter();
 
@@ -32,7 +32,7 @@ export class QuizComponent implements OnInit {
   timerEnd = null;
   zoomlevel = '100%';
   zoomlevelLabel = '1.1x';
-  settings = null;
+  settings = null
   //#endregion INTERNAL
 
   constructor(private _commonService: CommonServices,
@@ -55,7 +55,13 @@ export class QuizComponent implements OnInit {
   //#region DATA
   async getData() {
     if (this.id) {
-      // this.attempt = await this.getAttemptData(this.id);
+      this.id = JSON.parse(JSON.stringify(this.id));
+      const quiz = await this.getAttemptData(this.id);
+
+      // this.attempt = { ...quiz };
+
+
+      console.log('this.attempt: ', this.attempt);
 
       // if (this.attempt.state == 'completed') {
       //   this.attempt._score = this.attempt.score.toFixed(2);
@@ -81,6 +87,10 @@ export class QuizComponent implements OnInit {
   }
 
   async setupComponent() {
+    if(!this.attempt) {
+      return;
+    }
+    
     this.readonly = this.attempt.state == AttemptState.completed;
     this.currentAnswerIndex = 0;
     // this.currentAnswer = this.attempt.questions[this.currentAnswerIndex];
@@ -94,14 +104,17 @@ export class QuizComponent implements OnInit {
     // this.setCurrentAnswer();
   }
 
-  async getAttemptData(id: string) {
-    // const data = await this._commonService.searchAttempt(id, 'attemptId');
-    const data = [];
-    if (!data) {
+  async getAttemptData(id: number): Promise<QuizDTO> {
+    let attempt: AttemptDTO = await this._commonService.getAttemptById(id);
+    const quiz: QuizDTO = await this._commonService.getQuizCompleteById(attempt.quizId);
+    attempt.answers
+    console.log('data: ', quiz);
+    // const data = [];
+    if (!quiz) {
       this._uiService.notification('La información no pudo recuperarse correctamente');
       return null;
     }
-    return data;
+    return quiz;
   }
 
   async updateResults(isFinish = false) {

@@ -1,5 +1,5 @@
-import { Component, EventEmitter, forwardRef, Input, OnInit, Output, Self, ViewEncapsulation } from '@angular/core';
-import { AbstractControl, ControlValueAccessor, FormControl, FormControlName, NG_VALUE_ACCESSOR, NgControl } from '@angular/forms';
+import { Component, EventEmitter, Input, OnInit, Output, Self, ViewEncapsulation } from '@angular/core';
+import { ControlValueAccessor, NgControl } from '@angular/forms';
 
 @Component({
     selector: 'mat-input',

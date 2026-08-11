@@ -1,3 +1,4 @@
+<button class="log-button" (click)="showSQL()">data</button>
 <div class="wrapper {{ uistate }} {{ uisubstate }}">
     <div class="screen-collection {{ '__' + screen }}">
 
@@ -27,6 +28,11 @@
 
         <div class="screen" [ngClass]="{'open': screen === _screen.attemptreview }">
             <quiz [id]="submodule" [review]="true" class="_screen screen_quiz" *ngIf="screen === _screen.attemptreview" (onChange)="onChangeUI($event)"></quiz>
+        </div>
+
+        <div class="screen" [ngClass]="{'open': screen === _screen.dbclient }">
+            <div>{{ screen }}</div>
+            <dbclient class="_screen screen_quiz" *ngIf="screen === _screen.dbclient"></dbclient>
         </div>
 
     </div>

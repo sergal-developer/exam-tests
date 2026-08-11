@@ -1,8 +1,3 @@
-export const theme_table_script =
-  `CREATE TABLE IF NOT EXISTS [theme_table] (
-  [id] TEXT PRIMARY KEY,
-  [content] TEXT NOT NULL
-);`;
 
 export interface ThemeDTO {
   id: string;
@@ -83,4 +78,42 @@ export interface ThemePropertiesDTO {
   stadisticBackground?: String;
 
   zoomLevel?: String;
+}
+
+export const theme_querys = {
+  createTable: {
+    query:
+      `CREATE TABLE IF NOT EXISTS [theme_table] (
+      [id] TEXT PRIMARY KEY,
+      [content] TEXT NOT NULL
+    );`
+  },
+
+  deleteTable: {
+    query:
+      `DELETE FROM user_table`
+  },
+
+  select: {
+    query:
+      `SELECT * FROM theme_table;`
+  },
+
+  selectById: {
+    query:
+      `SELECT * FROM theme_table WHERE id = ?;`
+  },
+
+  post: {
+    query:
+      `INSERT INTO theme_table (id, content) 
+        VALUES (?, ?) 
+        ON CONFLICT(id) DO UPDATE SET content = excluded.content
+        RETURNING *;`
+  },
+
+  deleteById: {
+    query:
+      `DELETE FROM theme_table WHERE id = ?;`
+  }
 }

@@ -17,6 +17,7 @@ import { SettingsComponent } from './components/settings/settings.component';
 import { SplashComponent } from './components/splash/splash.component';
 import { ModuleComponent } from './modules.component';
 import { LogComponent } from '../shared/components/log/log.component';
+import { DbClientComponent } from './components/dbclient/dbclient.component';
 
 @NgModule({
   imports: [
@@ -43,6 +44,7 @@ import { LogComponent } from '../shared/components/log/log.component';
     SettingsComponent,
     SplashComponent,
     LogComponent,
+    DbClientComponent,
   ],
   exports: [
     ModuleComponent,
@@ -54,6 +56,7 @@ import { LogComponent } from '../shared/components/log/log.component';
     SettingsComponent,
     SplashComponent,
     LogComponent,
+    DbClientComponent,
   ],
   providers: [EventBusService, CommonServices, UiServices],
 })

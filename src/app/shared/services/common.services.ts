@@ -501,6 +501,10 @@ export class CommonServices {
   async deleteQuizAttempt(attemptId: number): Promise<AttemptDTO[]> {
     return await this._services.deleteQuizAttempt(attemptId);
   }
+
+   async getAttemptWithChildsById(attemptId: number): Promise<AttemptDTO> {
+    return await this._services.getAttemptWithChildsById(attemptId);
+  }
   //#endregion QUIZ_ATTEMPS
 
   //#region AWNSWERS_ATTEMPTS
