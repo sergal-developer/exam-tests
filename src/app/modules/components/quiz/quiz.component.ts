@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation, } from '@angular/core';
-import { AnswerDTO, AnswerOptionDTO, AttemptDTO, QuizDTO } from 'src/app/shared/data/entities/dtos';
+import { AnswerDTO, AnswerOptionDTO, AttemptAnswerDTO, AttemptDTO, QuizDTO } from 'src/app/shared/data/entities/dtos';
 import { AttemptState, GradeState } from 'src/app/shared/data/enumerables/enumerables';
 import { CommonServices } from 'src/app/shared/services/common.services';
 import { UiServices } from 'src/app/shared/services/ui.services';
@@ -104,17 +104,39 @@ export class QuizComponent implements OnInit {
     // this.setCurrentAnswer();
   }
 
-  async getAttemptData(id: number): Promise<QuizDTO> {
-    let attempt: AttemptDTO = await this._commonService.getAttemptById(id);
-    const quiz: QuizDTO = await this._commonService.getQuizCompleteById(attempt.quizId);
-    attempt.answers
-    console.log('data: ', quiz);
+  async getAttemptData(id: number): Promise<AttemptDTO> {
+    let attempt: AttemptDTO = await this._commonService.getAttemptWithChildsById(id);
+    console.log('getAttemptData: ', attempt);
+    
+    debugger;
+    if(attempt && !attempt.answers?.length) {
+      attempt.answers = [];
+      const quizAnswers: QuizDTO = await this._commonService.getQuizCompleteById(attempt.quizId);
+      quizAnswers.answers.map((answer) => {
+        // creacion de AttemptAnswerDTO
+        const _answerAttempt: AttemptAnswerDTO = {
+          answerAttemptId: null,
+          attemptId: attempt.attemptId,
+          selectedOptionId: null,
+          isCorrect: false,
+          answerId: answer.answerId,
+          optionsLinked: JSON.stringify(answer._options),
+          ...answer
+        };
+        console.log('_answerAttempt: ', _answerAttempt);
+        attempt.answers.push(_answerAttempt);
+      });
+
+      attempt.answersLinked = JSON.stringify(attempt.answers);
+    }
+    
+    console.log('data: ', attempt);
     // const data = [];
-    if (!quiz) {
+    if (!attempt) {
       this._uiService.notification('La información no pudo recuperarse correctamente');
       return null;
     }
-    return quiz;
+    return attempt;
   }
 
   async updateResults(isFinish = false) {

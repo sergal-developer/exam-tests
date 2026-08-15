@@ -34,13 +34,21 @@ export const log_querys = {
 
   post: {
     query:
+      `INSERT INTO log_table (date, content, type) 
+        VALUES (?, ?, ?)
+        RETURNING *;`
+  },
+
+  put: {
+    query:
       `INSERT INTO log_table (id, date, content, type) 
         VALUES (?, ?, ?, ?) 
         ON CONFLICT(id) DO UPDATE SET 
             date = excluded.date, 
             content = excluded.content, 
             type = excluded.type
-        RETURNING *;`},
+        RETURNING *;`
+    },
 
   deleteById: {
     query:

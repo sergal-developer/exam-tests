@@ -31,7 +31,8 @@
     "noUnusedParameters": false,
     "paths": {
       "crypto": ["node_modules/crypto-browserify"]
-    }
+    },
+    "allowSyntheticDefaultImports": true,
   },
   "noImplicitReturns": true,
   "noImplicitAny": false,

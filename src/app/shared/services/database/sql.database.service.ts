@@ -215,6 +215,9 @@ export class DatabaseService {
                 answer_attempt_querys.createTable.query,
             ];
 
+            
+            console.log('tableScripts: ', tableScripts.join('\n'));
+
             for (const script of tableScripts) {
                 const result = await this.executeSQL(script);
                 if (result === null) {
@@ -562,14 +565,41 @@ export class DatabaseService {
         return await this.executeActionSQL(quiz_attempt_querys.selectByUser.query, [userId]);
     }
 
-    async getAttemptById(attemptId: number): Promise<AttemptDTO> {
-        const response = await this.executeActionSQL(quiz_attempt_querys.selectById.query, [attemptId]);
+    async getAttemptById(quizId: number): Promise<AttemptDTO> {
+        const response = await this.executeActionSQL(quiz_attempt_querys.selectById.query, [quizId]);
         return response && response.length ? response[0] : null;
+    }
+
+    async getAttemptByQuizId(quizId: number): Promise<Array<AttemptDTO>> {
+        const response = await this.executeActionSQL(quiz_attempt_querys.selectByQuizId.query, [quizId]);
+        return response && response.length ? response : [];
     }
 
     async getAttemptWithChildsById(attemptId: number): Promise<AttemptDTO> {
         const response = await this.executeActionSQL(quiz_attempt_querys.selectWithRelationsById.query, [attemptId]);
-        return response && response.length ? response[0] : null;
+
+        if (response && response.length > 0) {
+            const data = response[0];
+            // Como SQLite devuelve los grupos JSON como cadenas de texto, 
+            // los parseamos para que vuelvan a ser arrays/objetos de JavaScript nativos.
+            if (typeof data.answers === 'string') {
+                data.answers = JSON.parse(data.answers);
+
+                if (data.answers && data.answers.length) {
+                    data.answers.map(ans => {
+                        if (typeof data.optionsLinked === 'string') {
+                            data.optionsLinked = JSON.parse(data.optionsLinked);
+                        }
+                    });
+                }
+            }
+
+            if (typeof data.answersLinked === 'string') {
+                data.answersLinked = JSON.parse(data.answersLinked);
+            }
+            return data;
+        }
+        return null;
     }
 
     async saveQuizAttempt(attempt: AttemptDTO): Promise<AttemptDTO> {
@@ -583,12 +613,12 @@ export class DatabaseService {
     }
 
     private async _postQuizAttempt(attempt: AttemptDTO): Promise<AttemptDTO> {
-        const response = await this.executeActionSQL(quiz_attempt_querys.post.query, [attempt.quizId, attempt.userId, attempt.title, attempt.creationDate, attempt.updatedDate, attempt.score, attempt.state]);
+        const response = await this.executeActionSQL(quiz_attempt_querys.post.query, [attempt.quizId, attempt.userId, attempt.title, attempt.updatedDate, attempt.startDate, attempt.score, attempt.state, attempt.time, attempt.answersLinked]);
         return response && response.length ? response[0] : null;
     }
 
     private async _putQuizAttempt(attempt: AttemptDTO): Promise<AttemptDTO> {
-        const response = await this.executeActionSQL(quiz_attempt_querys.put.query, [attempt.attemptId ?? null, attempt.quizId, attempt.userId, attempt.title, attempt.creationDate, attempt.updatedDate, attempt.score, attempt.state]);
+        const response = await this.executeActionSQL(quiz_attempt_querys.put.query, [attempt.attemptId ?? null, attempt.quizId, attempt.userId, attempt.title, attempt.updatedDate, attempt.startDate, attempt.score, attempt.state, attempt.time, attempt.answersLinked]);
         return response && response.length ? response[0] : null;
     }
 
@@ -614,13 +644,13 @@ export class DatabaseService {
 
     private async _postAnswerAttempt(ansAttempt: AttemptAnswerDTO): Promise<AttemptAnswerDTO> {
         const correctVal = ansAttempt.isCorrect ? 1 : 0;
-        const response = await this.executeActionSQL(answer_attempt_querys.post.query, [ansAttempt.attemptId, ansAttempt.answerId, ansAttempt.selectedOptionId, correctVal]);
+        const response = await this.executeActionSQL(answer_attempt_querys.post.query, [ansAttempt.attemptId, ansAttempt.answerId, ansAttempt.selectedOptionId, correctVal, ansAttempt.optionsLinked]);
         return response && response.length ? response[0] : null;
     }
 
     private async _putAnswerAttempt(ansAttempt: AttemptAnswerDTO): Promise<AttemptAnswerDTO> {
         const correctVal = ansAttempt.isCorrect ? 1 : 0;
-        const response = await this.executeActionSQL(answer_attempt_querys.put.query, [ansAttempt.answerAttemptId ?? null, ansAttempt.attemptId, ansAttempt.answerId, ansAttempt.selectedOptionId, correctVal]);
+        const response = await this.executeActionSQL(answer_attempt_querys.put.query, [ansAttempt.answerAttemptId ?? null, ansAttempt.attemptId, ansAttempt.answerId, ansAttempt.selectedOptionId, correctVal, ansAttempt.optionsLinked]);
         return response && response.length ? response[0] : null;
     }
 

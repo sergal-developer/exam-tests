@@ -5,8 +5,8 @@ export interface QuizDTO {
   uuid?: string;
   title: string;
   time: number;
-  creationDate: number;
-  updatedDate: number;
+  creationDate?: number;
+  updatedDate?: number;
   startDate?: number;
 
   // GENERATED
@@ -53,28 +53,33 @@ export interface AnswerOptionDTO {
 
 export interface AttemptDTO extends QuizDTO {
   attemptId: number;
-  quizId: number;
+  // quizId: number; the filed exist in QuizDTO
   userId: number;
+  title: string;
+  updatedDate: number;
+  startDate?: number;
   score: number;
   state: AttemptState;
+  time: number;
+  answersLinked: string;
 
   // GENERATED
-  answers?: AnswerDTO[];
+  answers?: AttemptAnswerDTO[];
   timeEnlapsed?: number;
   correctAnswers?: number;
   validTotalAnswers?: number;
   grade?: GradeState;
-
-  _creationDate?: string;
   _updatedDate?: string;
+  _startDate?: string;
 }
 
-export interface AttemptAnswerDTO {
-  answerAttemptId: number;
+export interface AttemptAnswerDTO extends AnswerDTO {
+  answerAttemptId?: number;
   attemptId: number;
-  answerId: number;
+  //answerId: number; this field exist in AnswerDTO
   selectedOptionId?: number;
   isCorrect: boolean;
+  optionsLinked: string;
 }
 
 export enum AttemptState {
@@ -101,14 +106,14 @@ export const quiz_querys = {
       [title] TEXT,
       [time] INTEGER,
       [creationDate] INTEGER,
-      [updatedDate] INTEGER,
+      [updatedDate] INTEGE,
       [startDate] INTEGER
     );`
   },
 
   deleteTable: {
     query:
-      `DELETE FROM quiz_table;`
+      `DROP TABLE IF EXISTS quiz_table;`
   },
 
   select: {
@@ -201,7 +206,7 @@ export const answer_querys = {
   },
   deleteTable: {
     query:
-      `DELETE FROM user_table;`
+      `DROP TABLE IF EXISTS answer_table;`
   },
 
   select: {
@@ -254,7 +259,7 @@ export const answer_option_querys = {
   },
   deleteTable: {
     query:
-      `DELETE FROM user_table;`
+      `DROP TABLE IF EXISTS answer_option_querys;`
   },
 
   selectByAnswer: {
@@ -292,26 +297,33 @@ export const quiz_attempt_querys = {
   createTable: {
     query:
       `CREATE TABLE IF NOT EXISTS [quiz_attempt_table] (
-      [attemptId] INTEGER PRIMARY KEY,
+      [attemptId] INTEGER PRIMARY KEY AUTOINCREMENT,
       [quizId] INTEGER,
       [userId] INTEGER,
       [title] TEXT,
-      [creationDate] INTEGER,
       [updatedDate] INTEGER,
+      [startDate] INTEGER,
       [score] REAL,
       [state] TEXT,
+      [time] INTEGER,
+      [answersLinked] TEXT,
       FOREIGN KEY ([quizId]) REFERENCES [quiz_table] ([quizId]) ON DELETE CASCADE
     );`
   },
 
   deleteTable: {
     query:
-      `DELETE FROM user_table;`
+      `DROP TABLE IF EXISTS quiz_attempt_table;`
   },
 
   selectByUser: {
     query:
       `SELECT * FROM quiz_attempt_table WHERE userId = ?;`
+  },
+
+  selectByQuizId: {
+    query:
+      `SELECT * FROM quiz_attempt_table WHERE quizId = ?;`
   },
 
   selectById: {
@@ -326,10 +338,12 @@ export const quiz_attempt_querys = {
             q.quizId,
             q.userId,
             q.title,
-            q.creationDate,
             q.updatedDate,
+            q.startDate,
             q.score,
             q.state,
+            q.time,
+            q.answersLinked,
             (
                 SELECT json_group_array(
                     json_object(
@@ -337,7 +351,8 @@ export const quiz_attempt_querys = {
                         'attemptId', a.attemptId,
                         'answerId', a.answerId,
                         'selectedOptionId', a.selectedOptionId,
-                        'isCorrect', a.isCorrect
+                        'isCorrect', a.isCorrect,
+                        'optionsLinked', a.optionsLinked
                     )
                 )
                 FROM answer_attempt_table a
@@ -349,23 +364,26 @@ export const quiz_attempt_querys = {
 
   post: {
     query:
-      `INSERT INTO quiz_attempt_table (quizId, userId, title, creationDate, updatedDate, score, state) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `INSERT INTO quiz_attempt_table (quizId, userId, title, updatedDate, startDate, score, state, time, answersLinked) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) 
         RETURNING *;`
   },
 
   put: {
     query:
-      `INSERT INTO quiz_attempt_table (attemptId, quizId, userId, title, creationDate, updatedDate, score, state) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?) 
+      `INSERT INTO quiz_attempt_table (attemptId, quizId, userId, title, updatedDate, startDate, score, state, time, answersLinked) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
         ON CONFLICT(attemptId) DO UPDATE SET 
             quizId = excluded.quizId, 
             userId = excluded.userId,
             title = excluded.title,
-            creationDate = excluded.creationDate, 
             updatedDate = excluded.updatedDate, 
+            startDate = excluded.startDate, 
             score = excluded.score,
-            state = excluded.state
+            state = excluded.state,
+            time = excluded.time,
+            answersLinked = excluded.answersLinked
+
         RETURNING *;`
   },
 
@@ -384,6 +402,7 @@ export const answer_attempt_querys = {
       [answerId] INTEGER,
       [selectedOptionId] INTEGER,
       [isCorrect] BOOLEAN,
+      [optionsLinked] TEXT,
       FOREIGN KEY ([attemptId]) REFERENCES [quiz_attempt_table] ([attemptId]) ON DELETE CASCADE,
       FOREIGN KEY ([answerId]) REFERENCES [answer_table] ([answerId]),
       FOREIGN KEY ([selectedOptionId]) REFERENCES [answer_option_table] ([optionId])
@@ -392,7 +411,7 @@ export const answer_attempt_querys = {
 
   deleteTable: {
     query:
-      `DELETE FROM user_table;`
+      `DROP TABLE IF EXISTS answer_attempt_table;`
   },
 
   selectByAttemptId: {
@@ -402,25 +421,26 @@ export const answer_attempt_querys = {
 
   selectById: {
     query:
-      `SELECT * FROM user_table WHERE value = ?;`
+      `SELECT * FROM answer_attempt_table WHERE value = ?;`
   },
 
   post: {
     query:
-      `INSERT INTO answer_attempt_table (attemptId, answerId, selectedOptionId, isCorrect) 
-        VALUES (?, ?, ?, ?)
+      `INSERT INTO answer_attempt_table (attemptId, answerId, selectedOptionId, isCorrect, optionsLinked)
+        VALUES (?, ?, ?, ?, ?)
         RETURNING *;`
   },
 
   put: {
     query:
-      `INSERT INTO answer_attempt_table (answerAttemptId, attemptId, answerId, selectedOptionId, isCorrect) 
-        VALUES (?, ?, ?, ?, ?) 
+      `INSERT INTO answer_attempt_table (answerAttemptId, attemptId, answerId, selectedOptionId, isCorrect, optionsLinked) 
+        VALUES (?, ?, ?, ?, ?, ?) 
         ON CONFLICT(answerAttemptId) DO UPDATE SET 
             attemptId = excluded.attemptId, 
             answerId = excluded.answerId, 
             selectedOptionId = excluded.selectedOptionId, 
-            isCorrect = excluded.isCorrect
+            isCorrect = excluded.isCorrect,
+            optionsLinked = excluded.optionsLinked
         RETURNING *;`
   },
 

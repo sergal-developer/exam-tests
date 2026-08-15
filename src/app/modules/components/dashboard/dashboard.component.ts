@@ -65,48 +65,31 @@ export class DashboardComponent implements OnInit {
   }
 
   async getAttempts(quiz: QuizDTO) {
-    // const attempt = await this._commonServices.filterAttempts(quiz.quizId);
-    // this.listAttempts = attempt && attempt.length ? this.normalizeAttempt(attempt) : [];
+    const attempts = await this._commonServices.getAttemptByQuizId(quiz.quizId);
+    console.log('attempt: ', attempts);
+    this.listAttempts = attempts && attempts.length ? this.normalizeAttempt(attempts) : [];
   }
 
   async createattempt() {
     const data: AttemptDTO = {
-      attemptId: 0,
+      attemptId: null,
       quizId: this.currentQuiz.quizId,
       userId: this.user.userId,
+      title: this.currentQuiz.title,
+      updatedDate: new Date().getTime(),
+      startDate: null,
       score: 0,
       state: AttemptState.new,
-      timeEnlapsed: 0, 
-      title: this.currentQuiz.title,
-      answers: [],
-      creationDate: new Date().getTime(),
-      updatedDate: new Date().getTime(),
       time: 0,
-      // answers: this.currentQuiz.answers,
-      // time: this.currentQuiz.time ? this.currentQuiz.time : 0,
-      // creationDate: new Date().getTime(),
-      // updatedDate: new Date().getTime(),
-      // startDate: null
+      answersLinked: this.currentQuiz.answers ? JSON.stringify(this.currentQuiz.answers) : '',
     }
-
-    // DISCART INVALID ANSWERS
-    // data.answers = this.validateQuestions(data.answers);
-    data.validTotalAnswers = data.answers.length;
-    console.log('createattempt: ', data);
-
-    // clean selected elements
-    // data.questions.map((question: AnswerEntity) => {
-    //   question.options.map((opt: OptionEntity) => {
-    //     opt.selected = false;
-    //   })
-    // });
 
     // SHUFFLE ANSWERS
     // data.questions = this.transform.shuffleArray(data.questions);
 
     // SAVE DATA
-    const attempt = await this._commonServices.saveQuizAttempt(data);
-    // const attempt = await this._commonServices.searchAttempt(data.attemptId, 'attemptId');
+    const attempt = await this._commonServices.saveAllQuizAttempt(data);
+    console.log('attempt: ', attempt);
 
     if (attempt) {
       this.goToCompleteAttempt(attempt);
@@ -118,18 +101,18 @@ export class DashboardComponent implements OnInit {
 
   async deleteQuiz(quiz: QuizDTO) {
     console.log('quiz: ', quiz);
-    this.listAttempts.map(async(attemp) => {
-      // await this._commonServices.deleteAttempt(attemp.id);
-    });
-    // await this._commonServices.deleteQuiz(quiz.id);
+    await this._commonServices.deleteQuiz(quiz.quizId);
     this.init();
     this.returnMain();
   }
 
   async resetAttemps(quiz: QuizDTO) {
-    this.listAttempts.map(async(attemp) => {
-      // await this._commonServices.deleteAttempt(attemp.id);
-    });
+    await Promise.all(
+      this.listAttempts.map(async(attemp) => {
+        await this._commonServices.deleteQuizAttempt(attemp.attemptId);
+      })
+    );
+    
     this.returnMain();
   }
   //#endregion DATA
@@ -143,9 +126,21 @@ export class DashboardComponent implements OnInit {
     this._commonServices.navigate('quizedit', quiz.quizId.toString());
   }
 
-  duplicateQuiz(quiz: QuizDTO) {
-    console.info('quiz: ', quiz);
-    // this._commonServices.navigate('quizedit', quiz.id);
+  async duplicateQuiz(quiz: QuizDTO) {
+    const quizData = await this._commonServices.getQuizCompleteById(quiz.quizId);
+    // prepare data to save as nre record
+    quizData.quizId = null;
+    quizData.title = `${ quizData.title } - Duplicated`;
+    quizData.answers.forEach(answer => {
+      answer.answerId = null;
+      answer._options.forEach(option => {
+        option.optionId = null;
+      })
+    });
+    console.log('quizData: ', quizData);
+    const quizNew = await this._commonServices.saveAllQuiz(quizData);
+    console.log('quizNew: ', quizNew);
+    this._commonServices.navigate('quizedit', `${ quizNew.quizId }`);
   }
   
 
@@ -205,7 +200,7 @@ export class DashboardComponent implements OnInit {
 
   normalizeAttempt(list: AttemptDTO[]) {
     list.map((item) => {
-      item._creationDate = this.transform.toDate(new Date(item.creationDate), 'MMM/d/yy h:mm');
+      item._startDate = this.transform.toDate(new Date(item.startDate), 'MMM/d/yy h:mm');
       item._updatedDate = this.transform.toDate(new Date(item.updatedDate), 'MMM/d/yy h:mm');
     })
     return list;

@@ -1,21 +1,23 @@
 import { Component, OnInit, ViewEncapsulation, } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import {
-    answer_attempt_querys,
-    answer_option_querys,
-    answer_querys,
-    language_querys,
-    log_querys,
-    quiz_attempt_querys,
-    quiz_querys,
-    settings_querys,
-    theme_querys,
-    user_querys } from "../../../shared/data/entities/dtos";
+  answer_attempt_querys,
+  answer_option_querys,
+  answer_querys,
+  language_querys,
+  log_querys,
+  quiz_attempt_querys,
+  quiz_querys,
+  settings_querys,
+  theme_querys,
+  user_querys
+} from "../../../shared/data/entities/dtos";
 
-import { ScreenEnum } from 'src/app/shared/data/enumerables/enumerables';
 import { CommonServices } from 'src/app/shared/services/common.services';
 import { DatabaseService } from 'src/app/shared/services/database/sql.database.service';
 import { UiServices } from 'src/app/shared/services/ui.services';
+import { Parser } from 'src/app/shared/data/utils/parseFields';
+
 
 @Component({
   selector: 'dbclient',
@@ -28,14 +30,24 @@ export class DbClientComponent implements OnInit {
   form: FormGroup;
 
   formClient: FormGroup = new FormGroup({
-      nameQuery: new FormControl('default', Validators.required),
-      query: new FormControl(`SELECT * FROM sqlite_master WHERE type='table';`)
+    nameQuery: new FormControl('default', Validators.required),
+    query: new FormControl(`SELECT * FROM sqlite_master WHERE type='table';`)
+  });
+
+  formFunctions: FormGroup = new FormGroup({
+    nameQuery: new FormControl('default', Validators.required),
+    query: new FormControl(``),
+    rawQuery: new FormControl(``)
   });
 
   errorMessages = '';
   response = '';
 
-  listQuerys: Array<{ queryName: string, query: string}> = [];
+  listQuerys: Array<{ queryName: string, query: string }> = [];
+  listFunctions: Array<{ queryName: string, query: string | null }> = [];
+
+  view: 'sql' | 'functions' = 'sql';
+  parser = new Parser();
   //#endregion INTERNAL VARS
 
   constructor(private _commonService: CommonServices,
@@ -43,7 +55,7 @@ export class DbClientComponent implements OnInit {
     public _uiServices: UiServices) { }
 
   async ngOnInit() {
-    this.getAllAvailableQuerys();
+    this.changeView('sql')
   }
 
   // #region DATA
@@ -62,12 +74,18 @@ export class DbClientComponent implements OnInit {
     ];
 
     this.listQuerys = this.buildQueryList(queryGroups);
-    console.log('this.listQuerys: ', this.listQuerys);
+  }
+
+  getAllAvailableFunctions() {
+    const functions = this.getMethods(CommonServices);
+    functions.map(func => {
+      this.listFunctions.push({ queryName: func.name, query: func.parameters ? '' : null });
+    })
   }
 
   private buildQueryList(queryGroups: Array<any>) {
-    const list: Array<{ queryName: string, query: string}> = [];
-    queryGroups.flatMap(({ name, data}) => {
+    const list: Array<{ queryName: string, query: string }> = [];
+    queryGroups.flatMap(({ name, data }) => {
       Object.entries(data).flatMap(([groupName, queries]) => {
         Object.entries(queries).map(([queryName, query]) => {
           const item = { queryName: `${name}.${groupName}`, query: query };
@@ -85,23 +103,140 @@ export class DbClientComponent implements OnInit {
   }
 
   async executeQuery() {
-    const { nameQuery, query } = this.formClient.value;
-    if(!query) {
-      this.errorMessages = 'query no exist';
-      return;
+    if(this.view == 'sql') {
+      this._executeSQL();
     }
 
-    const response = await this.services.executeInSQL(query, null, (log) => {
-      this.errorMessages = log || '';
-    });
-    this.response = response ? JSON.stringify(response, null, 2) : '';
+    if(this.view == 'functions') {
+      this._executeFunction();
+    }
   }
 
-  onSelectAutocomplete(data: { queryName: string, query: string}) {
-    if(!data) 
+  private async _executeSQL() {
+    const { nameQuery, query } = this.formClient.value;
+      if (!query) {
+        this.errorMessages = 'query no exist';
+        return;
+      }
+
+      const response = await this.services.executeInSQL(query, null, (log) => {
+        this.errorMessages = log || '';
+      });
+      this.response = response ? JSON.stringify(response, null, 2) : '';
+  }
+
+  private async _executeFunction() {
+    const { nameQuery, query, rawQuery } = this.formFunctions.value;
+    let response: any = null;
+    console.log('nameQuery', nameQuery, 'value', rawQuery );
+
+      if (!nameQuery) {
+        this.errorMessages = 'function no exist';
+        return;
+      }
+
+     try {
+       if(!query) {
+        response = await this._commonService[nameQuery]();
+      } else {
+        
+        console.log('function: ', nameQuery, this._commonService[nameQuery]);
+        const params = JSON.parse(rawQuery);
+        console.log('params: ', params);
+        response = await this._commonService[nameQuery](params);;
+        console.log('response: ', response);
+      }
+     } catch (error) {
+      console.log('error: ', error);
+        this.errorMessages = error.toString();
+     }
+
+     this.response = response ? JSON.stringify(response, null, 2) : '';
+
+     console.log('this.response: ', this.response);
+  }
+
+  onSelectAutocompleteSQL(data: { queryName: string, query: string }) {
+    if (!data)
       return;
 
     this.formClient.get('query').setValue(data.query);
   }
+
+  onSelectAutocompleteFn(data: { queryName: string, query: string | null }) {
+    if (!data)
+      return;
+
+    this.formFunctions.get('nameQuery').setValue(data.queryName);
+
+    if (data.query != null) {
+      this.formFunctions.get('query').enable();
+      this.formFunctions.get('query').setValue(data.query);
+
+    } else {
+      this.formFunctions.get('query').setValue(`la funcion ${data.queryName} no necesita parametros`);
+      this.formFunctions.get('query').disable();
+    }
+  }
+
+  changeView(view: 'sql' | 'functions') {
+    this.view = view;
+
+    if (this.view == 'sql') {
+      this.getAllAvailableQuerys();
+    }
+
+    if (this.view == 'functions') {
+      this.getAllAvailableFunctions();
+    }
+
+  }
+
+  validateData(evt) {
+    const { nameQuery, query } = this.formFunctions.value;
+    if(query) {
+      try {
+        this.errorMessages = null;
+        const isNumber = this.parser.parseNumber(query);
+        if (!isNumber) {
+          const parse = this.parser.parseFields(query);
+          if(parse.invalidFields) {
+            this.errorMessages += parse.invalidFields.map((i) => { return `${ i.reason } | name: ${ i.name }` }).join('\n ');
+          }
+
+          if(parse.json == '{}' || parse.fields.length == 0) {
+            this.errorMessages += 'No hay campos que convertir. \n ';
+          } else {
+            this.formFunctions.get('rawQuery').setValue(parse.json)
+          }
+        } else {
+          this.formFunctions.get('rawQuery').setValue(isNumber)
+        }
+      } catch (error) {
+        this.errorMessages = error.toString();
+      }
+    }
+  }
+
   //#endregion EVENTS
+
+  //#region CONVERTERS
+  getMethods(target: any): Array<{ name: string, parameters: number }> {
+    const prototype = target.prototype;
+    const list = Object.getOwnPropertyNames(prototype)
+      .filter(name => name !== "constructor")
+      .filter(name => typeof prototype[name] === "function")
+      .map(name => {
+        const fn = prototype[name];
+
+        return {
+          name,
+          parameters: fn.length
+        };
+      });
+      console.log('list: ', list);
+      return list;
+      
+  }
+  //#endregion CONVERTERS
 }

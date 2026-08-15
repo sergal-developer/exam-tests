@@ -7,7 +7,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class CommonServices {
-  private utils = new Utils();
 
   constructor(private _router: Router, private _services: DatabaseService) { }
 
@@ -117,8 +116,6 @@ export class CommonServices {
         }))
       })
     );
-
-
     return quiz;
   }
 
@@ -486,25 +483,62 @@ export class CommonServices {
   //#endregion AWNSWERS_OPTIONS
 
   //#region QUIZ_ATTEMPS
+  async getAttemptById(attemptId: number): Promise<AttemptDTO> {
+    return await this._services.getAttemptById(attemptId);
+  }
+
   async getAttemptsByUser(userId: number): Promise<AttemptDTO[]> {
     return await this._services.getAttemptsByUser(userId);
   }
 
-  async getAttemptById(attemptId: number): Promise<AttemptDTO> {
-    return await this._services.getAttemptById(attemptId);
+  async getAttemptByQuizId(quizId: number): Promise<Array<AttemptDTO>> {
+    return await this._services.getAttemptByQuizId(quizId);
+  }
+
+  async getAttemptWithChildsById(attemptId: number): Promise<AttemptDTO> {
+    return await this._services.getAttemptWithChildsById(attemptId);
   }
 
   async saveQuizAttempt(data: AttemptDTO): Promise<AttemptDTO> {
     return await this._services.saveQuizAttempt(data);
   }
 
+  async saveAllQuizAttempt(data: AttemptDTO): Promise<AttemptDTO> {
+    const quiz: QuizDTO = await this.getQuizCompleteById(data.quizId);
+    data.answers = [];
+
+    quiz.answers.map((answer) => {  
+      const _answerAttempt: AttemptAnswerDTO = {
+          ...answer,
+          answerAttemptId: null,
+          attemptId: data.attemptId,
+          selectedOptionId: null,
+          isCorrect: false,
+          answerId: answer.answerId,
+          optionsLinked: JSON.stringify(answer._options),
+      };
+      data.answers.push(_answerAttempt);
+    });
+
+    data.answersLinked = JSON.stringify(data.answers);
+    const quizAttempt: AttemptDTO = await this.saveQuizAttempt(data);
+    quizAttempt.answers = data.answers;
+
+    await Promise.all(
+      quizAttempt.answers.map(async (answer: AttemptAnswerDTO) => {
+        answer.attemptId = quizAttempt.attemptId; // update new attemptID updated
+        const responseAnswer = await this._services.saveAnswerAttempt(answer);
+        answer.answerAttemptId = responseAnswer.answerAttemptId; // update new attemptID updated
+        return answer;
+      })
+    );
+    return quizAttempt;
+  }
+
   async deleteQuizAttempt(attemptId: number): Promise<AttemptDTO[]> {
     return await this._services.deleteQuizAttempt(attemptId);
   }
 
-   async getAttemptWithChildsById(attemptId: number): Promise<AttemptDTO> {
-    return await this._services.getAttemptWithChildsById(attemptId);
-  }
   //#endregion QUIZ_ATTEMPS
 
   //#region AWNSWERS_ATTEMPTS
