@@ -97,356 +97,628 @@ export enum GradeState {
 //#endregion INTERFACES
 
 
-export const quiz_querys = {
+export const quiz_table_querys = {
+
   createTable: {
-    query:
-      `CREATE TABLE IF NOT EXISTS [quiz_table] (
-      [quizId] INTEGER PRIMARY KEY AUTOINCREMENT,
-      [uuid] TEXT,
-      [title] TEXT,
-      [time] INTEGER,
-      [creationDate] INTEGER,
-      [updatedDate] INTEGE,
-      [startDate] INTEGER
-    );`
+    query: `
+      CREATE TABLE IF NOT EXISTS [quiz_table] (
+        [quizId] INTEGER PRIMARY KEY AUTOINCREMENT,
+        [uuid] TEXT,
+        [title] TEXT,
+        [time] INTEGER,
+        [creationDate] INTEGER,
+        [updatedDate] INTEGER,
+        [startDate] INTEGER
+      );
+    `
   },
 
   deleteTable: {
-    query:
-      `DROP TABLE IF EXISTS quiz_table;`
+    query: `
+      DROP TABLE IF EXISTS [quiz_table];
+    `
   },
 
-  select: {
-    query:
-      `SELECT * FROM quiz_table;`
+  selectAll: {
+    query: `
+      SELECT *
+      FROM [quiz_table];
+    `
   },
 
   selectById: {
-    query:
-      `SELECT * FROM quiz_table WHERE quizId = ?;`
+    query: `
+      SELECT *
+      FROM [quiz_table]
+      WHERE [quizId] = ?;
+    `
   },
 
-  selectWithRelations: {
-    query:
-      `SELECT 
-            q.quizId,
-            q.uuid,
-            q.title,
-            q.time,
-            q.creationDate,
-            q.updatedDate,
-            q.startDate,
-            (
-                SELECT json_group_array(
-                    json_object(
-                        'answerId', a.answerId,
-                        'quizId', a.quizId,
-                        'title', a.title,
-                        'updatedDate', a.updatedDate,
-                        '_options', (
-                            SELECT json_group_array(
-                                json_object(
-                                    'optionId', o.optionId,
-                                    'answerId', o.answerId,
-                                    'content', o.content,
-                                    'optionIndex', o.optionIndex,
-                                    'updatedDate', o.updatedDate,
-                                    'isCorrect', o.isCorrect
-                                )
-                            )
-                            FROM answer_option_table o
-                            WHERE o.answerId = a.answerId
-                        )
+  selectByIdWithRelations: {
+    query: `
+      SELECT
+        q.[quizId],
+        q.[uuid],
+        q.[title],
+        q.[time],
+        q.[creationDate],
+        q.[updatedDate],
+        q.[startDate],
+
+        COALESCE(
+          (
+            SELECT json_group_array(
+              json_object(
+                'answerId', a.[answerId],
+                'quizId', a.[quizId],
+                'title', a.[title],
+                'updatedDate', a.[updatedDate],
+
+                'options',
+                COALESCE(
+                  (
+                    SELECT json_group_array(
+                      json_object(
+                        'optionId', ao.[optionId],
+                        'answerId', ao.[answerId],
+                        'content', ao.[content],
+                        'optionIndex', ao.[optionIndex],
+                        'updatedDate', ao.[updatedDate],
+                        'isCorrect', ao.[isCorrect]
+                      )
                     )
+                    FROM [answer_option_table] ao
+                    WHERE ao.[answerId] = a.[answerId]
+                  ),
+                  json('[]')
                 )
-                FROM answer_table a
-                WHERE a.quizId = q.quizId
-            ) as answers
-        FROM quiz_table q
-        WHERE q.quizId = ?;`
+              )
+            )
+            FROM [answer_table] a
+            WHERE a.[quizId] = q.[quizId]
+          ),
+          json('[]')
+        ) AS [answers]
+
+      FROM [quiz_table] q
+
+      WHERE q.[quizId] = ?;
+    `
+  },
+
+  filterBy: {
+    query: `
+      SELECT *
+      FROM [quiz_table]
+      WHERE [title] LIKE '%' || :title || '%';
+    `
   },
 
   post: {
-    query:
-      `INSERT INTO quiz_table (uuid, title, time, creationDate, updatedDate, startDate) 
-        VALUES (?, ?, ?, ?, ?, ?)
-        RETURNING *;`
+    query: `
+      INSERT INTO [quiz_table] (
+        [uuid],
+        [title],
+        [time],
+        [creationDate],
+        [updatedDate],
+        [startDate]
+      )
+      VALUES (?, ?, ?, ?, ?, ?)
+      RETURNING *;
+    `
   },
 
   put: {
-    query:
-      `INSERT INTO quiz_table (quizId, uuid, title, time, creationDate, updatedDate, startDate) 
-        VALUES (?, ?, ?, ?, ?, ?, ?) 
-        ON CONFLICT(quizId) DO UPDATE SET 
+    query: `
+      INSERT INTO [quiz_table] (
+        [quizId],
+        [uuid],
+        [title],
+        [time],
+        [creationDate],
+        [updatedDate],
+        [startDate]
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(quizId) DO UPDATE SET 
             uuid = excluded.uuid,
             title = excluded.title, 
             time = excluded.time, 
             creationDate = excluded.creationDate, 
             updatedDate = excluded.updatedDate, 
             startDate = excluded.startDate
-        RETURNING *;`
+      RETURNING *;
+    `
   },
+
   deleteById: {
-    query:
-      `DELETE FROM quiz_table WHERE quizId = ?`
+    query: `
+      DELETE FROM [quiz_table]
+      WHERE [quizId] = :quizId;
+    `
+  },
+};
 
-  }
-}
+export const answer_table_querys = {
 
-export const answer_querys = {
   createTable: {
-    query:
-      `CREATE TABLE IF NOT EXISTS [answer_table] (
-      [answerId] INTEGER PRIMARY KEY AUTOINCREMENT,
-      [quizId] INTEGER,
-      [title] TEXT,
-      [updatedDate] INTEGER,
-      FOREIGN KEY ([quizId]) REFERENCES [quiz_table] ([quizId]) ON DELETE CASCADE
-    );`
-  },
-  deleteTable: {
-    query:
-      `DROP TABLE IF EXISTS answer_table;`
+    query: `
+      CREATE TABLE IF NOT EXISTS [answer_table] (
+        [answerId] INTEGER PRIMARY KEY AUTOINCREMENT,
+        [quizId] INTEGER,
+        [title] TEXT,
+        [updatedDate] INTEGER,
+        FOREIGN KEY ([quizId])
+          REFERENCES [quiz_table] ([quizId])
+          ON DELETE CASCADE
+      );
+    `
   },
 
-  select: {
-    query:
-      `SELECT * FROM answer_table;`
+  deleteTable: {
+    query: `
+      DROP TABLE IF EXISTS [answer_table];
+    `
+  },
+
+  selectAll: {
+    query: `
+      SELECT *
+      FROM [answer_table];
+    `
   },
 
   selectById: {
-    query:
-      `SELECT * FROM answer_table WHERE quizId = ?;`
+    query: `
+      SELECT *
+      FROM [answer_table]
+      WHERE [answerId] = :answerId;
+    `
+  },
+
+  filterBy: {
+    query: `
+      SELECT *
+      FROM [answer_table]
+      WHERE [quizId] = :quizId;
+    `
   },
 
   post: {
-    query:
-      `INSERT INTO answer_table (quizId, title, updatedDate) 
-        VALUES (?, ?, ?)
-        RETURNING *;`
+    query: `
+      INSERT INTO [answer_table] (
+        [quizId],
+        [title],
+        [updatedDate]
+      )
+      VALUES (?, ?, ?)
+      RETURNING *;
+    `
   },
 
   put: {
-    query:
-      `INSERT INTO answer_table (answerId, quizId, title, updatedDate) 
-        VALUES (?, ?, ?, ?) 
-        ON CONFLICT(answerId) DO UPDATE SET 
-            quizId = excluded.quizId, 
-            title = excluded.title, 
-            updatedDate = excluded.updatedDate
-        RETURNING *;`
+    query: `
+      INSERT INTO [answer_table] (
+        [answerId],
+        [quizId],
+        [title],
+        [updatedDate]
+      ) 
+      VALUES (?, ?, ?, ?)
+      ON CONFLICT(answerId) DO UPDATE SET 
+      SET
+        [quizId] = excluded.quizId,
+        [title] = excluded.title,
+        [updatedDate] = excluded.updatedDate
+      RETURNING *;
+    `
   },
 
   deleteById: {
-    query:
-      `DELETE FROM answer_table WHERE answerId = ?;`
-
+    query: `
+      DELETE FROM [answer_table]
+      WHERE [answerId] = ?;
+    `
   }
-}
 
-export const answer_option_querys = {
+};
+
+export const answer_option_table_querys = {
+
   createTable: {
-    query:
-      `CREATE TABLE IF NOT EXISTS [answer_option_table] (
-      [optionId] INTEGER PRIMARY KEY AUTOINCREMENT,
-      [answerId] INTEGER,
-      [content] TEXT,
-      [optionIndex] INTEGER,
-      [updatedDate] INTEGER,
-      [isCorrect] BOOLEAN,
-      FOREIGN KEY ([answerId]) REFERENCES [answer_table] ([answerId]) ON DELETE CASCADE
-    );`
-  },
-  deleteTable: {
-    query:
-      `DROP TABLE IF EXISTS answer_option_querys;`
+    query: `
+      CREATE TABLE IF NOT EXISTS [answer_option_table] (
+        [optionId] INTEGER PRIMARY KEY AUTOINCREMENT,
+        [answerId] INTEGER,
+        [content] TEXT,
+        [optionIndex] INTEGER,
+        [updatedDate] INTEGER,
+        [isCorrect] BOOLEAN,
+        FOREIGN KEY ([answerId])
+          REFERENCES [answer_table] ([answerId])
+          ON DELETE CASCADE
+      );
+    `
   },
 
-  selectByAnswer: {
-    query:
-      `SELECT * FROM answer_option_table WHERE answerId = ? ORDER BY optionIndex ASC;`
+  deleteTable: {
+    query: `
+      DROP TABLE IF EXISTS [answer_option_table];
+    `
+  },
+
+  selectAll: {
+    query: `
+      SELECT *
+      FROM [answer_option_table];
+    `
+  },
+
+  selectById: {
+    query: `
+      SELECT *
+      FROM [answer_option_table]
+      WHERE [optionId] = ?;
+    `
+  },
+
+  selectByAnswerId: {
+    query: `
+      SELECT *
+      FROM [answer_option_table]
+      WHERE [answerId] = ?
+      ORDER BY optionIndex ASC;
+    `
+  },
+
+  filterBy: {
+    query: `
+      SELECT *
+      FROM [answer_option_table]
+      WHERE [answerId] = :answerId;
+    `
   },
 
   post: {
-    query:
-      `INSERT INTO answer_option_table (answerId, content, optionIndex, updatedDate, isCorrect) 
-        VALUES (?, ?, ?, ?, ?)
-        RETURNING *;`
+    query: `
+      INSERT INTO [answer_option_table] (
+        [answerId],
+        [content],
+        [optionIndex],
+        [updatedDate],
+        [isCorrect]
+      )
+      VALUES ( ?, ?, ?, ?, ?)
+      RETURNING *;
+    `
   },
 
   put: {
-    query:
-      `INSERT INTO answer_option_table (optionId, answerId, content, optionIndex, updatedDate, isCorrect) 
-        VALUES (?, ?, ?, ?, ?, ?) 
-        ON CONFLICT(optionId) DO UPDATE SET 
-            answerId = excluded.answerId, 
-            content = excluded.content, 
-            optionIndex = excluded.optionIndex, 
-            updatedDate = excluded.updatedDate, 
-            isCorrect = excluded.isCorrect
-        RETURNING *;`
+    query: `
+      INSERT INTO [answer_option_table] (
+          [optionId],
+          [answerId],
+          [content],
+          [optionIndex],
+          [updatedDate],
+          [isCorrect]
+      )
+      VALUES ( ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(optionId) DO UPDATE SET 
+          answerId = excluded.answerId, 
+          content = excluded.content, 
+          optionIndex = excluded.optionIndex, 
+          updatedDate = excluded.updatedDate, 
+          isCorrect = excluded.isCorrect
+      RETURNING *;
+    `
   },
 
   deleteById: {
-    query:
-      `DELETE FROM answer_option_table WHERE optionId = ?;`
+    query: `
+      DELETE FROM [answer_option_table]
+      WHERE [optionId] = :optionId;
+    `
   }
-}
 
-export const quiz_attempt_querys = {
+};
+
+export const quiz_attempt_table_querys = {
+
   createTable: {
-    query:
-      `CREATE TABLE IF NOT EXISTS [quiz_attempt_table] (
-      [attemptId] INTEGER PRIMARY KEY AUTOINCREMENT,
-      [quizId] INTEGER,
-      [userId] INTEGER,
-      [title] TEXT,
-      [updatedDate] INTEGER,
-      [startDate] INTEGER,
-      [score] REAL,
-      [state] TEXT,
-      [time] INTEGER,
-      [answersLinked] TEXT,
-      FOREIGN KEY ([quizId]) REFERENCES [quiz_table] ([quizId]) ON DELETE CASCADE
-    );`
+    query: `
+      CREATE TABLE IF NOT EXISTS [quiz_attempt_table] (
+        [attemptId] INTEGER PRIMARY KEY AUTOINCREMENT,
+        [quizId] INTEGER,
+        [userId] INTEGER,
+        [title] TEXT,
+        [updatedDate] INTEGER,
+        [startDate] INTEGER,
+        [score] REAL,
+        [state] TEXT,
+        [time] INTEGER,
+        [answersLinked] TEXT,
+        FOREIGN KEY ([quizId])
+          REFERENCES [quiz_table] ([quizId])
+          ON DELETE CASCADE
+      );
+    `
   },
 
   deleteTable: {
-    query:
-      `DROP TABLE IF EXISTS quiz_attempt_table;`
+    query: `
+      DROP TABLE IF EXISTS [quiz_attempt_table];
+    `
   },
 
-  selectByUser: {
-    query:
-      `SELECT * FROM quiz_attempt_table WHERE userId = ?;`
+  selectAll: {
+    query: `
+      SELECT *
+      FROM [quiz_attempt_table];
+    `
+  },
+
+  selectById: {
+    query: `
+      SELECT *
+      FROM [quiz_attempt_table]
+      WHERE [attemptId] = ?;
+    `
   },
 
   selectByQuizId: {
-    query:
-      `SELECT * FROM quiz_attempt_table WHERE quizId = ?;`
+    query: `
+      SELECT *
+      FROM [quiz_attempt_table]
+      WHERE [quizId] = ?;
+    `
   },
 
-  selectById: {
-    query:
-      `SELECT * FROM quiz_attempt_table WHERE attemptId = ?;`
+  selectByUserId: {
+    query: `
+      SELECT *
+      FROM [quiz_attempt_table]
+      WHERE [userId] = ?;
+    `
   },
 
-  selectWithRelationsById: {
-    query:
-      `SELECT
-            q.attemptId,
-            q.quizId,
-            q.userId,
-            q.title,
-            q.updatedDate,
-            q.startDate,
-            q.score,
-            q.state,
-            q.time,
-            q.answersLinked,
-            (
-                SELECT json_group_array(
+  filterBy: {
+    query: `
+      SELECT *
+      FROM [quiz_attempt_table]
+      WHERE [quizId] = :quizId;
+    `
+  },
+
+  selectByIdWithRelations: {
+    query: `
+      SELECT
+        qa.[attemptId],
+        qa.[quizId],
+        qa.[userId],
+        qa.[title],
+        qa.[updatedDate],
+        qa.[startDate],
+        qa.[score],
+        qa.[state],
+        qa.[time],
+        qa.[answersLinked],
+
+        COALESCE(
+          (
+            SELECT json_group_array(
+              json_object(
+                'answerAttemptId', aa.[answerAttemptId],
+                'attemptId', aa.[attemptId],
+                'answerId', aa.[answerId],
+                'selectedOptionId', aa.[selectedOptionId],
+                'isCorrect', aa.[isCorrect],
+                'optionsLinked', aa.[optionsLinked],
+
+                'answer',
+                CASE
+                  WHEN a.[answerId] IS NOT NULL THEN
                     json_object(
-                        'answerAttemptId', a.answerAttemptId,
-                        'attemptId', a.attemptId,
-                        'answerId', a.answerId,
-                        'selectedOptionId', a.selectedOptionId,
-                        'isCorrect', a.isCorrect,
-                        'optionsLinked', a.optionsLinked
+                      'answerId', a.[answerId],
+                      'quizId', a.[quizId],
+                      'title', a.[title],
+                      'updatedDate', a.[updatedDate]
                     )
-                )
-                FROM answer_attempt_table a
-                WHERE a.attemptId = q.attemptId
-            ) as answers
-        FROM quiz_attempt_table q
-        WHERE q.attemptId = ?;`
+                  ELSE NULL
+                END,
+
+                'selectedOption',
+                CASE
+                  WHEN ao.[optionId] IS NOT NULL THEN
+                    json_object(
+                      'optionId', ao.[optionId],
+                      'answerId', ao.[answerId],
+                      'content', ao.[content],
+                      'optionIndex', ao.[optionIndex],
+                      'updatedDate', ao.[updatedDate],
+                      'isCorrect', ao.[isCorrect]
+                    )
+                  ELSE NULL
+                END
+              )
+            )
+            FROM [answer_attempt_table] aa
+
+            LEFT JOIN [answer_table] a
+              ON a.[answerId] = aa.[answerId]
+
+            LEFT JOIN [answer_option_table] ao
+              ON ao.[optionId] = aa.[selectedOptionId]
+
+            WHERE aa.[attemptId] = qa.[attemptId]
+          ),
+          json('[]')
+        ) AS [answerAttempts]
+
+      FROM [quiz_attempt_table] qa
+
+      WHERE qa.[attemptId] = ?;
+    `
   },
 
   post: {
-    query:
-      `INSERT INTO quiz_attempt_table (quizId, userId, title, updatedDate, startDate, score, state, time, answersLinked) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) 
-        RETURNING *;`
+    query: `
+      INSERT INTO [quiz_attempt_table] (
+        [quizId],
+        [userId],
+        [title],
+        [updatedDate],
+        [startDate],
+        [score],
+        [state],
+        [time],
+        [answersLinked]
+      )
+      VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? )
+      RETURNING *;
+    `
   },
 
   put: {
-    query:
-      `INSERT INTO quiz_attempt_table (attemptId, quizId, userId, title, updatedDate, startDate, score, state, time, answersLinked) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
-        ON CONFLICT(attemptId) DO UPDATE SET 
-            quizId = excluded.quizId, 
-            userId = excluded.userId,
-            title = excluded.title,
-            updatedDate = excluded.updatedDate, 
-            startDate = excluded.startDate, 
-            score = excluded.score,
-            state = excluded.state,
-            time = excluded.time,
-            answersLinked = excluded.answersLinked
-
-        RETURNING *;`
+    query: `
+      INSERT INTO [quiz_attempt_table] (
+          [attemptId],
+          [quizId],
+          [userId],
+          [title],
+          [updatedDate],
+          [startDate],
+          [score],
+          [state],
+          [time],
+          [answersLinked]
+      )
+      VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+      ON CONFLICT(attemptId) DO UPDATE SET 
+            [quizId] = excluded.[quizId], 
+            [userId] = excluded.[userId],
+            [title] = excluded.[title],
+            [updatedDate] = excluded.[updatedDate], 
+            [startDate] = excluded.[startDate], 
+            [score] = excluded.[score],
+            [state] = excluded.[state],
+            [time] = excluded.[time],
+            [answersLinked] = excluded.[answersLinked]
+      RETURNING *;
+    `
   },
 
   deleteById: {
-    query:
-      `DELETE FROM quiz_attempt_table WHERE attemptId = ?;`
-  }
-}
+    query: `
+      DELETE FROM [quiz_attempt_table]
+      WHERE [attemptId] = :attemptId;
+    `
+  },
+};
 
-export const answer_attempt_querys = {
+export const answer_attempt_table_querys = {
+
   createTable: {
-    query:
-      `CREATE TABLE IF NOT EXISTS [answer_attempt_table] (
-      [answerAttemptId] INTEGER PRIMARY KEY AUTOINCREMENT,
-      [attemptId] INTEGER,
-      [answerId] INTEGER,
-      [selectedOptionId] INTEGER,
-      [isCorrect] BOOLEAN,
-      [optionsLinked] TEXT,
-      FOREIGN KEY ([attemptId]) REFERENCES [quiz_attempt_table] ([attemptId]) ON DELETE CASCADE,
-      FOREIGN KEY ([answerId]) REFERENCES [answer_table] ([answerId]),
-      FOREIGN KEY ([selectedOptionId]) REFERENCES [answer_option_table] ([optionId])
-    );`
+    query: `
+      CREATE TABLE IF NOT EXISTS [answer_attempt_table] (
+        [answerAttemptId] INTEGER PRIMARY KEY AUTOINCREMENT,
+        [attemptId] INTEGER,
+        [answerId] INTEGER,
+        [selectedOptionId] INTEGER,
+        [isCorrect] BOOLEAN,
+        [optionsLinked] TEXT,
+
+        FOREIGN KEY ([attemptId])
+          REFERENCES [quiz_attempt_table] ([attemptId])
+          ON DELETE CASCADE,
+
+        FOREIGN KEY ([answerId])
+          REFERENCES [answer_table] ([answerId]),
+
+        FOREIGN KEY ([selectedOptionId])
+          REFERENCES [answer_option_table] ([optionId])
+      );
+    `
   },
 
   deleteTable: {
-    query:
-      `DROP TABLE IF EXISTS answer_attempt_table;`
+    query: `
+      DROP TABLE IF EXISTS [answer_attempt_table];
+    `
   },
 
-  selectByAttemptId: {
-    query:
-      `SELECT * FROM answer_attempt_table WHERE attemptId = ?;`
+  selectAll: {
+    query: `
+      SELECT *
+      FROM [answer_attempt_table];
+    `
   },
 
   selectById: {
-    query:
-      `SELECT * FROM answer_attempt_table WHERE value = ?;`
+    query: `
+      SELECT *
+      FROM [answer_attempt_table]
+      WHERE [answerAttemptId] = ?;
+    `
+  },
+
+  selectByAttemptId: {
+    query: `
+      SELECT *
+      FROM [answer_attempt_table]
+      WHERE [attemptId] = ?;
+    `
+  },
+
+  filterBy: {
+    query: `
+      SELECT *
+      FROM [answer_attempt_table]
+      WHERE [attemptId] = ?;
+    `
   },
 
   post: {
-    query:
-      `INSERT INTO answer_attempt_table (attemptId, answerId, selectedOptionId, isCorrect, optionsLinked)
-        VALUES (?, ?, ?, ?, ?)
-        RETURNING *;`
+    query: `
+      INSERT INTO [answer_attempt_table] (
+        [attemptId],
+        [answerId],
+        [selectedOptionId],
+        [isCorrect],
+        [optionsLinked]
+      )
+      VALUES ( ?, ?, ?, ?, ? )
+      RETURNING *;
+    `
   },
 
   put: {
-    query:
-      `INSERT INTO answer_attempt_table (answerAttemptId, attemptId, answerId, selectedOptionId, isCorrect, optionsLinked) 
-        VALUES (?, ?, ?, ?, ?, ?) 
-        ON CONFLICT(answerAttemptId) DO UPDATE SET 
-            attemptId = excluded.attemptId, 
-            answerId = excluded.answerId, 
-            selectedOptionId = excluded.selectedOptionId, 
-            isCorrect = excluded.isCorrect,
-            optionsLinked = excluded.optionsLinked
-        RETURNING *;`
+    query: `
+      INSERT INTO [answer_attempt_table] (
+        [answerAttemptId],
+        [attemptId],
+        [answerId],
+        [selectedOptionId],
+        [isCorrect],
+        [optionsLinked]
+      )
+      VALUES ( ?, ?, ?, ?, ?, ? )
+      ON CONFLICT(answerAttemptId) DO UPDATE SET 
+            [attemptId] = excluded.[attemptId], 
+            [answerId] = excluded.[answerId], 
+            [selectedOptionId] = excluded.[selectedOptionId], 
+            [isCorrect] = excluded.[isCorrect],
+            [optionsLinked] = excluded.[optionsLinked]
+      RETURNING *;
+    `
   },
 
   deleteById: {
-    query:
-      `DELETE FROM answer_attempt_table WHERE answerAttemptId = ?;`
+    query: `
+      DELETE FROM [answer_attempt_table]
+      WHERE [answerAttemptId] = ?;
+    `
   }
-}
 
+};

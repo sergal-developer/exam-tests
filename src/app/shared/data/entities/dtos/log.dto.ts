@@ -5,54 +5,86 @@ export interface LogDTO {
   type: string
 }
 
-export const log_querys = {
+export const log_table_querys = {
+
   createTable: {
-    query:
-      `CREATE TABLE IF NOT EXISTS [log_table] (
-            [id] INTEGER PRIMARY KEY AUTOINCREMENT,
-            [date] INTEGER,
-            [content] TEXT,
-            [type] TEXT );`
+    query: `
+      CREATE TABLE IF NOT EXISTS [log_table] (
+        [id] INTEGER PRIMARY KEY AUTOINCREMENT,
+        [date] INTEGER,
+        [content] TEXT,
+        [type] TEXT
+      );
+    `
   },
-  
+
   deleteTable: {
-    query:
-      `DELETE FROM log_table;`
+    query: `
+      DROP TABLE IF EXISTS [log_table];
+    `
   },
 
-  select: {
-    query:
-      `SELECT * FROM log_table;`
-
+  selectAll: {
+    query: `
+      SELECT *
+      FROM [log_table];
+    `
   },
 
   selectById: {
-    query:
-      `SELECT * FROM log_table WHERE id = ?;`
+    query: `
+      SELECT *
+      FROM [log_table]
+      WHERE [id] = ?;
+    `
+  },
 
+  filterBy: {
+    query: `
+      SELECT *
+      FROM [log_table]
+      WHERE [type] = ?;
+    `
   },
 
   post: {
-    query:
-      `INSERT INTO log_table (date, content, type) 
-        VALUES (?, ?, ?)
-        RETURNING *;`
+    query: `
+      INSERT INTO [log_table] (
+        [date],
+        [content],
+        [type]
+      )
+      VALUES (?, ?, ?) 
+      ON CONFLICT(id) DO UPDATE SET 
+          date = excluded.date, 
+          content = excluded.content, 
+          type = excluded.type
+      RETURNING *;
+    `
   },
 
   put: {
-    query:
-      `INSERT INTO log_table (id, date, content, type) 
-        VALUES (?, ?, ?, ?) 
-        ON CONFLICT(id) DO UPDATE SET 
-            date = excluded.date, 
-            content = excluded.content, 
-            type = excluded.type
-        RETURNING *;`
-    },
+    query: `
+      INSERT INTO [log_table] (
+        [id]      
+        [date],
+        [content],
+        [type]
+      )
+      VALUES (?, ?, ?, ?) 
+      ON CONFLICT(id) DO UPDATE SET 
+          date = excluded.date, 
+          content = excluded.content, 
+          type = excluded.type
+      RETURNING *;
+    `
+  },
 
   deleteById: {
-    query:
-      `DELETE FROM log_table WHERE id = ?;`
-
+    query: `
+      DELETE FROM [log_table]
+      WHERE [id] = :id;
+    `
   }
-}
+
+};

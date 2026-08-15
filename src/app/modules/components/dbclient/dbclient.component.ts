@@ -1,16 +1,16 @@
 import { Component, OnInit, ViewEncapsulation, } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import {
-  answer_attempt_querys,
-  answer_option_querys,
-  answer_querys,
-  language_querys,
-  log_querys,
-  quiz_attempt_querys,
-  quiz_querys,
-  settings_querys,
-  theme_querys,
-  user_querys
+  answer_attempt_table_querys,
+  answer_option_table_querys,
+  answer_table_querys,
+  language_table_querys,
+  log_table_querys,
+  quiz_attempt_table_querys,
+  quiz_table_querys,
+  settings_table_querys,
+  theme_table_querys,
+  user_table_querys
 } from "../../../shared/data/entities/dtos";
 
 import { CommonServices } from 'src/app/shared/services/common.services';
@@ -61,16 +61,16 @@ export class DbClientComponent implements OnInit {
   // #region DATA
   getAllAvailableQuerys() {
     const queryGroups = [
-      { name: 'answer_attempt', data: answer_attempt_querys },
-      { name: 'answer_option', data: answer_option_querys },
-      { name: 'answer', data: answer_querys },
-      { name: 'language', data: language_querys },
-      { name: 'log', data: log_querys },
-      { name: 'quiz_attempt', data: quiz_attempt_querys },
-      { name: 'quiz', data: quiz_querys },
-      { name: 'settings', data: settings_querys },
-      { name: 'theme', data: theme_querys },
-      { name: 'user', data: user_querys },
+      { name: 'answer_attempt', data: answer_attempt_table_querys },
+      { name: 'answer_option', data: answer_option_table_querys },
+      { name: 'answer', data: answer_table_querys },
+      { name: 'language', data: language_table_querys },
+      { name: 'log', data: log_table_querys },
+      { name: 'quiz_attempt', data: quiz_attempt_table_querys },
+      { name: 'quiz', data: quiz_table_querys },
+      { name: 'settings', data: settings_table_querys },
+      { name: 'theme', data: theme_table_querys },
+      { name: 'user', data: user_table_querys },
     ];
 
     this.listQuerys = this.buildQueryList(queryGroups);

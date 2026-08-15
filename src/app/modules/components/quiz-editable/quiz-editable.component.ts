@@ -87,9 +87,24 @@ export class QuizEditableComponent implements OnInit {
       questions: [2, Validators.required],
       options: [4, Validators.required],
     });
-    this.showIAForm = false;
+    this.form = this.fb.group({
+      title: [this.translateLabels.new_quiz, Validators.required],
+      time: [''],
+    });
 
+    this.durationFormShow = false;
 
+      this.quiz = {
+        quizId: null,
+        title: '',
+        answers: [],
+        creationDate: new Date().getTime(),
+        updatedDate: new Date().getTime(),
+        time: 0,
+      }
+      this.quiz.answers = [];
+
+      /*
     if (this.quizId && !injectData) {
       // no se esta injectando datos y recupera el examen solicitado
       this.quiz = await this.getQuizData(this.quizId);
@@ -166,26 +181,15 @@ export class QuizEditableComponent implements OnInit {
       }
 
     } else {
-      this.form = this.fb.group({
-        title: [this.translateLabels.new_quiz, Validators.required],
-        time: [''],
-      });
-
-      this.durationFormShow = false;
-
-      this.quiz = {
-        quizId: null,
-        title: '',
-        answers: [],
-        creationDate: new Date().getTime(),
-        updatedDate: new Date().getTime(),
-        time: 0,
-      }
+      */
       this.quiz.answers = [this.getNewQuestion()];
-    }
+    // }
 
     this.currentAnswerIndex = 0;
     this.setCurrentAnswer();
+
+    let quiz = this._commonService.prepareQueryAnswersOptions(this.quiz);
+      console.log('QUIZ: ', quiz, this.quiz);
   }
 
   setCurrentAnswer() {
@@ -193,7 +197,7 @@ export class QuizEditableComponent implements OnInit {
 
     const optionArray = [];
     answerItem._options.map(opt => {
-      optionArray.push(this.initOption(opt))
+      optionArray.push(this.getNewOption(opt))
     });
     this.formQuestion = this.fb.group({
       answerId: [answerItem.answerId, Validators.required],
@@ -294,7 +298,7 @@ export class QuizEditableComponent implements OnInit {
     const lastIndex = this.formQuestion.value._options.length - 1;
     const lastValue = this.formQuestion.value._options[lastIndex].content;
     if (lastIndex >= 0 && lastValue != '') {
-      this.getOptions().push(this.initOption());
+      this.getOptions().push(this.getNewOption());
     } else if (lastIndex > 0 && lastValue == '') {
       const postlastValue = this.formQuestion.value._options[lastIndex - 1].content;
       if (postlastValue == '') {
@@ -1419,35 +1423,6 @@ export class QuizEditableComponent implements OnInit {
   //#endregion EVENTS
 
   //#region CONVERTERS
-  initOption(optionValue?: AnswerOptionDTO) {
-    console.log('optionValue: ', optionValue);
-    const question = this.quiz.answers[this.currentAnswerIndex];
-    const option: AnswerOptionDTO = {
-      answerId: question.answerId,
-      content: '',
-      optionId: null,
-      optionIndex: question._options.length + 1,
-      updatedDate: new Date().getTime(),
-      // GENERATED
-      isCorrect: false,
-      _selected: false,
-    };
-
-    if (!optionValue) {
-      const length = this.formQuestion ? this.formQuestion.value._options.length : 0;
-      option.optionIndex = length + 1;
-    } else {
-      option.answerId = optionValue.answerId;
-      option.content = optionValue.content;
-      option.optionId = optionValue.optionId;
-      option.optionIndex = optionValue.optionIndex;
-      option.updatedDate = optionValue.updatedDate;
-      // GENERATED
-      option.isCorrect = optionValue.isCorrect;
-      option._selected = optionValue.isCorrect;
-    }
-    return this.fb.group(option)
-  }
 
   getletter(index) {
     const ascii = 64; // 65 es el código ASCII de 'A', 90 es el de 'Z'
@@ -1482,6 +1457,35 @@ export class QuizEditableComponent implements OnInit {
     };
     question._options = [option]
     return question;
+  }
+
+  getNewOption(optionValue?: AnswerOptionDTO) {
+    const question = this.quiz.answers[this.currentAnswerIndex];
+    const option: AnswerOptionDTO = {
+      answerId: question.answerId,
+      content: '',
+      optionId: null,
+      optionIndex: question._options.length + 1,
+      updatedDate: new Date().getTime(),
+      // GENERATED
+      isCorrect: false,
+      _selected: false,
+    };
+
+    if (!optionValue) {
+      const length = this.formQuestion ? this.formQuestion.value._options.length : 0;
+      option.optionIndex = length + 1;
+    } else {
+      option.answerId = optionValue.answerId;
+      option.content = optionValue.content;
+      option.optionId = optionValue.optionId;
+      option.optionIndex = optionValue.optionIndex;
+      option.updatedDate = optionValue.updatedDate;
+      // GENERATED
+      option.isCorrect = optionValue.isCorrect;
+      option._selected = optionValue.isCorrect;
+    }
+    return this.fb.group(option)
   }
   //#endregion CONVERTERS
 

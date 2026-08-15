@@ -2,25 +2,25 @@ import { Injectable } from "@angular/core";
 import { CapacitorSQLite, DBSQLiteValues, SQLiteConnection, SQLiteDBConnection } from '@capacitor-community/sqlite';
 import { Capacitor } from '@capacitor/core';
 import {
-    answer_attempt_querys,
-    answer_option_querys,
-    answer_querys,
+    answer_attempt_table_querys,
+    answer_option_table_querys,
+    answer_table_querys,
     AnswerDTO,
     AnswerOptionDTO,
     AttemptAnswerDTO,
     AttemptDTO,
-    language_querys,
+    language_table_querys,
     LanguageDTO,
-    log_querys,
+    log_table_querys,
     LogDTO,
-    quiz_attempt_querys,
-    quiz_querys,
+    quiz_attempt_table_querys,
+    quiz_table_querys,
     QuizDTO,
-    settings_querys,
+    settings_table_querys,
     SettingsDTO,
-    theme_querys,
+    theme_table_querys,
     ThemeDTO,
-    user_querys,
+    user_table_querys,
     UserDTO
 } from "../../data/entities/dtos";
 import { UiServices } from "../ui.services";
@@ -203,20 +203,17 @@ export class DatabaseService {
             await this.executeSQL('PRAGMA foreign_keys = ON;');
 
             const tableScripts = [
-                log_querys.createTable.query,
-                language_querys.createTable.query,
-                user_querys.createTable.query,
-                settings_querys.createTable.query,
-                theme_querys.createTable.query,
-                quiz_querys.createTable.query,
-                answer_querys.createTable.query,
-                answer_option_querys.createTable.query,
-                quiz_attempt_querys.createTable.query,
-                answer_attempt_querys.createTable.query,
+                log_table_querys.createTable.query,
+                language_table_querys.createTable.query,
+                user_table_querys.createTable.query,
+                settings_table_querys.createTable.query,
+                theme_table_querys.createTable.query,
+                quiz_table_querys.createTable.query,
+                answer_table_querys.createTable.query,
+                answer_option_table_querys.createTable.query,
+                quiz_attempt_table_querys.createTable.query,
+                answer_attempt_table_querys.createTable.query,
             ];
-
-            
-            console.log('tableScripts: ', tableScripts.join('\n'));
 
             for (const script of tableScripts) {
                 const result = await this.executeSQL(script);
@@ -242,16 +239,16 @@ export class DatabaseService {
         try {
 
             const tableScripts = [
-                answer_attempt_querys.deleteTable.query,
-                quiz_attempt_querys.deleteTable.query,
-                answer_option_querys.deleteTable.query,
-                answer_querys.deleteTable.query,
-                quiz_querys.deleteTable.query,
-                language_querys.deleteTable.query,
-                theme_querys.deleteTable.query,
-                settings_querys.deleteTable.query,
-                user_querys.deleteTable.query,
-                log_querys.deleteTable.query,
+                answer_attempt_table_querys.deleteTable.query,
+                quiz_attempt_table_querys.deleteTable.query,
+                answer_option_table_querys.deleteTable.query,
+                answer_table_querys.deleteTable.query,
+                quiz_table_querys.deleteTable.query,
+                language_table_querys.deleteTable.query,
+                theme_table_querys.deleteTable.query,
+                settings_table_querys.deleteTable.query,
+                user_table_querys.deleteTable.query,
+                log_table_querys.deleteTable.query,
             ];
 
             for (const script of tableScripts) {
@@ -274,55 +271,55 @@ export class DatabaseService {
 
     //#region Logs (log_table)
     async getAllLogs(): Promise<LogDTO[]> {
-        return await this.executeActionSQL(log_querys.select.query);
+        return await this.executeActionSQL(log_table_querys.selectAll.query);
     }
 
     async getLogById(id: number): Promise<LogDTO[]> {
-        return await this.executeActionSQL(log_querys.selectById.query, [id]);
+        return await this.executeActionSQL(log_table_querys.selectById.query, [id]);
     }
 
     async postLog(log: LogDTO): Promise<LogDTO> {
-        const response = await this.executeActionSQL(log_querys.post.query, [log.id ?? null, log.date, log.content, log.type]);
+        const response = await this.executeActionSQL(log_table_querys.post.query, [log.id ?? null, log.date, log.content, log.type]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteLog(id: number): Promise<LogDTO[]> {
-        return await this.executeActionSQL(log_querys.deleteById.query, [id]);
+        return await this.executeActionSQL(log_table_querys.deleteById.query, [id]);
     }
     //#endregion
 
     //#region Languages (language_table)
     async getAllLanguages(): Promise<LanguageDTO[]> {
-        return await this.executeActionSQL(language_querys.select.query);
+        return await this.executeActionSQL(language_table_querys.selectAll.query);
     }
 
     async getLanguageByValue(value: string): Promise<LanguageDTO> {
-        const response = await this.executeActionSQL(language_querys.selectById.query, [value]);
+        const response = await this.executeActionSQL(language_table_querys.selectById.query, [value]);
         return response && response.length ? response[0] : null;
     }
 
     async postLanguage(lang: LanguageDTO): Promise<LanguageDTO[]> {
-        const response = await this.executeActionSQL(language_querys.post.query, [lang.value, lang.name]);
+        const response = await this.executeActionSQL(language_table_querys.post.query, [lang.value, lang.name]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteLanguage(value: string): Promise<LanguageDTO[]> {
-        return await this.executeActionSQL(language_querys.deleteById.query, [value]);
+        return await this.executeActionSQL(language_table_querys.deleteById.query, [value]);
     }
     //#endregion
 
     //#region Users (user_table)
     async getAllUsers(): Promise<UserDTO[]> {
-        return await this.executeActionSQL(user_querys.select.query);
+        return await this.executeActionSQL(user_table_querys.selectAll.query);
     }
 
     async getUserById(userId: number): Promise<UserDTO> {
-        const response = await this.executeActionSQL(user_querys.selectById.query, [userId]);
+        const response = await this.executeActionSQL(user_table_querys.selectById.query, [userId]);
         return response && response.length ? response[0] : null;
     }
 
     async getCurrentUser(): Promise<UserDTO> {
-        const response = await this.executeActionSQL(user_querys.selectByCurrent.query);
+        const response = await this.executeActionSQL(user_table_querys.selectByCurrent.query);
         return response && response.length ? response[0] : null;
     }
 
@@ -346,7 +343,7 @@ export class DatabaseService {
             user.current ? 1 : 0                    // Booleano a Entero (1 o 0)
         ];
 
-        const response = await this.executeActionSQL(user_querys.post.query, values);
+        const response = await this.executeActionSQL(user_table_querys.post.query, values);
         return response && response.length ? response[0] : null;
     }
 
@@ -361,12 +358,12 @@ export class DatabaseService {
             user.current ? 1 : 0                    // Booleano a Entero (1 o 0)
         ];
 
-        const response = await this.executeActionSQL(user_querys.put.query, values);
+        const response = await this.executeActionSQL(user_table_querys.put.query, values);
         return response && response.length ? response[0] : null;
     }
 
     async deleteUser(userId: number): Promise<UserDTO[]> {
-        return await this.executeActionSQL(user_querys.deleteById.query, [userId]);
+        return await this.executeActionSQL(user_table_querys.deleteById.query, [userId]);
     }
     //#endregion
 
@@ -389,67 +386,67 @@ export class DatabaseService {
     }
 
     async getAllSettings(): Promise<SettingsDTO[]> {
-        const response = await this.executeActionSQL(settings_querys.select.query);
+        const response = await this.executeActionSQL(settings_table_querys.selectAll.query);
         return this.normalizeSettings(response);
     }
 
     async getSettingById(settingId: number): Promise<SettingsDTO> {
-        let response = await this.executeActionSQL(settings_querys.selectById.query, [settingId]);
+        let response = await this.executeActionSQL(settings_table_querys.selectById.query, [settingId]);
         response = this.normalizeSettings(response);
         return response && response.length ? response[0] : null;
     }
 
     async getSettingCompleteById(settingId: number): Promise<SettingsDTO> {
-        let response = await this.executeActionSQL(settings_querys.selectWithRelationsById.query, [settingId]);
+        let response = await this.executeActionSQL(settings_table_querys.selectByIdWithRelations.query, [settingId]);
         response = this.normalizeSettings(response);
         return response && response.length ? response[0] : null;
     }
 
     async postSetting(setting: SettingsDTO): Promise<SettingsDTO> {
         setting.permissions = this.objectToString(setting.permissions)
-        const response = await this.executeActionSQL(settings_querys.post.query, [setting.settingId ?? null, setting.language, setting.permissions, setting.theme]);
+        const response = await this.executeActionSQL(settings_table_querys.post.query, [setting.settingId ?? null, setting.language, setting.permissions, setting.theme]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteSetting(settingId: number): Promise<SettingsDTO[]> {
-        return await this.executeActionSQL(settings_querys.deleteById.query, [settingId]);
+        return await this.executeActionSQL(settings_table_querys.deleteById.query, [settingId]);
     }
     //#endregion
 
     //#region Themes (theme_table)
     async getAllThemes(): Promise<ThemeDTO[]> {
-        return await this.executeActionSQL(theme_querys.select.query);
+        return await this.executeActionSQL(theme_table_querys.selectAll.query);
     }
 
     async getTheme(id: string): Promise<ThemeDTO> {
-        const response = await this.executeActionSQL(theme_querys.selectById.query, [id]);
+        const response = await this.executeActionSQL(theme_table_querys.selectById.query, [id]);
         return response && response.length ? response[0] : null;
     }
 
     async postTheme(theme: ThemeDTO): Promise<ThemeDTO> {
         theme.content = this.objectToString(theme.content);
-        const response = await this.executeActionSQL(theme_querys.post.query, [theme.id, theme.content]);
+        const response = await this.executeActionSQL(theme_table_querys.post.query, [theme.id, theme.content]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteTheme(id: string): Promise<ThemeDTO[]> {
-        return await this.executeActionSQL(theme_querys.deleteById.query, [id]);
+        return await this.executeActionSQL(theme_table_querys.deleteById.query, [id]);
     }
     //#endregion
 
     //#region Quizzes (quiz_table)
     async getAllQuizzes(): Promise<QuizDTO[]> {
-        return await this.executeActionSQL(quiz_querys.select.query);
+        return await this.executeActionSQL(quiz_table_querys.selectAll.query);
     }
 
     async getQuizById(quizId: number): Promise<QuizDTO> {
-        const response = await this.executeActionSQL(quiz_querys.selectById.query, [quizId]);
+        const response = await this.executeActionSQL(quiz_table_querys.selectById.query, [quizId]);
         return response && response.length ? response[0] : null;
     }
 
     async getQuizCompleteById(quizId: number): Promise<QuizDTO> {
         try {
-            const result = await this.executeActionSQL(quiz_querys.selectWithRelations.query, [quizId]);
+            const result = await this.executeActionSQL(quiz_table_querys.selectByIdWithRelations.query, [quizId]);
 
             if (result && result.length > 0) {
                 const quiz = result[0];
@@ -478,27 +475,27 @@ export class DatabaseService {
     }
 
     private async _postQuiz(quiz: QuizDTO): Promise<QuizDTO> {
-        const response = await this.executeActionSQL(quiz_querys.post.query, [quiz.uuid, quiz.title, quiz.time, quiz.creationDate, quiz.updatedDate, quiz.startDate]);
+        const response = await this.executeActionSQL(quiz_table_querys.post.query, [quiz.uuid, quiz.title, quiz.time, quiz.creationDate, quiz.updatedDate, quiz.startDate]);
         return response && response.length ? response[0] : null;
     }
 
     private async _putQuiz(quiz: QuizDTO): Promise<QuizDTO> {
-        const response = await this.executeActionSQL(quiz_querys.put.query, [quiz.quizId ?? null, quiz.uuid, quiz.title, quiz.time, quiz.creationDate, quiz.updatedDate, quiz.startDate]);
+        const response = await this.executeActionSQL(quiz_table_querys.put.query, [quiz.quizId ?? null, quiz.uuid, quiz.title, quiz.time, quiz.creationDate, quiz.updatedDate, quiz.startDate]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteQuiz(quizId: number): Promise<QuizDTO[]> {
-        return await this.executeActionSQL(quiz_querys.deleteById.query, [quizId]);
+        return await this.executeActionSQL(quiz_table_querys.deleteById.query, [quizId]);
     }
     //#endregion
 
     //#region Answers (answer_table)
     async getAllAnswers(): Promise<AnswerDTO[]> {
-        return await this.executeActionSQL(answer_querys.select.query);
+        return await this.executeActionSQL(answer_table_querys.selectAll.query);
     }
 
     async getAnswersByQuiz(quizId: number): Promise<AnswerDTO> {
-        const response = await this.executeActionSQL(answer_querys.selectById.query, [quizId]);
+        const response = await this.executeActionSQL(answer_table_querys.selectById.query, [quizId]);
         return response && response.length ? response[0] : null;
     }
 
@@ -513,24 +510,24 @@ export class DatabaseService {
     }
 
     private async _postAnswer(answer: AnswerDTO): Promise<AnswerDTO> {
-        const response = await this.executeActionSQL(answer_querys.post.query, [answer.quizId, answer.title, answer.updatedDate]);
+        const response = await this.executeActionSQL(answer_table_querys.post.query, [answer.quizId, answer.title, answer.updatedDate]);
         return response && response.length ? response[0] : null;
     }
 
     private async _putAnswer(answer: AnswerDTO): Promise<AnswerDTO> {
-        const response = await this.executeActionSQL(answer_querys.put.query, [answer.answerId ?? null, answer.quizId, answer.title, answer.updatedDate]);
+        const response = await this.executeActionSQL(answer_table_querys.put.query, [answer.answerId ?? null, answer.quizId, answer.title, answer.updatedDate]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteAnswer(answerId: number): Promise<AnswerDTO[]> {
         const query = ``;
-        return await this.executeActionSQL(answer_querys.deleteById.query, [answerId]);
+        return await this.executeActionSQL(answer_table_querys.deleteById.query, [answerId]);
     }
     //#endregion
 
     //#region Answer Options (answer_option_table)
     async getOptionsByAnswer(answerId: number): Promise<AnswerOptionDTO[]> {
-        return await this.executeActionSQL(answer_option_querys.selectByAnswer.query, [answerId]);
+        return await this.executeActionSQL(answer_option_table_querys.selectByAnswerId.query, [answerId]);
     }
 
     async saveAnswerOption(option: AnswerOptionDTO): Promise<AnswerOptionDTO> {
@@ -545,38 +542,38 @@ export class DatabaseService {
 
     private async _postAnswerOption(option: AnswerOptionDTO): Promise<AnswerOptionDTO> {
         const correctVal = option.isCorrect ? 1 : 0;
-        const response = await this.executeActionSQL(answer_option_querys.post.query, [option.answerId, option.content, option.optionIndex, option.updatedDate, correctVal]);
+        const response = await this.executeActionSQL(answer_option_table_querys.post.query, [option.answerId, option.content, option.optionIndex, option.updatedDate, correctVal]);
         return response && response.length ? response[0] : null;
     }
 
     private async _putAnswerOption(option: AnswerOptionDTO): Promise<AnswerOptionDTO> {
         const correctVal = option.isCorrect ? 1 : 0;
-        const response = await this.executeActionSQL(answer_option_querys.put.query, [option.optionId ?? null, option.answerId, option.content, option.optionIndex, option.updatedDate, correctVal]);
+        const response = await this.executeActionSQL(answer_option_table_querys.put.query, [option.optionId ?? null, option.answerId, option.content, option.optionIndex, option.updatedDate, correctVal]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteAnswerOption(optionId: number): Promise<AnswerOptionDTO[]> {
-        return await this.executeActionSQL(answer_option_querys.deleteById.query, [optionId]);
+        return await this.executeActionSQL(answer_option_table_querys.deleteById.query, [optionId]);
     }
     //#endregion
 
     //#region Quiz Attempts (quiz_attempt_table)
     async getAttemptsByUser(userId: number): Promise<AttemptDTO[]> {
-        return await this.executeActionSQL(quiz_attempt_querys.selectByUser.query, [userId]);
+        return await this.executeActionSQL(quiz_attempt_table_querys.selectByUserId.query, [userId]);
     }
 
     async getAttemptById(quizId: number): Promise<AttemptDTO> {
-        const response = await this.executeActionSQL(quiz_attempt_querys.selectById.query, [quizId]);
+        const response = await this.executeActionSQL(quiz_attempt_table_querys.selectById.query, [quizId]);
         return response && response.length ? response[0] : null;
     }
 
     async getAttemptByQuizId(quizId: number): Promise<Array<AttemptDTO>> {
-        const response = await this.executeActionSQL(quiz_attempt_querys.selectByQuizId.query, [quizId]);
+        const response = await this.executeActionSQL(quiz_attempt_table_querys.selectByQuizId.query, [quizId]);
         return response && response.length ? response : [];
     }
 
     async getAttemptWithChildsById(attemptId: number): Promise<AttemptDTO> {
-        const response = await this.executeActionSQL(quiz_attempt_querys.selectWithRelationsById.query, [attemptId]);
+        const response = await this.executeActionSQL(quiz_attempt_table_querys.selectByIdWithRelations.query, [attemptId]);
 
         if (response && response.length > 0) {
             const data = response[0];
@@ -613,23 +610,23 @@ export class DatabaseService {
     }
 
     private async _postQuizAttempt(attempt: AttemptDTO): Promise<AttemptDTO> {
-        const response = await this.executeActionSQL(quiz_attempt_querys.post.query, [attempt.quizId, attempt.userId, attempt.title, attempt.updatedDate, attempt.startDate, attempt.score, attempt.state, attempt.time, attempt.answersLinked]);
+        const response = await this.executeActionSQL(quiz_attempt_table_querys.post.query, [attempt.quizId, attempt.userId, attempt.title, attempt.updatedDate, attempt.startDate, attempt.score, attempt.state, attempt.time, attempt.answersLinked]);
         return response && response.length ? response[0] : null;
     }
 
     private async _putQuizAttempt(attempt: AttemptDTO): Promise<AttemptDTO> {
-        const response = await this.executeActionSQL(quiz_attempt_querys.put.query, [attempt.attemptId ?? null, attempt.quizId, attempt.userId, attempt.title, attempt.updatedDate, attempt.startDate, attempt.score, attempt.state, attempt.time, attempt.answersLinked]);
+        const response = await this.executeActionSQL(quiz_attempt_table_querys.put.query, [attempt.attemptId ?? null, attempt.quizId, attempt.userId, attempt.title, attempt.updatedDate, attempt.startDate, attempt.score, attempt.state, attempt.time, attempt.answersLinked]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteQuizAttempt(attemptId: number): Promise<AttemptDTO[]> {
-        return await this.executeActionSQL(quiz_attempt_querys.deleteById.query, [attemptId]);
+        return await this.executeActionSQL(quiz_attempt_table_querys.deleteById.query, [attemptId]);
     }
     //#endregion
 
     //#region Answer Attempts (answer_attempt_table)
     async getAnswerAttemptsByAttempt(attemptId: number): Promise<AttemptAnswerDTO[]> {
-        return await this.executeActionSQL(answer_attempt_querys.selectByAttemptId.query, [attemptId]);
+        return await this.executeActionSQL(answer_attempt_table_querys.selectByAttemptId.query, [attemptId]);
     }
 
     async saveAnswerAttempt(ansAttempt: AttemptAnswerDTO): Promise<AttemptAnswerDTO> {
@@ -644,18 +641,18 @@ export class DatabaseService {
 
     private async _postAnswerAttempt(ansAttempt: AttemptAnswerDTO): Promise<AttemptAnswerDTO> {
         const correctVal = ansAttempt.isCorrect ? 1 : 0;
-        const response = await this.executeActionSQL(answer_attempt_querys.post.query, [ansAttempt.attemptId, ansAttempt.answerId, ansAttempt.selectedOptionId, correctVal, ansAttempt.optionsLinked]);
+        const response = await this.executeActionSQL(answer_attempt_table_querys.post.query, [ansAttempt.attemptId, ansAttempt.answerId, ansAttempt.selectedOptionId, correctVal, ansAttempt.optionsLinked]);
         return response && response.length ? response[0] : null;
     }
 
     private async _putAnswerAttempt(ansAttempt: AttemptAnswerDTO): Promise<AttemptAnswerDTO> {
         const correctVal = ansAttempt.isCorrect ? 1 : 0;
-        const response = await this.executeActionSQL(answer_attempt_querys.put.query, [ansAttempt.answerAttemptId ?? null, ansAttempt.attemptId, ansAttempt.answerId, ansAttempt.selectedOptionId, correctVal, ansAttempt.optionsLinked]);
+        const response = await this.executeActionSQL(answer_attempt_table_querys.put.query, [ansAttempt.answerAttemptId ?? null, ansAttempt.attemptId, ansAttempt.answerId, ansAttempt.selectedOptionId, correctVal, ansAttempt.optionsLinked]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteAnswerAttemptById(attemptId: number): Promise<AttemptDTO[]> {
-        return await this.executeActionSQL(answer_attempt_querys.deleteById.query, [attemptId]);
+        return await this.executeActionSQL(answer_attempt_table_querys.deleteById.query, [attemptId]);
     }
     //#endregion
 

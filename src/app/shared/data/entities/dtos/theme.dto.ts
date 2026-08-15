@@ -80,40 +80,77 @@ export interface ThemePropertiesDTO {
   zoomLevel?: String;
 }
 
-export const theme_querys = {
+export const theme_table_querys = {
+
   createTable: {
-    query:
-      `CREATE TABLE IF NOT EXISTS [theme_table] (
-      [id] TEXT PRIMARY KEY,
-      [content] TEXT NOT NULL
-    );`
+    query: `
+      CREATE TABLE IF NOT EXISTS [theme_table] (
+        [id] TEXT PRIMARY KEY,
+        [content] TEXT NOT NULL
+      );
+    `
   },
 
   deleteTable: {
-    query:
-      `DELETE FROM user_table`
+    query: `
+      DROP TABLE IF EXISTS [theme_table];
+    `
   },
 
-  select: {
-    query:
-      `SELECT * FROM theme_table;`
+  selectAll: {
+    query: `
+      SELECT *
+      FROM [theme_table];
+    `
   },
 
   selectById: {
-    query:
-      `SELECT * FROM theme_table WHERE id = ?;`
+    query: `
+      SELECT *
+      FROM [theme_table]
+      WHERE [id] = ?;
+    `
+  },
+
+  filterBy: {
+    query: `
+      SELECT *
+      FROM [theme_table]
+      WHERE [id] = ?;
+    `
   },
 
   post: {
-    query:
-      `INSERT INTO theme_table (id, content) 
-        VALUES (?, ?) 
-        ON CONFLICT(id) DO UPDATE SET content = excluded.content
-        RETURNING *;`
+    query: `
+      INSERT INTO [theme_table] (
+        [id],
+        [content]
+      )
+      VALUES (?, ?)
+      ON CONFLICT(id) DO UPDATE SET 
+          content = excluded.content
+      RETURNING *;
+    `
+  },
+
+  put: {
+    query: `
+      INSERT INTO [theme_table] (
+        [id],
+        [content]
+      )
+      VALUES (?, ?)
+      ON CONFLICT(id) DO UPDATE SET 
+          content = excluded.content
+      RETURNING *;
+    `
   },
 
   deleteById: {
-    query:
-      `DELETE FROM theme_table WHERE id = ?;`
+    query: `
+      DELETE FROM [theme_table]
+      WHERE [id] = :id;
+    `
   }
-}
+
+};

@@ -3,41 +3,77 @@ export interface LanguageDTO {
   name: string;
 }
 
-export const language_querys = {
+export const language_table_querys = {
+
   createTable: {
-    query:
-      `CREATE TABLE IF NOT EXISTS [language_table] (
-      [value] TEXT PRIMARY KEY,
-      [name] TEXT
-    );`
+    query: `
+      CREATE TABLE IF NOT EXISTS [language_table] (
+        [value] TEXT PRIMARY KEY,
+        [name] TEXT
+      );
+    `
   },
-  
+
   deleteTable: {
-    query:
-      `DELETE FROM language_table;`
+    query: `
+      DROP TABLE IF EXISTS [language_table];
+    `
   },
 
-  select: {
-    query:
-      `SELECT * FROM language_table;`
-
+  selectAll: {
+    query: `
+      SELECT *
+      FROM [language_table];
+    `
   },
 
   selectById: {
-    query:
-      `SELECT * FROM language_table WHERE value = ?;`
+    query: `
+      SELECT *
+      FROM [language_table]
+      WHERE [value] = ?;
+    `
+  },
+
+  filterBy: {
+    query: `
+      SELECT *
+      FROM [language_table]
+      WHERE [name] = ?;
+    `
   },
 
   post: {
-    query:
-      `INSERT INTO language_table (value, name) 
-        VALUES (?, ?) 
-        ON CONFLICT(value) DO UPDATE SET name = excluded.name
-        RETURNING *;`
+    query: `
+      INSERT INTO [language_table] (
+        [value],
+        [name]
+      )
+      VALUES (?, ?)
+      ON CONFLICT(value) DO UPDATE SET 
+          name = excluded.name
+      RETURNING *;
+    `
+  },
+
+  put: {
+    query: `
+      INSERT INTO [language_table] (
+        [value],
+        [name]
+      )
+      VALUES (?, ?)
+      ON CONFLICT(value) DO UPDATE SET 
+          name = excluded.name
+      RETURNING *;
+    `
   },
 
   deleteById: {
-    query:
-      `DELETE FROM language_table WHERE value = ?;`
+    query: `
+      DELETE FROM [language_table]
+      WHERE [value] = ?;
+    `
   }
-}
+
+};

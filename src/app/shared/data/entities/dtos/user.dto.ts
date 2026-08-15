@@ -11,68 +11,100 @@ export interface UserDTO {
   // GENERATED
 }
 
-export const user_querys = {
+export const user_table_querys = {
+
   createTable: {
-    query:
-      `CREATE TABLE IF NOT EXISTS [user_table] (
-      [userId] INTEGER PRIMARY KEY,
-      [uuid] TEXT,
-      [userName] TEXT NOT NULL,
-      [age] INTEGER,
-      [avatarUrl] TEXT,
-      [avatarBody] TEXT,
-      [current] BOOLEAN
-    );`
+    query: `
+      CREATE TABLE IF NOT EXISTS [user_table] (
+        [userId] INTEGER PRIMARY KEY,
+        [uuid] TEXT,
+        [userName] TEXT NOT NULL,
+        [age] INTEGER,
+        [avatarUrl] TEXT,
+        [avatarBody] TEXT,
+        [current] BOOLEAN
+      );
+    `
   },
 
   deleteTable: {
-    query:
-      `DELETE FROM user_table`
-
+    query: `
+      DROP TABLE IF EXISTS [user_table];
+    `
   },
 
-  select: {
-    query:
-      `SELECT * FROM user_table;`
-
+  selectAll: {
+    query: `
+      SELECT *
+      FROM [user_table];
+    `
   },
 
   selectById: {
-    query:
-      `SELECT * FROM user_table WHERE userId = ?;`
-
+    query: `
+      SELECT *
+      FROM [user_table]
+      WHERE [userId] = ?;
+    `
   },
 
   selectByCurrent: {
-    query:
-      `SELECT * FROM user_table WHERE current = 1 LIMIT 1;`
+    query:`
+    SELECT * 
+    FROM [user_table] 
+    WHERE [current] = 1 LIMIT 1;`
+  },
 
+  filterBy: {
+    query: `
+      SELECT *
+      FROM [user_table]
+      WHERE [userName] = ?;
+    `
   },
 
   post: {
-    query:
-      `INSERT INTO user_table (uuid, userName, age, avatarUrl, avatarBody, current) 
-        VALUES (?, ?, ?, ?, ?, ?)
-        RETURNING *;`
+    query: `
+      INSERT INTO [user_table] (
+        [uuid],
+        [userName],
+        [age],
+        [avatarUrl],
+        [avatarBody],
+        [current]
+      )
+      VALUES (?, ?, ?, ?, ?, ?)
+      RETURNING *;
+    `
   },
 
   put: {
-    query:
-      `INSERT INTO user_table (userId, uuid, userName, age, avatarUrl, avatarBody, current) 
-        VALUES (?, ?, ?, ?, ?, ?, ?) 
-        ON CONFLICT(userId) DO UPDATE SET 
-            uuid = excluded.uuid,
-            userName = excluded.userName, 
-            age = excluded.age, 
-            avatarUrl = excluded.avatarUrl, 
-            avatarBody = excluded.avatarBody, 
-            current = excluded.current
-        RETURNING *;`
+    query: `
+      INSERT INTO [user_table] (
+        [userId],
+        [uuid],
+        [userName],
+        [age],
+        [avatarUrl],
+        [avatarBody],
+        [current]
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(userId) DO UPDATE SET
+            [uuid] = excluded.uuid,
+            [userName] = excluded.userName,
+            [age] = excluded.age,
+            [avatarUrl] = excluded.avatarUrl,
+            [avatarBody] = excluded.avatarBody,
+            [current] = excluded.current
+      RETURNING *;
+    `
   },
 
   deleteById: {
-    query:
-      `DELETE FROM user_table WHERE userId = ?;`
-
+    query: `
+      DELETE FROM [user_table]
+      WHERE [userId] = ?;
+    `
   }
-}
+};
