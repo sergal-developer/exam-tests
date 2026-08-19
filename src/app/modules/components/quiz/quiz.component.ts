@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation, } from '@angular/core';
-import { AnswerDTO, AnswerOptionDTO, AttemptAnswerDTO, AttemptDTO, QuizDTO } from 'src/app/shared/data/entities/dtos';
+import { QuizAnswerDTO, QuizAnswerOptionDTO, AttemptAnswerDTO, AttemptDTO, QuizDTO } from 'src/app/shared/data/entities/dtos';
 import { AttemptState, GradeState } from 'src/app/shared/data/enumerables/enumerables';
 import { CommonServices } from 'src/app/shared/services/common.services';
 import { UiServices } from 'src/app/shared/services/ui.services';
@@ -17,7 +17,7 @@ export class QuizComponent implements OnInit {
   //#region INTERNAL
   attempt: AttemptDTO = null;
   currentAnswerIndex = 0;
-  currentAnswer: AnswerDTO = null;
+  currentAnswer: QuizAnswerDTO = null;
 
   readonly = false;
   progress = 0;
@@ -171,7 +171,7 @@ export class QuizComponent implements OnInit {
   //#endregion DATA
 
   //#region EVENTS
-  selectOption(option: AnswerOptionDTO) {
+  selectOption(option: QuizAnswerOptionDTO) {
     if (this.readonly) { return; }
 
     // if (option.selected) {

@@ -21,6 +21,29 @@ export interface PermissionsDTO {
   ai: boolean,
 }
 
+export function getSettingsDTO(settingId: number | null, language: string, theme: string, permissions: string): SettingsDTO {
+  return {
+    settingId: settingId,
+    language: language,
+    theme: theme,
+    permissions: permissions,
+    _languages: [],
+    _themes: [],
+    _colors: []
+  } as SettingsDTO;
+}
+
+export function getPermissionsDTO(createAction: boolean, duplicateAction: boolean, editAction: boolean, deleteAction: boolean, aiAction: boolean): PermissionsDTO {
+  return {
+    create: createAction,
+    duplicate: duplicateAction,
+    edit: editAction,
+    delete: deleteAction,
+    ai: aiAction
+  } as PermissionsDTO;
+}
+
+
 export const settings_table_querys = {
 
   createTable: {

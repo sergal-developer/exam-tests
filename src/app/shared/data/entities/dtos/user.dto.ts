@@ -1,4 +1,6 @@
 
+import { v4 as uuidv4 } from 'uuid';
+
 export interface UserDTO {
   userId?: number;
   uuid: string;
@@ -9,6 +11,18 @@ export interface UserDTO {
   current: boolean | number;
 
   // GENERATED
+}
+
+export function getUserDTO(userName: string, age: number | null, avatarUrl: string | null): UserDTO {
+  return {
+    userId: null,
+    uuid: uuidv4(),
+    userName: userName,
+    age: age,
+    avatarUrl: avatarUrl,
+    avatarBody: null,
+    current: false,
+  } as UserDTO;
 }
 
 export const user_table_querys = {
@@ -49,7 +63,7 @@ export const user_table_querys = {
   },
 
   selectByCurrent: {
-    query:`
+    query: `
     SELECT * 
     FROM [user_table] 
     WHERE [current] = 1 LIMIT 1;`

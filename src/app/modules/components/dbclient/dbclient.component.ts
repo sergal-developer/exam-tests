@@ -1,22 +1,23 @@
 import { Component, OnInit, ViewEncapsulation, } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import {
-  answer_attempt_table_querys,
-  answer_option_table_querys,
-  answer_table_querys,
+  attempt_answer_table_querys,
+  quiz_answer_option_table_querys,
+  quiz_answer_table_querys,
   language_table_querys,
   log_table_querys,
-  quiz_attempt_table_querys,
+  attempt_table_querys,
   quiz_table_querys,
   settings_table_querys,
   theme_table_querys,
   user_table_querys
 } from "../../../shared/data/entities/dtos";
 
+import { Parser } from 'src/app/shared/data/utils/parseFields';
 import { CommonServices } from 'src/app/shared/services/common.services';
+import { runCommonServicesTests } from 'src/app/shared/services/common.services.testing';
 import { DatabaseService } from 'src/app/shared/services/database/sql.database.service';
 import { UiServices } from 'src/app/shared/services/ui.services';
-import { Parser } from 'src/app/shared/data/utils/parseFields';
 
 
 @Component({
@@ -48,6 +49,7 @@ export class DbClientComponent implements OnInit {
 
   view: 'sql' | 'functions' = 'sql';
   parser = new Parser();
+
   //#endregion INTERNAL VARS
 
   constructor(private _commonService: CommonServices,
@@ -55,18 +57,18 @@ export class DbClientComponent implements OnInit {
     public _uiServices: UiServices) { }
 
   async ngOnInit() {
-    this.changeView('sql')
+    this.changeView('functions')
   }
 
   // #region DATA
   getAllAvailableQuerys() {
     const queryGroups = [
-      { name: 'answer_attempt', data: answer_attempt_table_querys },
-      { name: 'answer_option', data: answer_option_table_querys },
-      { name: 'answer', data: answer_table_querys },
+      { name: 'answer_attempt', data: attempt_answer_table_querys },
+      { name: 'answer_option', data: quiz_answer_option_table_querys },
+      { name: 'answer', data: quiz_answer_table_querys },
       { name: 'language', data: language_table_querys },
       { name: 'log', data: log_table_querys },
-      { name: 'quiz_attempt', data: quiz_attempt_table_querys },
+      { name: 'quiz_attempt', data: attempt_table_querys },
       { name: 'quiz', data: quiz_table_querys },
       { name: 'settings', data: settings_table_querys },
       { name: 'theme', data: theme_table_querys },
@@ -103,57 +105,64 @@ export class DbClientComponent implements OnInit {
   }
 
   async executeQuery() {
-    if(this.view == 'sql') {
+    if (this.view == 'sql') {
       this._executeSQL();
     }
 
-    if(this.view == 'functions') {
-      this._executeFunction();
+    if (this.view == 'functions') {
+      const { nameQuery, query, rawQuery } = this.formFunctions.value;
+
+      if (rawQuery) {
+        this._executeFunction();
+      } else {
+        const logs = await runCommonServicesTests(this._commonService);
+        console.log('logs: ', logs);
+      }
     }
   }
 
   private async _executeSQL() {
     const { nameQuery, query } = this.formClient.value;
-      if (!query) {
-        this.errorMessages = 'query no exist';
-        return;
-      }
+    if (!query) {
+      this.errorMessages = 'query no exist';
+      return;
+    }
 
-      const response = await this.services.executeInSQL(query, null, (log) => {
-        this.errorMessages = log || '';
-      });
-      this.response = response ? JSON.stringify(response, null, 2) : '';
+    const response = await this.services.executeInSQL(query, null, (log) => {
+      this.errorMessages = log || '';
+    });
+    this.response = response ? JSON.stringify(response, null, 2) : '';
   }
 
   private async _executeFunction() {
     const { nameQuery, query, rawQuery } = this.formFunctions.value;
     let response: any = null;
-    console.log('nameQuery', nameQuery, 'value', rawQuery );
+    console.log('nameQuery', nameQuery, 'value', rawQuery);
 
-      if (!nameQuery) {
-        this.errorMessages = 'function no exist';
-        return;
-      }
+    if (!nameQuery) {
+      this.errorMessages = 'function no exist';
+      return;
+    }
 
-     try {
-       if(!query) {
+    try {
+      if (!query) {
         response = await this._commonService[nameQuery]();
       } else {
-        
+
         console.log('function: ', nameQuery, this._commonService[nameQuery]);
         const params = JSON.parse(rawQuery);
         console.log('params: ', params);
         response = await this._commonService[nameQuery](params);;
         console.log('response: ', response);
       }
-     } catch (error) {
+    } catch (error) {
       console.log('error: ', error);
-        this.errorMessages = error.toString();
-     }
+      this.errorMessages = error.toString();
+    }
 
-     this.response = response ? JSON.stringify(response, null, 2) : '';
+    this.response = response ? JSON.stringify(response, null, 2) : '';
 
-     console.log('this.response: ', this.response);
+    console.log('this.response: ', this.response);
   }
 
   onSelectAutocompleteSQL(data: { queryName: string, query: string }) {
@@ -194,17 +203,17 @@ export class DbClientComponent implements OnInit {
 
   validateData(evt) {
     const { nameQuery, query } = this.formFunctions.value;
-    if(query) {
+    if (query) {
       try {
         this.errorMessages = null;
         const isNumber = this.parser.parseNumber(query);
         if (!isNumber) {
           const parse = this.parser.parseFields(query);
-          if(parse.invalidFields) {
-            this.errorMessages += parse.invalidFields.map((i) => { return `${ i.reason } | name: ${ i.name }` }).join('\n ');
+          if (parse.invalidFields) {
+            this.errorMessages += parse.invalidFields.map((i) => { return `${i.reason} | name: ${i.name}` }).join('\n ');
           }
 
-          if(parse.json == '{}' || parse.fields.length == 0) {
+          if (parse.json == '{}' || parse.fields.length == 0) {
             this.errorMessages += 'No hay campos que convertir. \n ';
           } else {
             this.formFunctions.get('rawQuery').setValue(parse.json)
@@ -234,9 +243,9 @@ export class DbClientComponent implements OnInit {
           parameters: fn.length
         };
       });
-      console.log('list: ', list);
-      return list;
-      
+    console.log('list: ', list);
+    return list;
+
   }
   //#endregion CONVERTERS
 }

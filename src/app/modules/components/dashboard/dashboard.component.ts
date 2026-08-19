@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation, } from '@angular/core';
-import { AnswerDTO, PermissionsDTO, AttemptDTO, QuizDTO, UserDTO } from 'src/app/shared/data/entities/dtos';
+import { QuizAnswerDTO, PermissionsDTO, AttemptDTO, QuizDTO, UserDTO } from 'src/app/shared/data/entities/dtos';
 import { AttemptState } from 'src/app/shared/data/enumerables/enumerables';
 import { TransformData } from 'src/app/shared/data/utils/transformData';
 import { CommonServices } from 'src/app/shared/services/common.services';
@@ -206,7 +206,7 @@ export class DashboardComponent implements OnInit {
     return list;
   }
 
-  validateQuestions(list: AnswerDTO[]) {
+  validateQuestions(list: QuizAnswerDTO[]) {
     const validAnswers = [];
     list.map((answer) => {
       if (answer.title != '' && answer._selectedAnswer != null) {

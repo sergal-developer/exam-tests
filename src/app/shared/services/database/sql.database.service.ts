@@ -2,19 +2,19 @@ import { Injectable } from "@angular/core";
 import { CapacitorSQLite, DBSQLiteValues, SQLiteConnection, SQLiteDBConnection } from '@capacitor-community/sqlite';
 import { Capacitor } from '@capacitor/core';
 import {
-    answer_attempt_table_querys,
-    answer_option_table_querys,
-    answer_table_querys,
-    AnswerDTO,
-    AnswerOptionDTO,
+    attempt_answer_table_querys,
+    attempt_table_querys,
     AttemptAnswerDTO,
     AttemptDTO,
     language_table_querys,
     LanguageDTO,
     log_table_querys,
     LogDTO,
-    quiz_attempt_table_querys,
+    quiz_answer_option_table_querys,
+    quiz_answer_table_querys,
     quiz_table_querys,
+    QuizAnswerDTO,
+    QuizAnswerOptionDTO,
     QuizDTO,
     settings_table_querys,
     SettingsDTO,
@@ -35,6 +35,8 @@ export class DatabaseService {
 
     private db: SQLiteDBConnection;
     private sqliteConnection!: SQLiteConnection;
+
+    origin: string = '';
 
     constructor(
         private _uiServices: UiServices,
@@ -128,8 +130,8 @@ export class DatabaseService {
             }
             return request;
         } catch (error) {
-            console.info('ERROR:', error);
-            this._uiServices.notification('ERROR EXEC: ' + JSON.stringify(error))
+            console.info(`ERROR:${ this.origin }:`, error);
+            this._uiServices.notification(`ERROR:${ this.origin }: ${ error.toString() }`)
             return null
         }
     }
@@ -151,8 +153,8 @@ export class DatabaseService {
             }
             return request && request.values ? request.values : null;
         } catch (error) {
-            console.info('ERROR:', error);
-            this._uiServices.notification('ERROR EXEC: ' + JSON.stringify(error))
+            console.warn(`ERROR:${ this.origin }:`, error);
+            this._uiServices.notification(`ERROR:${ this.origin }: ${ error.toString() }`)
             return null
         }
     }
@@ -179,8 +181,8 @@ export class DatabaseService {
             }
             return request && request.values ? request.values : null;
         } catch (error) {
-            console.info('ERROR:', error);
-            this._uiServices.notification('ERROR EXEC: ' + error);
+            console.info(`ERROR:${ this.origin }:`, error);
+            this._uiServices.notification(`ERROR:${ this.origin }: ${ error.toString() }`)
 
             if (log) {
                 log(error);
@@ -209,10 +211,10 @@ export class DatabaseService {
                 settings_table_querys.createTable.query,
                 theme_table_querys.createTable.query,
                 quiz_table_querys.createTable.query,
-                answer_table_querys.createTable.query,
-                answer_option_table_querys.createTable.query,
-                quiz_attempt_table_querys.createTable.query,
-                answer_attempt_table_querys.createTable.query,
+                quiz_answer_table_querys.createTable.query,
+                quiz_answer_option_table_querys.createTable.query,
+                attempt_table_querys.createTable.query,
+                attempt_answer_table_querys.createTable.query,
             ];
 
             for (const script of tableScripts) {
@@ -224,7 +226,7 @@ export class DatabaseService {
             return true;
 
         } catch (error) {
-            console.info('ERROR:', error);
+            console.info(`ERROR:${ this.origin }:`, error);
             return null;
         }
     }
@@ -239,10 +241,10 @@ export class DatabaseService {
         try {
 
             const tableScripts = [
-                answer_attempt_table_querys.deleteTable.query,
-                quiz_attempt_table_querys.deleteTable.query,
-                answer_option_table_querys.deleteTable.query,
-                answer_table_querys.deleteTable.query,
+                attempt_answer_table_querys.deleteTable.query,
+                attempt_table_querys.deleteTable.query,
+                quiz_answer_option_table_querys.deleteTable.query,
+                quiz_answer_table_querys.deleteTable.query,
                 quiz_table_querys.deleteTable.query,
                 language_table_querys.deleteTable.query,
                 theme_table_querys.deleteTable.query,
@@ -260,7 +262,7 @@ export class DatabaseService {
             return true;
 
         } catch (error) {
-            console.info('ERROR:', error);
+            console.info(`ERROR:${ this.origin }:`, error);
             return null;
         }
 
@@ -271,59 +273,71 @@ export class DatabaseService {
 
     //#region Logs (log_table)
     async getAllLogs(): Promise<LogDTO[]> {
+        this.origin = `getAllLogs()`;
         return await this.executeActionSQL(log_table_querys.selectAll.query);
     }
 
     async getLogById(id: number): Promise<LogDTO[]> {
+        this.origin = `getLogById(${ id }})`;
         return await this.executeActionSQL(log_table_querys.selectById.query, [id]);
     }
 
     async postLog(log: LogDTO): Promise<LogDTO> {
+        this.origin = `postLog(${ JSON.stringify(log) })`;
         const response = await this.executeActionSQL(log_table_querys.post.query, [log.id ?? null, log.date, log.content, log.type]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteLog(id: number): Promise<LogDTO[]> {
+        this.origin = `deleteLog(${ id })`;
         return await this.executeActionSQL(log_table_querys.deleteById.query, [id]);
     }
     //#endregion
 
     //#region Languages (language_table)
     async getAllLanguages(): Promise<LanguageDTO[]> {
+        this.origin = `getAllLanguages()`;
         return await this.executeActionSQL(language_table_querys.selectAll.query);
     }
 
     async getLanguageByValue(value: string): Promise<LanguageDTO> {
+        this.origin = `getLanguageByValue(${ value })`;
         const response = await this.executeActionSQL(language_table_querys.selectById.query, [value]);
         return response && response.length ? response[0] : null;
     }
 
     async postLanguage(lang: LanguageDTO): Promise<LanguageDTO[]> {
+        this.origin = `postLanguage(${ JSON.stringify(lang) })`;
         const response = await this.executeActionSQL(language_table_querys.post.query, [lang.value, lang.name]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteLanguage(value: string): Promise<LanguageDTO[]> {
+        this.origin = `deleteLanguage(${ value })`;
         return await this.executeActionSQL(language_table_querys.deleteById.query, [value]);
     }
     //#endregion
 
     //#region Users (user_table)
     async getAllUsers(): Promise<UserDTO[]> {
+        this.origin = `getAllUsers()`;
         return await this.executeActionSQL(user_table_querys.selectAll.query);
     }
 
     async getUserById(userId: number): Promise<UserDTO> {
+        this.origin = `getUserById(${ userId }})`;
         const response = await this.executeActionSQL(user_table_querys.selectById.query, [userId]);
         return response && response.length ? response[0] : null;
     }
 
     async getCurrentUser(): Promise<UserDTO> {
+        this.origin = `getCurrentUser()`;
         const response = await this.executeActionSQL(user_table_querys.selectByCurrent.query);
         return response && response.length ? response[0] : null;
     }
 
     async saveUser(user: UserDTO): Promise<UserDTO> {
+        this.origin = `saveUser(${ JSON.stringify(user) })`;
         let response: UserDTO = null;
         if (!user.userId) {
             response = await this._postUser(user);
@@ -334,6 +348,7 @@ export class DatabaseService {
     }
 
     private async _postUser(user: UserDTO): Promise<UserDTO> {
+        this.origin = `_postUser(${ JSON.stringify(user) })`;
         const values = [
             user.uuid ?? null,
             user.userName,
@@ -348,6 +363,7 @@ export class DatabaseService {
     }
 
     private async _putUser(user: UserDTO): Promise<UserDTO> {
+        this.origin = `_putUser(${ JSON.stringify(user) })`;
         const values = [
             user.userId ?? null,
             user.uuid ?? null,
@@ -363,6 +379,7 @@ export class DatabaseService {
     }
 
     async deleteUser(userId: number): Promise<UserDTO[]> {
+        this.origin = `deleteUser(${userId})`;
         return await this.executeActionSQL(user_table_querys.deleteById.query, [userId]);
     }
     //#endregion
@@ -386,65 +403,77 @@ export class DatabaseService {
     }
 
     async getAllSettings(): Promise<SettingsDTO[]> {
+        this.origin = `getAllSettings()`;
         const response = await this.executeActionSQL(settings_table_querys.selectAll.query);
         return this.normalizeSettings(response);
     }
 
     async getSettingById(settingId: number): Promise<SettingsDTO> {
+        this.origin = `getSettingById(${settingId})`;
         let response = await this.executeActionSQL(settings_table_querys.selectById.query, [settingId]);
         response = this.normalizeSettings(response);
         return response && response.length ? response[0] : null;
     }
 
     async getSettingCompleteById(settingId: number): Promise<SettingsDTO> {
+        this.origin = `getSettingCompleteById(${settingId})`;
         let response = await this.executeActionSQL(settings_table_querys.selectByIdWithRelations.query, [settingId]);
         response = this.normalizeSettings(response);
         return response && response.length ? response[0] : null;
     }
 
     async postSetting(setting: SettingsDTO): Promise<SettingsDTO> {
+        this.origin = `postSetting(${JSON.stringify(setting)})`;
         setting.permissions = this.objectToString(setting.permissions)
         const response = await this.executeActionSQL(settings_table_querys.post.query, [setting.settingId ?? null, setting.language, setting.permissions, setting.theme]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteSetting(settingId: number): Promise<SettingsDTO[]> {
+        this.origin = `deleteSetting(${settingId})`;
         return await this.executeActionSQL(settings_table_querys.deleteById.query, [settingId]);
     }
     //#endregion
 
     //#region Themes (theme_table)
     async getAllThemes(): Promise<ThemeDTO[]> {
+        this.origin = `getAllThemes()`;
         return await this.executeActionSQL(theme_table_querys.selectAll.query);
     }
 
     async getTheme(id: string): Promise<ThemeDTO> {
+        this.origin = `getTheme(${id}) `;
         const response = await this.executeActionSQL(theme_table_querys.selectById.query, [id]);
         return response && response.length ? response[0] : null;
     }
 
     async postTheme(theme: ThemeDTO): Promise<ThemeDTO> {
+        this.origin = `postTheme(${JSON.stringify(theme)})`;
         theme.content = this.objectToString(theme.content);
         const response = await this.executeActionSQL(theme_table_querys.post.query, [theme.id, theme.content]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteTheme(id: string): Promise<ThemeDTO[]> {
+        this.origin = `deleteTheme(${id})`;
         return await this.executeActionSQL(theme_table_querys.deleteById.query, [id]);
     }
     //#endregion
 
     //#region Quizzes (quiz_table)
     async getAllQuizzes(): Promise<QuizDTO[]> {
+        this.origin = `getAllQuizzes()`;
         return await this.executeActionSQL(quiz_table_querys.selectAll.query);
     }
 
     async getQuizById(quizId: number): Promise<QuizDTO> {
+        this.origin = `getQuizById(${quizId})`;
         const response = await this.executeActionSQL(quiz_table_querys.selectById.query, [quizId]);
         return response && response.length ? response[0] : null;
     }
 
     async getQuizCompleteById(quizId: number): Promise<QuizDTO> {
+        this.origin = `getQuizCompleteById(${quizId})`;
         try {
             const result = await this.executeActionSQL(quiz_table_querys.selectByIdWithRelations.query, [quizId]);
 
@@ -465,6 +494,7 @@ export class DatabaseService {
     }
 
     async saveQuiz(quiz: QuizDTO): Promise<QuizDTO> {
+        this.origin = `saveQuiz(${JSON.stringify(quiz)})`;
         let response: QuizDTO = null;
         if (!quiz.quizId) {
             response = await this._postQuiz(quiz);
@@ -475,32 +505,38 @@ export class DatabaseService {
     }
 
     private async _postQuiz(quiz: QuizDTO): Promise<QuizDTO> {
+        this.origin = `_postQuiz(${JSON.stringify(quiz)})`;
         const response = await this.executeActionSQL(quiz_table_querys.post.query, [quiz.uuid, quiz.title, quiz.time, quiz.creationDate, quiz.updatedDate, quiz.startDate]);
         return response && response.length ? response[0] : null;
     }
 
     private async _putQuiz(quiz: QuizDTO): Promise<QuizDTO> {
+        this.origin = `_putQuiz(${JSON.stringify(quiz)})`;
         const response = await this.executeActionSQL(quiz_table_querys.put.query, [quiz.quizId ?? null, quiz.uuid, quiz.title, quiz.time, quiz.creationDate, quiz.updatedDate, quiz.startDate]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteQuiz(quizId: number): Promise<QuizDTO[]> {
+        this.origin = `deleteQuiz(${quizId})`;
         return await this.executeActionSQL(quiz_table_querys.deleteById.query, [quizId]);
     }
     //#endregion
 
     //#region Answers (answer_table)
-    async getAllAnswers(): Promise<AnswerDTO[]> {
-        return await this.executeActionSQL(answer_table_querys.selectAll.query);
+    async getAllAnswers(): Promise<QuizAnswerDTO[]> {
+        this.origin = `getAllAnswers()`;
+        return await this.executeActionSQL(quiz_answer_table_querys.selectAll.query);
     }
 
-    async getAnswersByQuiz(quizId: number): Promise<AnswerDTO> {
-        const response = await this.executeActionSQL(answer_table_querys.selectById.query, [quizId]);
+    async getAnswersByQuiz(quizId: number): Promise<QuizAnswerDTO> {
+        this.origin = `getAnswersByQuiz(${quizId})`;
+        const response = await this.executeActionSQL(quiz_answer_table_querys.selectById.query, [quizId]);
         return response && response.length ? response[0] : null;
     }
 
-    async saveAnswer(answer: AnswerDTO): Promise<AnswerDTO> {
-        let response: AnswerDTO = null;
+    async saveAnswer(answer: QuizAnswerDTO): Promise<QuizAnswerDTO> {
+        this.origin = `saveAnswer(${JSON.stringify(answer)})`;
+        let response: QuizAnswerDTO = null;
         if (!answer.answerId) {
             response = await this._postAnswer(answer);
         } else {
@@ -509,29 +545,34 @@ export class DatabaseService {
         return response;
     }
 
-    private async _postAnswer(answer: AnswerDTO): Promise<AnswerDTO> {
-        const response = await this.executeActionSQL(answer_table_querys.post.query, [answer.quizId, answer.title, answer.updatedDate]);
+    private async _postAnswer(answer: QuizAnswerDTO): Promise<QuizAnswerDTO> {
+        this.origin = `_postAnswer(${JSON.stringify(answer)})`;
+        const response = await this.executeActionSQL(quiz_answer_table_querys.post.query, [answer.quizId, answer.title, answer.updatedDate]);
         return response && response.length ? response[0] : null;
     }
 
-    private async _putAnswer(answer: AnswerDTO): Promise<AnswerDTO> {
-        const response = await this.executeActionSQL(answer_table_querys.put.query, [answer.answerId ?? null, answer.quizId, answer.title, answer.updatedDate]);
+    private async _putAnswer(answer: QuizAnswerDTO): Promise<QuizAnswerDTO> {
+        this.origin = `_putAnswer(${JSON.stringify(answer)})`;
+        const response = await this.executeActionSQL(quiz_answer_table_querys.put.query, [answer.answerId ?? null, answer.quizId, answer.title, answer.updatedDate]);
         return response && response.length ? response[0] : null;
     }
 
-    async deleteAnswer(answerId: number): Promise<AnswerDTO[]> {
+    async deleteAnswer(answerId: number): Promise<QuizAnswerDTO[]> {
+        this.origin = `deleteAnswer(${answerId})`;
         const query = ``;
-        return await this.executeActionSQL(answer_table_querys.deleteById.query, [answerId]);
+        return await this.executeActionSQL(quiz_answer_table_querys.deleteById.query, [answerId]);
     }
     //#endregion
 
     //#region Answer Options (answer_option_table)
-    async getOptionsByAnswer(answerId: number): Promise<AnswerOptionDTO[]> {
-        return await this.executeActionSQL(answer_option_table_querys.selectByAnswerId.query, [answerId]);
+    async getOptionsByAnswer(answerId: number): Promise<QuizAnswerOptionDTO[]> {
+        this.origin = `getOptionsByAnswer(${answerId})`;
+        return await this.executeActionSQL(quiz_answer_option_table_querys.selectByAnswerId.query, [answerId]);
     }
 
-    async saveAnswerOption(option: AnswerOptionDTO): Promise<AnswerOptionDTO> {
-        let response: AnswerOptionDTO = null;
+    async saveAnswerOption(option: QuizAnswerOptionDTO): Promise<QuizAnswerOptionDTO> {
+        this.origin = `saveAnswerOption(${JSON.stringify(option)})`;
+        let response: QuizAnswerOptionDTO = null;
         if (!option.optionId) {
             response = await this._postAnswerOption(option);
         } else {
@@ -540,40 +581,47 @@ export class DatabaseService {
         return response;
     }
 
-    private async _postAnswerOption(option: AnswerOptionDTO): Promise<AnswerOptionDTO> {
+    private async _postAnswerOption(option: QuizAnswerOptionDTO): Promise<QuizAnswerOptionDTO> {
+        this.origin = `_postAnswerOption(${JSON.stringify(option)})`;
         const correctVal = option.isCorrect ? 1 : 0;
-        const response = await this.executeActionSQL(answer_option_table_querys.post.query, [option.answerId, option.content, option.optionIndex, option.updatedDate, correctVal]);
+        const response = await this.executeActionSQL(quiz_answer_option_table_querys.post.query, [option.answerId, option.content, option.optionIndex, option.updatedDate, correctVal]);
         return response && response.length ? response[0] : null;
     }
 
-    private async _putAnswerOption(option: AnswerOptionDTO): Promise<AnswerOptionDTO> {
+    private async _putAnswerOption(option: QuizAnswerOptionDTO): Promise<QuizAnswerOptionDTO> {
+        this.origin = `_putAnswerOption(${JSON.stringify(option)})`;
         const correctVal = option.isCorrect ? 1 : 0;
-        const response = await this.executeActionSQL(answer_option_table_querys.put.query, [option.optionId ?? null, option.answerId, option.content, option.optionIndex, option.updatedDate, correctVal]);
+        const response = await this.executeActionSQL(quiz_answer_option_table_querys.put.query, [option.optionId ?? null, option.answerId, option.content, option.optionIndex, option.updatedDate, correctVal]);
         return response && response.length ? response[0] : null;
     }
 
-    async deleteAnswerOption(optionId: number): Promise<AnswerOptionDTO[]> {
-        return await this.executeActionSQL(answer_option_table_querys.deleteById.query, [optionId]);
+    async deleteAnswerOption(optionId: number): Promise<QuizAnswerOptionDTO[]> {
+        this.origin = `deleteAnswerOption(${optionId})`;
+        return await this.executeActionSQL(quiz_answer_option_table_querys.deleteById.query, [optionId]);
     }
     //#endregion
 
     //#region Quiz Attempts (quiz_attempt_table)
     async getAttemptsByUser(userId: number): Promise<AttemptDTO[]> {
-        return await this.executeActionSQL(quiz_attempt_table_querys.selectByUserId.query, [userId]);
+        this.origin = `getAttemptsByUser(${userId})`;
+        return await this.executeActionSQL(attempt_table_querys.selectByUserId.query, [userId]);
     }
 
     async getAttemptById(quizId: number): Promise<AttemptDTO> {
-        const response = await this.executeActionSQL(quiz_attempt_table_querys.selectById.query, [quizId]);
+        this.origin = `getAttemptById(${quizId})`;
+        const response = await this.executeActionSQL(attempt_table_querys.selectById.query, [quizId]);
         return response && response.length ? response[0] : null;
     }
 
     async getAttemptByQuizId(quizId: number): Promise<Array<AttemptDTO>> {
-        const response = await this.executeActionSQL(quiz_attempt_table_querys.selectByQuizId.query, [quizId]);
+        this.origin = `getAttemptByQuizId(${quizId})`;
+        const response = await this.executeActionSQL(attempt_table_querys.selectByQuizId.query, [quizId]);
         return response && response.length ? response : [];
     }
 
     async getAttemptWithChildsById(attemptId: number): Promise<AttemptDTO> {
-        const response = await this.executeActionSQL(quiz_attempt_table_querys.selectByIdWithRelations.query, [attemptId]);
+        this.origin = `getAttemptWithChildsById(${attemptId})`;
+        const response = await this.executeActionSQL(attempt_table_querys.selectByIdWithRelations.query, [attemptId]);
 
         if (response && response.length > 0) {
             const data = response[0];
@@ -600,6 +648,7 @@ export class DatabaseService {
     }
 
     async saveQuizAttempt(attempt: AttemptDTO): Promise<AttemptDTO> {
+        this.origin = `saveQuizAttempt(${JSON.stringify(attempt)})`;
         let response: AttemptDTO = null;
         if (!attempt.attemptId) {
             response = await this._postQuizAttempt(attempt);
@@ -610,49 +659,58 @@ export class DatabaseService {
     }
 
     private async _postQuizAttempt(attempt: AttemptDTO): Promise<AttemptDTO> {
-        const response = await this.executeActionSQL(quiz_attempt_table_querys.post.query, [attempt.quizId, attempt.userId, attempt.title, attempt.updatedDate, attempt.startDate, attempt.score, attempt.state, attempt.time, attempt.answersLinked]);
+        this.origin = `_postQuizAttempt(${JSON.stringify(attempt)})`;
+        const response = await this.executeActionSQL(attempt_table_querys.post.query, [attempt.quizId, attempt.userId, attempt.title, attempt.updatedDate, attempt.startDate, attempt.score, attempt.state, attempt.time, attempt.answersLinked]);
         return response && response.length ? response[0] : null;
     }
 
     private async _putQuizAttempt(attempt: AttemptDTO): Promise<AttemptDTO> {
-        const response = await this.executeActionSQL(quiz_attempt_table_querys.put.query, [attempt.attemptId ?? null, attempt.quizId, attempt.userId, attempt.title, attempt.updatedDate, attempt.startDate, attempt.score, attempt.state, attempt.time, attempt.answersLinked]);
+        this.origin = `_putQuizAttempt(${JSON.stringify(attempt)})`;
+        const response = await this.executeActionSQL(attempt_table_querys.put.query, [attempt.attemptId ?? null, attempt.quizId, attempt.userId, attempt.title, attempt.updatedDate, attempt.startDate, attempt.score, attempt.state, attempt.time, attempt.answersLinked]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteQuizAttempt(attemptId: number): Promise<AttemptDTO[]> {
-        return await this.executeActionSQL(quiz_attempt_table_querys.deleteById.query, [attemptId]);
+        this.origin = `deleteQuizAttempt(${attemptId})`;
+        return await this.executeActionSQL(attempt_table_querys.deleteById.query, [attemptId]);
     }
     //#endregion
 
     //#region Answer Attempts (answer_attempt_table)
     async getAnswerAttemptsByAttempt(attemptId: number): Promise<AttemptAnswerDTO[]> {
-        return await this.executeActionSQL(answer_attempt_table_querys.selectByAttemptId.query, [attemptId]);
+        this.origin = `getAnswerAttemptsByAttempt(${attemptId})`;
+        return await this.executeActionSQL(attempt_answer_table_querys.selectByAttemptId.query, [attemptId]);
     }
 
     async saveAnswerAttempt(ansAttempt: AttemptAnswerDTO): Promise<AttemptAnswerDTO> {
+        this.origin = `saveAnswerAttempt(${JSON.stringify(ansAttempt, null, 2)})`;
         let response: AttemptAnswerDTO = null;
-        if (!ansAttempt.attemptId) {
+        if (!ansAttempt.answerAttemptId) {
             response = await this._postAnswerAttempt(ansAttempt);
         } else {
+            console.log('ansAttempt: ', ansAttempt);
             response = await this._putAnswerAttempt(ansAttempt);
         }
         return response;
     }
 
     private async _postAnswerAttempt(ansAttempt: AttemptAnswerDTO): Promise<AttemptAnswerDTO> {
+        this.origin = `_postAnswerAttempt(${JSON.stringify(ansAttempt)})`;
         const correctVal = ansAttempt.isCorrect ? 1 : 0;
-        const response = await this.executeActionSQL(answer_attempt_table_querys.post.query, [ansAttempt.attemptId, ansAttempt.answerId, ansAttempt.selectedOptionId, correctVal, ansAttempt.optionsLinked]);
+        const response = await this.executeActionSQL(attempt_answer_table_querys.post.query, [ansAttempt.attemptId, ansAttempt.answerId, ansAttempt.selectedOptionId, correctVal, ansAttempt.optionsLinked]);
         return response && response.length ? response[0] : null;
     }
 
     private async _putAnswerAttempt(ansAttempt: AttemptAnswerDTO): Promise<AttemptAnswerDTO> {
+        this.origin = `_putAnswerAttempt(${JSON.stringify(ansAttempt)})`;
         const correctVal = ansAttempt.isCorrect ? 1 : 0;
-        const response = await this.executeActionSQL(answer_attempt_table_querys.put.query, [ansAttempt.answerAttemptId ?? null, ansAttempt.attemptId, ansAttempt.answerId, ansAttempt.selectedOptionId, correctVal, ansAttempt.optionsLinked]);
+        const response = await this.executeActionSQL(attempt_answer_table_querys.put.query, [ansAttempt.answerAttemptId ?? null, ansAttempt.attemptId, ansAttempt.answerId, ansAttempt.selectedOptionId, correctVal, ansAttempt.optionsLinked]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteAnswerAttemptById(attemptId: number): Promise<AttemptDTO[]> {
-        return await this.executeActionSQL(answer_attempt_table_querys.deleteById.query, [attemptId]);
+        this.origin = `deleteAnswerAttemptById(${attemptId})`;
+        return await this.executeActionSQL(attempt_answer_table_querys.deleteById.query, [attemptId]);
     }
     //#endregion
 

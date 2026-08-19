@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, ViewEncapsulation, } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { AnswerDTO, AnswerOptionDTO, QuizDTO, SettingsDTO } from 'src/app/shared/data/entities/dtos';
+import { QuizAnswerDTO, QuizAnswerOptionDTO, QuizDTO, SettingsDTO } from 'src/app/shared/data/entities/dtos';
 import { CommonServices } from 'src/app/shared/services/common.services';
 import { UiServices } from 'src/app/shared/services/ui.services';
 import { v4 as uuidv4 } from 'uuid';
@@ -32,7 +32,7 @@ export class QuizEditableComponent implements OnInit {
 
   options: any = [];
   quiz: QuizDTO = null;
-  currentAnswer: AnswerDTO = null;
+  currentAnswer: QuizAnswerDTO = null;
   currentAnswerIndex = 0;
 
   translateLabels = {
@@ -118,8 +118,8 @@ export class QuizEditableComponent implements OnInit {
       }
 
       // add blanck spaces in questions
-      // this.quiz.answers.map((answer: AnswerDTO) => {
-      //   const newOption: AnswerOptionDTO = {
+      // this.quiz.answers.map((answer: QuizAnswerDTO) => {
+      //   const newOption: QuizAnswerOptionDTO = {
       //     answerId: answer.answerId,
       //     content: ,
       //     optionId: -1,
@@ -131,7 +131,7 @@ export class QuizEditableComponent implements OnInit {
       //     _selected: false,
       //   };
       //   const length = this.quiz.answers.length || 0;
-      //   const newOption: AnswerOptionDTO = {
+      //   const newOption: QuizAnswerOptionDTO = {
       //     answerId: answer.answerId,
       //     content: '',
       //     optionIndex: length + 1,
@@ -161,9 +161,9 @@ export class QuizEditableComponent implements OnInit {
       this.quiz.title = oldQuiz.title == '' ? this.quiz.title : oldQuiz.title;
       this.quiz.answers = oldQuiz.answers.length > 1 ? [...oldQuiz.answers, ...this.quiz.answers] : this.quiz.answers;
 
-      this.quiz.answers.map((answer: AnswerDTO) => {
+      this.quiz.answers.map((answer: QuizAnswerDTO) => {
         const length = this.quiz.answers.length || 0;
-        // answer._options.map((option: IAnswerOptionDTO) => {
+        // answer._options.map((option: IQuizAnswerOptionDTO) => {
         //   option.letter = this.getletter(option.id + 1);
         //   option.selected = false;
         //   option.correctAnswer = option.id == answer.correctAnswer;
@@ -215,7 +215,7 @@ export class QuizEditableComponent implements OnInit {
   get validActions(): boolean {
     const formValid = this.form.valid ?? false;
     const formQuestionValid = this.formQuestion.valid ?? false;
-    const question: AnswerDTO = this.formQuestion.value;
+    const question: QuizAnswerDTO = this.formQuestion.value;
     const questionsValid = question._options.length >= 3;
     const selectedAwnser = question._options.find(opt => opt._selected);
     return formValid && formQuestionValid && selectedAwnser && questionsValid;
@@ -243,14 +243,14 @@ export class QuizEditableComponent implements OnInit {
 
     if (cleanUnused) {
       // clean unused data
-      this.quiz.answers.map((question: AnswerDTO) => {
-        question._options = question._options.filter((opt: AnswerOptionDTO) => opt.content != '');
-        const correct = question._options.find((opt: AnswerOptionDTO) => opt['_selected']);
+      this.quiz.answers.map((question: QuizAnswerDTO) => {
+        question._options = question._options.filter((opt: QuizAnswerOptionDTO) => opt.content != '');
+        const correct = question._options.find((opt: QuizAnswerOptionDTO) => opt['_selected']);
         if (correct) {
           question['correctAnswer'] = correct.optionId;
         }
       });
-      this.quiz.answers = this.quiz.answers.filter((question: AnswerDTO) => question._options.length > 0);
+      this.quiz.answers = this.quiz.answers.filter((question: QuizAnswerDTO) => question._options.length > 0);
     }
 
     // // save or update data
@@ -281,7 +281,7 @@ export class QuizEditableComponent implements OnInit {
 
   //#region EVENTS
   selectAnswerCorrect(option: FormGroup) {
-    const _option = option.value as AnswerOptionDTO;
+    const _option = option.value as QuizAnswerOptionDTO;
      console.log('lastValue: ', _option);
     // reset all items
     this.formQuestion.value._options.map((opt, index) => {
@@ -1432,7 +1432,7 @@ export class QuizEditableComponent implements OnInit {
   }
 
   getNewQuestion() {
-    const question: AnswerDTO = {
+    const question: QuizAnswerDTO = {
       answerId: -1,
       quizId: this.quiz.quizId,
       title: '',
@@ -1444,7 +1444,7 @@ export class QuizEditableComponent implements OnInit {
       _answerText: `${this.quiz.answers.length + 1}`,
     }
 
-    const option: AnswerOptionDTO = {
+    const option: QuizAnswerOptionDTO = {
       answerId: question.answerId,
       content: '',
       optionId: -1,
@@ -1459,9 +1459,9 @@ export class QuizEditableComponent implements OnInit {
     return question;
   }
 
-  getNewOption(optionValue?: AnswerOptionDTO) {
+  getNewOption(optionValue?: QuizAnswerOptionDTO) {
     const question = this.quiz.answers[this.currentAnswerIndex];
-    const option: AnswerOptionDTO = {
+    const option: QuizAnswerOptionDTO = {
       answerId: question.answerId,
       content: '',
       optionId: null,

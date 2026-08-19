@@ -3,6 +3,10 @@ export interface LanguageDTO {
   name: string;
 }
 
+export function getLanguageDTO(name: string, value: string): LanguageDTO {
+  return { name: name, value: value } as LanguageDTO;
+}
+
 export const language_table_querys = {
 
   createTable: {

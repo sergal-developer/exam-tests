@@ -80,6 +80,14 @@ export interface ThemePropertiesDTO {
   zoomLevel?: String;
 }
 
+export function getThemeDTO(id: string, content: string): ThemeDTO {
+  return {
+    id: id,
+    content: content
+  } as ThemeDTO;
+}
+
+
 export const theme_table_querys = {
 
   createTable: {

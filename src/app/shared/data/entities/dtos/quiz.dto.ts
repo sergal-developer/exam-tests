@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 
 //#region INTERFACES
 export interface QuizDTO {
@@ -10,7 +11,7 @@ export interface QuizDTO {
   startDate?: number;
 
   // GENERATED
-  answers?: AnswerDTO[];
+  answers?: QuizAnswerDTO[];
 
   // varaibles for UI and format
   _showDetails?: boolean;
@@ -23,14 +24,14 @@ export interface QuizDTO {
   _bestTimeValue?: string;
 }
 
-export interface AnswerDTO {
+export interface QuizAnswerDTO {
   answerId?: number;
   quizId?: number;
   title: string;
   updatedDate: number;
 
   // GENERATED
-  _options?: AnswerOptionDTO[];
+  _options?: QuizAnswerOptionDTO[];
   _currentOption?: number | null;
   _answerText?: string | null;
 
@@ -39,7 +40,7 @@ export interface AnswerDTO {
   _isCorrect?: boolean;
 }
 
-export interface AnswerOptionDTO {
+export interface QuizAnswerOptionDTO {
   optionId?: number;
   answerId: number;
   content: string;
@@ -52,7 +53,7 @@ export interface AnswerOptionDTO {
 }
 
 export interface AttemptDTO extends QuizDTO {
-  attemptId: number;
+  attemptId?: number;
   // quizId: number; the filed exist in QuizDTO
   userId: number;
   title: string;
@@ -73,13 +74,15 @@ export interface AttemptDTO extends QuizDTO {
   _startDate?: string;
 }
 
-export interface AttemptAnswerDTO extends AnswerDTO {
+export interface AttemptAnswerDTO extends QuizAnswerDTO {
   answerAttemptId?: number;
   attemptId: number;
-  //answerId: number; this field exist in AnswerDTO
+  //answerId: number; this field exist in QuizAnswerDTO
   selectedOptionId?: number;
   isCorrect: boolean;
   optionsLinked: string;
+
+  // _options?: QuizAnswerOptionDTO[]; this field exist in QuizAnswerDTO
 }
 
 export enum AttemptState {
@@ -93,9 +96,102 @@ export enum GradeState {
   failed = 'failed',
   barely_passed = 'barely_passed',
 }
-
 //#endregion INTERFACES
 
+// #region INITIALIZE
+export function getQuizDTO(title: string, time: number): QuizDTO {
+  return {
+    quizId: null,
+    uuid: uuidv4(),
+    title: title,
+    time: time,
+    creationDate: new Date().getMilliseconds(),
+    updatedDate: new Date().getMilliseconds(),
+    startDate: new Date().getMilliseconds(),
+
+    answers: [],
+    _showDetails: false,
+    _status: '',
+    _current: false,
+    _creationDate: '',
+    _updatedDate: '',
+    _startDate: '',
+    _attemptsValue: '',
+    _bestTimeValue: ''
+  } as QuizDTO;
+}
+
+export function getQuizAnswerDTO(title: string): QuizAnswerDTO {
+  return {
+    answerId: null,
+    quizId: null,
+    title: title,
+    updatedDate: new Date().getMilliseconds(),
+
+    _options: [],
+    _currentOption: null,
+    _answerText: null,
+    _selectedAnswer: '',
+    _isEvaluated: false,
+    _isCorrect: false,
+  } as QuizAnswerDTO;
+}
+
+export function getQuizAnswerOptionDTO(content: string, optionIndex: number): QuizAnswerOptionDTO {
+  return {
+    optionId: null,
+    answerId: null,
+    content: content,
+    optionIndex: optionIndex,
+    updatedDate: new Date().getMilliseconds(),
+    isCorrect: false,
+
+    _selected: false
+  } as QuizAnswerOptionDTO;
+}
+
+export function getAttemptDTO(quizId: number, userId: number, title: string, answers: QuizAnswerDTO[]): AttemptDTO {
+  const attemptAnswers = answers ? answers.map(ans => {
+    let item: AttemptAnswerDTO = getAttemptAnswerDTO(ans.answerId, ans._options);
+    return item;
+  }) : [];
+
+  return {
+    attemptId: null,
+    quizId: quizId,
+    userId: userId,
+    title: title,
+    updatedDate: new Date().getMilliseconds(),
+    startDate: new Date().getMilliseconds(),
+    score: 0,
+    state: AttemptState.new,
+    time: 0,
+    answersLinked: JSON.stringify(attemptAnswers),
+
+    answers: attemptAnswers,
+    timeEnlapsed: 0,
+    correctAnswers: 0,
+    validTotalAnswers: 0,
+    grade: null,
+    _updatedDate: '',
+    _startDate: '',
+  } as AttemptDTO;
+}
+
+export function getAttemptAnswerDTO(answerId: number, options: QuizAnswerOptionDTO[]): AttemptAnswerDTO {
+  return {
+    answerAttemptId: null,
+    attemptId: null,
+    answerId: answerId,
+    selectedOptionId: null,
+    isCorrect: false,
+    optionsLinked: JSON.stringify(options),
+
+    _options: options
+  } as AttemptAnswerDTO;
+}
+
+// #endregion INITIALIZE
 
 export const quiz_table_querys = {
 
@@ -167,14 +263,14 @@ export const quiz_table_querys = {
                         'isCorrect', ao.[isCorrect]
                       )
                     )
-                    FROM [answer_option_table] ao
+                    FROM [quiz_answer_option_table] ao
                     WHERE ao.[answerId] = a.[answerId]
                   ),
                   json('[]')
                 )
               )
             )
-            FROM [answer_table] a
+            FROM [quiz_answer_table] a
             WHERE a.[quizId] = q.[quizId]
           ),
           json('[]')
@@ -240,12 +336,12 @@ export const quiz_table_querys = {
   },
 };
 
-export const answer_table_querys = {
+export const quiz_answer_table_querys = {
 
   createTable: {
     query: `
-      CREATE TABLE IF NOT EXISTS [answer_table] (
-        [answerId] INTEGER PRIMARY KEY AUTOINCREMENT,
+      CREATE TABLE IF NOT EXISTS [quiz_answer_table] (
+        [answerId] INTEGER PRIMARY KEY,
         [quizId] INTEGER,
         [title] TEXT,
         [updatedDate] INTEGER,
@@ -258,21 +354,21 @@ export const answer_table_querys = {
 
   deleteTable: {
     query: `
-      DROP TABLE IF EXISTS [answer_table];
+      DROP TABLE IF EXISTS [quiz_answer_table];
     `
   },
 
   selectAll: {
     query: `
       SELECT *
-      FROM [answer_table];
+      FROM [quiz_answer_table];
     `
   },
 
   selectById: {
     query: `
       SELECT *
-      FROM [answer_table]
+      FROM [quiz_answer_table]
       WHERE [answerId] = :answerId;
     `
   },
@@ -280,14 +376,14 @@ export const answer_table_querys = {
   filterBy: {
     query: `
       SELECT *
-      FROM [answer_table]
+      FROM [quiz_answer_table]
       WHERE [quizId] = :quizId;
     `
   },
 
   post: {
     query: `
-      INSERT INTO [answer_table] (
+      INSERT INTO [quiz_answer_table] (
         [quizId],
         [title],
         [updatedDate]
@@ -299,7 +395,7 @@ export const answer_table_querys = {
 
   put: {
     query: `
-      INSERT INTO [answer_table] (
+      INSERT INTO [quiz_answer_table] (
         [answerId],
         [quizId],
         [title],
@@ -307,7 +403,6 @@ export const answer_table_querys = {
       ) 
       VALUES (?, ?, ?, ?)
       ON CONFLICT(answerId) DO UPDATE SET 
-      SET
         [quizId] = excluded.quizId,
         [title] = excluded.title,
         [updatedDate] = excluded.updatedDate
@@ -317,26 +412,26 @@ export const answer_table_querys = {
 
   deleteById: {
     query: `
-      DELETE FROM [answer_table]
+      DELETE FROM [quiz_answer_table]
       WHERE [answerId] = ?;
     `
   }
 
 };
 
-export const answer_option_table_querys = {
+export const quiz_answer_option_table_querys = {
 
   createTable: {
     query: `
-      CREATE TABLE IF NOT EXISTS [answer_option_table] (
-        [optionId] INTEGER PRIMARY KEY AUTOINCREMENT,
+      CREATE TABLE IF NOT EXISTS [quiz_answer_option_table] (
+        [optionId] INTEGER PRIMARY KEY,
         [answerId] INTEGER,
         [content] TEXT,
         [optionIndex] INTEGER,
         [updatedDate] INTEGER,
         [isCorrect] BOOLEAN,
         FOREIGN KEY ([answerId])
-          REFERENCES [answer_table] ([answerId])
+          REFERENCES [quiz_answer_table] ([answerId])
           ON DELETE CASCADE
       );
     `
@@ -344,21 +439,21 @@ export const answer_option_table_querys = {
 
   deleteTable: {
     query: `
-      DROP TABLE IF EXISTS [answer_option_table];
+      DROP TABLE IF EXISTS [quiz_answer_option_table];
     `
   },
 
   selectAll: {
     query: `
       SELECT *
-      FROM [answer_option_table];
+      FROM [quiz_answer_option_table];
     `
   },
 
   selectById: {
     query: `
       SELECT *
-      FROM [answer_option_table]
+      FROM [quiz_answer_option_table]
       WHERE [optionId] = ?;
     `
   },
@@ -366,7 +461,7 @@ export const answer_option_table_querys = {
   selectByAnswerId: {
     query: `
       SELECT *
-      FROM [answer_option_table]
+      FROM [quiz_answer_option_table]
       WHERE [answerId] = ?
       ORDER BY optionIndex ASC;
     `
@@ -375,14 +470,14 @@ export const answer_option_table_querys = {
   filterBy: {
     query: `
       SELECT *
-      FROM [answer_option_table]
+      FROM [quiz_answer_option_table]
       WHERE [answerId] = :answerId;
     `
   },
 
   post: {
     query: `
-      INSERT INTO [answer_option_table] (
+      INSERT INTO [quiz_answer_option_table] (
         [answerId],
         [content],
         [optionIndex],
@@ -396,7 +491,7 @@ export const answer_option_table_querys = {
 
   put: {
     query: `
-      INSERT INTO [answer_option_table] (
+      INSERT INTO [quiz_answer_option_table] (
           [optionId],
           [answerId],
           [content],
@@ -417,18 +512,18 @@ export const answer_option_table_querys = {
 
   deleteById: {
     query: `
-      DELETE FROM [answer_option_table]
+      DELETE FROM [quiz_answer_option_table]
       WHERE [optionId] = :optionId;
     `
   }
 
 };
 
-export const quiz_attempt_table_querys = {
+export const attempt_table_querys = {
 
   createTable: {
     query: `
-      CREATE TABLE IF NOT EXISTS [quiz_attempt_table] (
+      CREATE TABLE IF NOT EXISTS [attempt_table] (
         [attemptId] INTEGER PRIMARY KEY AUTOINCREMENT,
         [quizId] INTEGER,
         [userId] INTEGER,
@@ -448,21 +543,21 @@ export const quiz_attempt_table_querys = {
 
   deleteTable: {
     query: `
-      DROP TABLE IF EXISTS [quiz_attempt_table];
+      DROP TABLE IF EXISTS [attempt_table];
     `
   },
 
   selectAll: {
     query: `
       SELECT *
-      FROM [quiz_attempt_table];
+      FROM [attempt_table];
     `
   },
 
   selectById: {
     query: `
       SELECT *
-      FROM [quiz_attempt_table]
+      FROM [attempt_table]
       WHERE [attemptId] = ?;
     `
   },
@@ -470,7 +565,7 @@ export const quiz_attempt_table_querys = {
   selectByQuizId: {
     query: `
       SELECT *
-      FROM [quiz_attempt_table]
+      FROM [attempt_table]
       WHERE [quizId] = ?;
     `
   },
@@ -478,7 +573,7 @@ export const quiz_attempt_table_querys = {
   selectByUserId: {
     query: `
       SELECT *
-      FROM [quiz_attempt_table]
+      FROM [attempt_table]
       WHERE [userId] = ?;
     `
   },
@@ -486,7 +581,7 @@ export const quiz_attempt_table_querys = {
   filterBy: {
     query: `
       SELECT *
-      FROM [quiz_attempt_table]
+      FROM [attempt_table]
       WHERE [quizId] = :quizId;
     `
   },
@@ -543,12 +638,12 @@ export const quiz_attempt_table_querys = {
                 END
               )
             )
-            FROM [answer_attempt_table] aa
+            FROM [attempt_answer_table] aa
 
-            LEFT JOIN [answer_table] a
+            LEFT JOIN [quiz_answer_table] a
               ON a.[answerId] = aa.[answerId]
 
-            LEFT JOIN [answer_option_table] ao
+            LEFT JOIN [quiz_answer_option_table] ao
               ON ao.[optionId] = aa.[selectedOptionId]
 
             WHERE aa.[attemptId] = qa.[attemptId]
@@ -556,7 +651,7 @@ export const quiz_attempt_table_querys = {
           json('[]')
         ) AS [answerAttempts]
 
-      FROM [quiz_attempt_table] qa
+      FROM [attempt_table] qa
 
       WHERE qa.[attemptId] = ?;
     `
@@ -564,7 +659,7 @@ export const quiz_attempt_table_querys = {
 
   post: {
     query: `
-      INSERT INTO [quiz_attempt_table] (
+      INSERT INTO [attempt_table] (
         [quizId],
         [userId],
         [title],
@@ -582,7 +677,7 @@ export const quiz_attempt_table_querys = {
 
   put: {
     query: `
-      INSERT INTO [quiz_attempt_table] (
+      INSERT INTO [attempt_table] (
           [attemptId],
           [quizId],
           [userId],
@@ -611,17 +706,17 @@ export const quiz_attempt_table_querys = {
 
   deleteById: {
     query: `
-      DELETE FROM [quiz_attempt_table]
+      DELETE FROM [attempt_table]
       WHERE [attemptId] = :attemptId;
     `
   },
 };
 
-export const answer_attempt_table_querys = {
+export const attempt_answer_table_querys = {
 
   createTable: {
     query: `
-      CREATE TABLE IF NOT EXISTS [answer_attempt_table] (
+      CREATE TABLE IF NOT EXISTS [attempt_answer_table] (
         [answerAttemptId] INTEGER PRIMARY KEY AUTOINCREMENT,
         [attemptId] INTEGER,
         [answerId] INTEGER,
@@ -630,35 +725,35 @@ export const answer_attempt_table_querys = {
         [optionsLinked] TEXT,
 
         FOREIGN KEY ([attemptId])
-          REFERENCES [quiz_attempt_table] ([attemptId])
+          REFERENCES [attempt_table] ([attemptId])
           ON DELETE CASCADE,
 
         FOREIGN KEY ([answerId])
-          REFERENCES [answer_table] ([answerId]),
+          REFERENCES [quiz_answer_table] ([answerId]),
 
         FOREIGN KEY ([selectedOptionId])
-          REFERENCES [answer_option_table] ([optionId])
+          REFERENCES [quiz_answer_option_table] ([optionId])
       );
     `
   },
 
   deleteTable: {
     query: `
-      DROP TABLE IF EXISTS [answer_attempt_table];
+      DROP TABLE IF EXISTS [attempt_answer_table];
     `
   },
 
   selectAll: {
     query: `
       SELECT *
-      FROM [answer_attempt_table];
+      FROM [attempt_answer_table];
     `
   },
 
   selectById: {
     query: `
       SELECT *
-      FROM [answer_attempt_table]
+      FROM [attempt_answer_table]
       WHERE [answerAttemptId] = ?;
     `
   },
@@ -666,7 +761,7 @@ export const answer_attempt_table_querys = {
   selectByAttemptId: {
     query: `
       SELECT *
-      FROM [answer_attempt_table]
+      FROM [attempt_answer_table]
       WHERE [attemptId] = ?;
     `
   },
@@ -674,28 +769,34 @@ export const answer_attempt_table_querys = {
   filterBy: {
     query: `
       SELECT *
-      FROM [answer_attempt_table]
+      FROM [attempt_answer_table]
       WHERE [attemptId] = ?;
     `
   },
 
   post: {
     query: `
-      INSERT INTO [answer_attempt_table] (
+      INSERT INTO [attempt_answer_table] (
         [attemptId],
         [answerId],
         [selectedOptionId],
         [isCorrect],
         [optionsLinked]
       )
-      VALUES ( ?, ?, ?, ?, ? )
+      VALUES (:attemptId, :answerId, :selectedOptionId, :isCorrect, :optionsLinked)
+      ON CONFLICT(answerAttemptId) DO UPDATE SET 
+            [attemptId] = excluded.[attemptId], 
+            [answerId] = excluded.[answerId], 
+            [selectedOptionId] = excluded.[selectedOptionId], 
+            [isCorrect] = excluded.[isCorrect],
+            [optionsLinked] = excluded.[optionsLinked]
       RETURNING *;
     `
   },
 
   put: {
     query: `
-      INSERT INTO [answer_attempt_table] (
+      INSERT INTO [attempt_answer_table] (
         [answerAttemptId],
         [attemptId],
         [answerId],
@@ -703,7 +804,7 @@ export const answer_attempt_table_querys = {
         [isCorrect],
         [optionsLinked]
       )
-      VALUES ( ?, ?, ?, ?, ?, ? )
+      VALUES (:attempt_answer_table, :attemptId, :answerId, :selectedOptionId, :isCorrect, :optionsLinked)
       ON CONFLICT(answerAttemptId) DO UPDATE SET 
             [attemptId] = excluded.[attemptId], 
             [answerId] = excluded.[answerId], 
@@ -716,7 +817,7 @@ export const answer_attempt_table_querys = {
 
   deleteById: {
     query: `
-      DELETE FROM [answer_attempt_table]
+      DELETE FROM [attempt_answer_table]
       WHERE [answerAttemptId] = ?;
     `
   }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { AnswerDTO, AnswerOptionDTO, LogDTO, AttemptAnswerDTO, AttemptDTO, QuizDTO, SettingsDTO, ThemeDTO, UserDTO, ThemePropertiesDTO } from '../data/entities/dtos';
+import { QuizAnswerDTO, QuizAnswerOptionDTO, LogDTO, AttemptAnswerDTO, AttemptDTO, QuizDTO, SettingsDTO, ThemeDTO, UserDTO, ThemePropertiesDTO } from '../data/entities/dtos';
 import { Utils } from '../data/utils/utils';
 import { DatabaseService } from './database/sql.database.service';
 import { v4 as uuidv4 } from 'uuid';
@@ -104,12 +104,12 @@ export class CommonServices {
     data = this.prepareQueryAnswersOptions(quiz);
 
     await Promise.all(
-      quiz.answers.map(async (answer: AnswerDTO) => {
+      quiz.answers.map(async (answer: QuizAnswerDTO) => {
         const responseAnswer = await this._services.saveAnswer(answer);
         answer.answerId = responseAnswer.answerId;
 
         // Guardar todas las opciones y esperar a que terminen
-        await Promise.all(answer._options.map(async (option: AnswerOptionDTO) => {
+        await Promise.all(answer._options.map(async (option: QuizAnswerOptionDTO) => {
           option.answerId = answer.answerId;
           const responseOption = await this._services.saveAnswerOption(option);
           option.optionId = responseOption.optionId;
@@ -120,7 +120,7 @@ export class CommonServices {
   }
 
 
-  prepareQueryAnswersOptions(quiz: QuizDTO): { quiz: QuizDTO, answers: AnswerDTO[], answerOptions: AnswerOptionDTO[] } {
+  prepareQueryAnswersOptions(quiz: QuizDTO): { quiz: QuizDTO, answers: QuizAnswerDTO[], answerOptions: QuizAnswerOptionDTO[] } {
     const _quiz: QuizDTO = {
       quizId: quiz.quizId == -1 ? null : quiz.quizId,
       uuid: quiz.uuid || uuidv4(),
@@ -156,35 +156,35 @@ export class CommonServices {
   //#endregion QUIZ
 
   //#region QUIZ_AWNSWERS
-  async getAllAnswers(): Promise<AnswerDTO[]> {
-    let response: AnswerDTO[] = await this._services.getAllAnswers();
+  async getAllAnswers(): Promise<QuizAnswerDTO[]> {
+    let response: QuizAnswerDTO[] = await this._services.getAllAnswers();
     return response;
   }
 
-  async getAnswersByQuiz(quizId: number): Promise<AnswerDTO> {
+  async getAnswersByQuiz(quizId: number): Promise<QuizAnswerDTO> {
     return await this._services.getAnswersByQuiz(quizId);
   }
 
-  async saveAnswer(data: AnswerDTO): Promise<AnswerDTO> {
+  async saveAnswer(data: QuizAnswerDTO): Promise<QuizAnswerDTO> {
     return await this._services.saveAnswer(data);
   }
 
-  async deleteAnswer(id: number): Promise<AnswerDTO> {
+  async deleteAnswer(id: number): Promise<QuizAnswerDTO> {
     let response = await this._services.deleteAnswer(id);
     return response && response.length ? response[0] : null;
   }
   //#endregion QUIZ_AWNSWERS
 
   //#region AWNSWERS_OPTIONS
-  async getOptionsByAnswer(answerId: number): Promise<AnswerOptionDTO[]> {
+  async getOptionsByAnswer(answerId: number): Promise<QuizAnswerOptionDTO[]> {
     return await this._services.getOptionsByAnswer(answerId);
   }
 
-  async saveAnswerOption(data: AnswerOptionDTO): Promise<AnswerOptionDTO> {
+  async saveAnswerOption(data: QuizAnswerOptionDTO): Promise<QuizAnswerOptionDTO> {
     return await this._services.saveAnswerOption(data);
   }
 
-  async deleteAnswerOption(id: number): Promise<AnswerOptionDTO> {
+  async deleteAnswerOption(id: number): Promise<QuizAnswerOptionDTO> {
     let response = await this._services.deleteAnswerOption(id);
     return response && response.length ? response[0] : null;
   }
@@ -226,16 +226,22 @@ export class CommonServices {
 
     data.answersLinked = JSON.stringify(data.answers);
     const quizAttempt: AttemptDTO = await this.saveQuizAttempt(data);
-    quizAttempt.answers = data.answers;
+    if(quizAttempt) {
+      quizAttempt.answers = data.answers;
 
-    await Promise.all(
-      quizAttempt.answers.map(async (answer: AttemptAnswerDTO) => {
-        answer.attemptId = quizAttempt.attemptId; // update new attemptID updated
-        const responseAnswer = await this._services.saveAnswerAttempt(answer);
-        answer.answerAttemptId = responseAnswer.answerAttemptId; // update new attemptID updated
-        return answer;
-      })
-    );
+      await Promise.all(
+        quizAttempt.answers.map(async (answer: AttemptAnswerDTO) => {
+          answer.attemptId = quizAttempt.attemptId; // update new attemptID updated
+          const responseAnswer = await this._services.saveAnswerAttempt(answer);
+          if(responseAnswer) {
+            answer.answerAttemptId = responseAnswer.answerAttemptId; // update new attemptID updated
+          }
+
+          return answer;
+        })
+      );
+    }
+    
     return quizAttempt;
   }
 
