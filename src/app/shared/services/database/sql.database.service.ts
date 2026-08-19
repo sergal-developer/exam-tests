@@ -284,7 +284,7 @@ export class DatabaseService {
 
     async postLog(log: LogDTO): Promise<LogDTO> {
         this.origin = `postLog(${ JSON.stringify(log) })`;
-        const response = await this.executeActionSQL(log_table_querys.post.query, [log.id ?? null, log.date, log.content, log.type]);
+        const response = await this.executeActionSQL(log_table_querys.post.query, [log.date, log.content, log.type]);
         return response && response.length ? response[0] : null;
     }
 
@@ -399,20 +399,15 @@ export class DatabaseService {
                 }
             });
         }
+        console.log('datalist: ', datalist);
         return datalist;
+        
     }
 
     async getAllSettings(): Promise<SettingsDTO[]> {
         this.origin = `getAllSettings()`;
         const response = await this.executeActionSQL(settings_table_querys.selectAll.query);
         return this.normalizeSettings(response);
-    }
-
-    async getSettingById(settingId: number): Promise<SettingsDTO> {
-        this.origin = `getSettingById(${settingId})`;
-        let response = await this.executeActionSQL(settings_table_querys.selectById.query, [settingId]);
-        response = this.normalizeSettings(response);
-        return response && response.length ? response[0] : null;
     }
 
     async getSettingCompleteById(settingId: number): Promise<SettingsDTO> {

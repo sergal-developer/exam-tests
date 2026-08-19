@@ -51,7 +51,8 @@ export class SettingsComponent implements OnInit {
 
   //#region DATA
   async getSettings() {
-    this.settings = await this._commonServices.getCurrentSettings();
+    this.settings = await this._commonServices.getSettingCompleteById();
+    console.log('this.settings: ', this.settings);
     this.profile = await this._commonServices.getCurrentUser();
 
     this.form = this.fb.group({
@@ -73,6 +74,7 @@ export class SettingsComponent implements OnInit {
     this.settings.permissions[id] = !this.settings.permissions[id];
     this.updatePermission();
   }
+
   async updatePermission() {
     if (this.updating) { return; }
     this.updating = true;

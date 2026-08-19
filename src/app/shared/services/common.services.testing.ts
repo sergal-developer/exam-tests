@@ -48,6 +48,8 @@ export class CommonServicesTesting {
 
     //#region SETTINGS
     async testSettings(): Promise<void> {
+        const currentSettings = await this.commonServices.getAllSettings();
+
         const setting: SettingsDTO = {
             settingId: 0,
             language: 'en',
@@ -56,12 +58,12 @@ export class CommonServicesTesting {
         };
         const saved = await this.commonServices.saveSettings(setting);
         this.log('saveSettings', saved);
-        const byId = await this.commonServices.getSettingById(0);
-        this.log('getSettingById', byId);
         const current = await this.commonServices.getCurrentSettings();
         this.log('getCurrentSettings', current);
-        const updated = await this.commonServices.updateSettings({ ...setting, theme: 'light' });
+        const updated = await this.commonServices.saveSettings({ ...setting, theme: 'light' });
         this.log('updateSettings', updated);
+        this.log('setting edited:', updated.theme == 'light');
+
         const all = await this.commonServices.getAllSettings();
         this.log('getAllSettings.length', all?.length);
         this.log('getAllSettings', all);
@@ -307,7 +309,6 @@ export class CommonServicesTesting {
     //#region LOGS
     async testLogs(): Promise<void> {
         const log = getLogDTO('Log test', 'info');
-        console.log('new log: ', log);
         const created = await this.commonServices.postLog(log);
         this.log('postLog', created);
         const id = toNumberId(created?.id);
@@ -330,8 +331,13 @@ export class CommonServicesTesting {
     }
 
     async testSetDefaultData(): Promise<void> {
-        const settings = await this.commonServices.setDefaultData();
-        this.log('setDefaultData', settings?.settingId);
+        let settings = await this.commonServices.setupDefaultData(false);
+
+        this.log('setDefaultData', settings);
+        if(!settings.settingId) {
+            settings = await this.commonServices.saveDefaultData();
+        }
+        this.log('setDefaultData', settings);
     }
     //#endregion STRUCTURE
 
@@ -346,14 +352,15 @@ export class CommonServicesTesting {
 
     async runAll(): Promise<void> {
         this.log('=== BEGIN COMMON SERVICES TEST ===');
-        // await this.testStructure();
-        // await this.testThemes();
-        // await this.testSettings();
-        // await this.testSetDefaultData();
+        await this.testStructure();
+        await this.testLogs();
+        await this.testThemes();
+        await this.testSettings();
+        await this.testSetDefaultData();
         // await this.testUsers();
         // await this.testPrepareQueryAnswersOptions();
         // await this.testSaveAllQuiz();
-        await this.testLogs();
+        
         // await this.testAttempts();
         // await this.testSaveAllQuizAttempt();
         // await this.testNavigate();

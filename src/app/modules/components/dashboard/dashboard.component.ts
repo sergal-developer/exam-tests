@@ -59,7 +59,7 @@ export class DashboardComponent implements OnInit {
   }
 
   async getSettings() {
-    const settings = await this._commonServices.setDefaultData();
+    const settings = await this._commonServices.saveDefaultData();
     this.user = await this._commonServices.getCurrentUser();
     this.permissions = settings.permissions as PermissionsDTO;
   }

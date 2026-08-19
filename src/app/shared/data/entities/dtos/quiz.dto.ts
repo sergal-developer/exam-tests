@@ -105,9 +105,9 @@ export function getQuizDTO(title: string, time: number): QuizDTO {
     uuid: uuidv4(),
     title: title,
     time: time,
-    creationDate: new Date().getMilliseconds(),
-    updatedDate: new Date().getMilliseconds(),
-    startDate: new Date().getMilliseconds(),
+    creationDate: new Date().getTime(),
+    updatedDate: new Date().getTime(),
+    startDate: new Date().getTime(),
 
     answers: [],
     _showDetails: false,
@@ -126,7 +126,7 @@ export function getQuizAnswerDTO(title: string): QuizAnswerDTO {
     answerId: null,
     quizId: null,
     title: title,
-    updatedDate: new Date().getMilliseconds(),
+    updatedDate: new Date().getTime(),
 
     _options: [],
     _currentOption: null,
@@ -143,7 +143,7 @@ export function getQuizAnswerOptionDTO(content: string, optionIndex: number): Qu
     answerId: null,
     content: content,
     optionIndex: optionIndex,
-    updatedDate: new Date().getMilliseconds(),
+    updatedDate: new Date().getTime(),
     isCorrect: false,
 
     _selected: false
@@ -161,8 +161,8 @@ export function getAttemptDTO(quizId: number, userId: number, title: string, ans
     quizId: quizId,
     userId: userId,
     title: title,
-    updatedDate: new Date().getMilliseconds(),
-    startDate: new Date().getMilliseconds(),
+    updatedDate: new Date().getTime(),
+    startDate: new Date().getTime(),
     score: 0,
     state: AttemptState.new,
     time: 0,

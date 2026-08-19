@@ -8,7 +8,7 @@ export interface LogDTO {
 export function getLogDTO(content: any, type: string): LogDTO {
   return {
     id: null,
-    date: new Date().getMilliseconds(),
+    date: new Date().getTime(),
     content: content,
     type: type
   } as LogDTO;
@@ -68,23 +68,6 @@ export const log_table_querys = {
           date = excluded.[date], 
           content = excluded.[content], 
           type = excluded.[type]
-      RETURNING *;
-    `
-  },
-
-  put: {
-    query: `
-      INSERT INTO [log_table] (
-        [id]      
-        [date],
-        [content],
-        [type]
-      )
-      VALUES (?, ?, ?, ?) 
-      ON CONFLICT(id) DO UPDATE SET 
-          date = excluded.date, 
-          content = excluded.content, 
-          type = excluded.type
       RETURNING *;
     `
   },

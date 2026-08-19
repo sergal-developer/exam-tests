@@ -5,7 +5,7 @@ export interface SettingsDTO {
   settingId?: number;
   language: string;
   theme?: string;
-  permissions: string | PermissionsDTO,
+  permissions: PermissionsDTO | string;
 
   // GENERATED
   _languages?: LanguageDTO[],
@@ -21,9 +21,9 @@ export interface PermissionsDTO {
   ai: boolean,
 }
 
-export function getSettingsDTO(settingId: number | null, language: string, theme: string, permissions: string): SettingsDTO {
+export function getSettingsDTO(language: string, theme: string, permissions: PermissionsDTO): SettingsDTO {
   return {
-    settingId: settingId,
+    settingId: null,
     language: language,
     theme: theme,
     permissions: permissions,
@@ -67,14 +67,6 @@ export const settings_table_querys = {
     query: `
       SELECT *
       FROM [settings_table];
-    `
-  },
-
-  selectById: {
-    query: `
-      SELECT *
-      FROM [settings_table]
-      WHERE [settingId] = ?;
     `
   },
 

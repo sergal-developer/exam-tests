@@ -13,7 +13,7 @@ import { UiServices } from '../shared/services/ui.services';
   encapsulation: ViewEncapsulation.None,
 })
 export class ModuleComponent implements OnInit, AfterViewInit {
-  availableLangs = ['es', 'en'];
+  
   browserLangs: string[] = [];
   currentLang = '';
 
@@ -40,14 +40,12 @@ export class ModuleComponent implements OnInit, AfterViewInit {
         this.module = this._activatedRoute.snapshot.paramMap.get('module');
         if (this.module) {
           this.screen = this._screen[this.module];
-          console.log('this.screen: ', this.screen);
         }
 
         this.submodule = this._activatedRoute.snapshot.queryParamMap.get('action');
 
         setTimeout(() => {
           this.uistate = `__${this.screen}`;
-          console.log('this.uistate: ', this.uistate);
           this.uisubstate = '';
         }, 500);
       }
@@ -57,7 +55,7 @@ export class ModuleComponent implements OnInit, AfterViewInit {
   async ngOnInit() {
     this.getPropsScreen();
     const existStructure = await this.loadDatabaseStructure();
-    this.setupLanguage(existStructure);
+    this.setupDefaultData(existStructure);
   }
 
   async ngAfterViewInit() {
@@ -71,29 +69,16 @@ export class ModuleComponent implements OnInit, AfterViewInit {
     return structure ? true : false;
   }
 
-  async setupLanguage(existDatabaseStructure = false) {
-    if (existDatabaseStructure) {
-      const setting = await this._commonService.getCurrentSettings();
-      if (setting) {
-        const languages = [];
-        setting._languages.map((lan) => {
-          languages.push(lan.value);
-        })
-        this.translate.addLangs(languages);
-        this.translate.setDefaultLang(setting.language);
-        this.applyCurrentTheme(setting);
-      } else {
-        this.setDefaultSettings();
-      }
-    } else {
-      this.setDefaultSettings();
-    }
-  }
+  async setupDefaultData(existDatabaseStructure = false) {
+    let settings: SettingsDTO;
+    settings = await this._commonService.setupDefaultData(existDatabaseStructure);
 
-  private setDefaultSettings() {
-    this.translate.addLangs(this.availableLangs);
-    this.currentLang = 'es';
-    this.translate.setDefaultLang(this.currentLang);
+    const availableLangs = settings._languages.map(lang => {
+      return lang.value;
+    });
+
+    this.translate.addLangs(availableLangs);
+    this.translate.setDefaultLang(settings.language);
   }
 
   onChangeUI(event) {

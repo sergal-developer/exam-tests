@@ -58,7 +58,7 @@ export class RegisterComponent implements OnInit {
 
   //#region DATA
   async checkInitialSettings() {
-    const settings = await this._commonServices.setDefaultData();
+    const settings = await this._commonServices.saveDefaultData();
     const profile = await this._commonServices.getActiveUser()
     if (profile) {
       this._commonServices.navigate('dashboard');

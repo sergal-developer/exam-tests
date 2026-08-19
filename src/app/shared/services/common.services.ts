@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { QuizAnswerDTO, QuizAnswerOptionDTO, LogDTO, AttemptAnswerDTO, AttemptDTO, QuizDTO, SettingsDTO, ThemeDTO, UserDTO, ThemePropertiesDTO } from '../data/entities/dtos';
+import { QuizAnswerDTO, QuizAnswerOptionDTO, LogDTO, AttemptAnswerDTO, AttemptDTO, QuizDTO, SettingsDTO, ThemeDTO, UserDTO, ThemePropertiesDTO, getSettingsDTO, getPermissionsDTO } from '../data/entities/dtos';
 import { Utils } from '../data/utils/utils';
 import { DatabaseService } from './database/sql.database.service';
 import { v4 as uuidv4 } from 'uuid';
@@ -8,6 +8,8 @@ import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class CommonServices {
 
+  availableLangs = ['es', 'en'];
+  currentLang = '';
   constructor(private _router: Router, private _services: DatabaseService) { }
 
   //#region PUBLIC METHODS
@@ -18,20 +20,16 @@ export class CommonServices {
   }
 
   async getCurrentSettings(): Promise<SettingsDTO> {
-    return await this._services.getSettingCompleteById(0);
+    const data = await this.getAllSettings();
+    return data && data.length ? data[0]  : null;
   }
 
-  async getSettingById(id: number): Promise<SettingsDTO> {
-    return await this._services.getSettingCompleteById(id)
+  async getSettingCompleteById(settingId: number = 0): Promise<SettingsDTO> {
+    return await this._services.getSettingCompleteById(settingId);
   }
 
   async saveSettings(data: SettingsDTO): Promise<SettingsDTO> {
     return await this._services.postSetting(data);
-  }
-
-  async updateSettings(data: SettingsDTO): Promise<SettingsDTO> {
-    await this._services.postSetting(data);
-    return this.getSettingById(data.settingId);
   }
   //#endregion SETTINGS
 
@@ -440,7 +438,7 @@ export class CommonServices {
     return await this._services.getStructure();
   }
 
-  async setDefaultData(): Promise<SettingsDTO> {
+  async saveDefaultData(): Promise<SettingsDTO> {
     let settings = await this._services.getSettingCompleteById(0);
 
     if (!settings) {
@@ -452,9 +450,9 @@ export class CommonServices {
       const permissions = {
         create: true,
         delete: false,
-        duplicate: false,
+        duplicate: true,
         edit: true,
-        ai: true
+        ai: false
       };
 
       await this._services.postSetting({ settingId: 0, language: 'en', theme: 'dark', permissions: permissions });
@@ -466,6 +464,39 @@ export class CommonServices {
   async getActiveUser() {
     let users = await this._services.getAllUsers();
     return users && users.length ? users[0] : null;
+  }
+
+  async setupDefaultData(existDatabaseStructure = false) {
+    if (existDatabaseStructure) {
+      const setting = await this.getCurrentSettings();
+      if (setting) {
+        const languages = [];
+        setting._languages.map((lan) => {
+          languages.push(lan.value);
+        });
+        return setting;
+      }
+    }
+
+    return this.setDefaultSettings();
+  }
+
+  private setDefaultSettings(): SettingsDTO {
+    const languages = []
+    this.availableLangs.map((lan) => {
+        languages.push({ name: lan, value: lan });
+    });
+
+    const setting = getSettingsDTO('es', 'dark', getPermissionsDTO(true, true, true, false, false));
+
+    setting._languages = languages;
+    setting._themes = [
+      { id: 'light', content: this.defaultThemeLight },
+      { id: 'dark', content: this.defaultThemeDark },
+    ];
+    setting._colors = [];
+
+    return setting;
   }
   //#endregion DEFAULT_DATA
 
