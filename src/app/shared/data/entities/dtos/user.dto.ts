@@ -118,7 +118,8 @@ export const user_table_querys = {
   deleteById: {
     query: `
       DELETE FROM [user_table]
-      WHERE [userId] = ?;
+      WHERE [userId] = ?
+      RETURNING *;
     `
   }
 };

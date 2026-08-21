@@ -105,7 +105,7 @@ export class QuizComponent implements OnInit {
   }
 
   async getAttemptData(id: number): Promise<AttemptDTO> {
-    let attempt: AttemptDTO = await this._commonService.getAttemptWithChildsById(id);
+    let attempt: AttemptDTO = await this._commonService.getAttemptCompleteById(id);
     console.log('getAttemptData: ', attempt);
     
     debugger;
@@ -120,7 +120,7 @@ export class QuizComponent implements OnInit {
           selectedOptionId: null,
           isCorrect: false,
           answerId: answer.answerId,
-          optionsLinked: JSON.stringify(answer._options),
+          optionsLinked: JSON.stringify(answer.options),
           ...answer
         };
         console.log('_answerAttempt: ', _answerAttempt);

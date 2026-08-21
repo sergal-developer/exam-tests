@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { QuizAnswerDTO, QuizAnswerOptionDTO, LogDTO, AttemptAnswerDTO, AttemptDTO, QuizDTO, SettingsDTO, ThemeDTO, UserDTO, ThemePropertiesDTO, getSettingsDTO, getPermissionsDTO } from '../data/entities/dtos';
+import { QuizAnswerDTO, QuizAnswerOptionDTO, LogDTO, AttemptAnswerDTO, AttemptDTO, QuizDTO, SettingsDTO, ThemeDTO, UserDTO, ThemePropertiesDTO, getSettingsDTO, getPermissionsDTO, getQuizDTOValid, normalizeQuizDTO, getAttemptDTO } from '../data/entities/dtos';
 import { Utils } from '../data/utils/utils';
 import { DatabaseService } from './database/sql.database.service';
 import { v4 as uuidv4 } from 'uuid';
@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class CommonServices {
 
-  availableLangs = ['es', 'en'];
+  availableLangs = [{ name: 'English', value: 'en' }, { name: 'Español', value: 'es' }];
   currentLang = '';
   constructor(private _router: Router, private _services: DatabaseService) { }
 
@@ -21,7 +21,10 @@ export class CommonServices {
 
   async getCurrentSettings(): Promise<SettingsDTO> {
     const data = await this.getAllSettings();
-    return data && data.length ? data[0]  : null;
+    if (data && data.length) {
+      return await this.getSettingCompleteById(data[0].settingId);
+    }
+    return null;
   }
 
   async getSettingCompleteById(settingId: number = 0): Promise<SettingsDTO> {
@@ -30,6 +33,10 @@ export class CommonServices {
 
   async saveSettings(data: SettingsDTO): Promise<SettingsDTO> {
     return await this._services.postSetting(data);
+  }
+
+  async deleteSettingById(id: number): Promise<any> {
+    return await this._services.deleteSetting(id);
   }
   //#endregion SETTINGS
 
@@ -72,34 +79,21 @@ export class CommonServices {
     return response;
   }
 
-  async getQuizById(quizId: number): Promise<QuizDTO> {
-    return await this._services.getQuizById(quizId);
-  }
-
   async getQuizCompleteById(quizId: number): Promise<QuizDTO> {
-    return await this._services.getQuizCompleteById(quizId);
-  }
-
-  async saveQuiz(quiz: QuizDTO): Promise<QuizDTO> {
-    return await this._services.saveQuiz(quiz);
-  }
-
-  async deleteQuiz(quizId: number): Promise<QuizDTO> {
-
-    let response = await this._services.deleteQuiz(quizId);
-    return response && response.length ? response[0] : null;
+    let quiz = await this._services.getQuizCompleteById(quizId);
+    return quiz ? normalizeQuizDTO(quiz) : null;
   }
 
   async saveAllQuiz(quiz: QuizDTO): Promise<QuizDTO> {
     // quiz = quiz || this.mockquiz();
-    let data = this.prepareQueryAnswersOptions(quiz);
+    let data = getQuizDTOValid(quiz);
 
     // Guardar el quiz primero
     const responseQuiz: QuizDTO = await this._services.saveQuiz(data.quiz);
     quiz.quizId = responseQuiz.quizId;
 
     // Preparar nuevamente los datos con el quizId
-    data = this.prepareQueryAnswersOptions(quiz);
+    data = getQuizDTOValid(quiz);
 
     await Promise.all(
       quiz.answers.map(async (answer: QuizAnswerDTO) => {
@@ -107,16 +101,40 @@ export class CommonServices {
         answer.answerId = responseAnswer.answerId;
 
         // Guardar todas las opciones y esperar a que terminen
-        await Promise.all(answer._options.map(async (option: QuizAnswerOptionDTO) => {
+        await Promise.all(answer.options.map(async (option: QuizAnswerOptionDTO) => {
           option.answerId = answer.answerId;
           const responseOption = await this._services.saveAnswerOption(option);
           option.optionId = responseOption.optionId;
         }))
       })
     );
-    return quiz;
+
+    return normalizeQuizDTO(quiz);
   }
 
+  async duplicateQuiz(quizId: number): Promise<QuizDTO> {
+    // return await this._services.getQuizCompleteById(quizId);
+    const _quiz = await this._services.getQuizCompleteById(quizId);
+    // clean _quiz to save as new record
+    _quiz.quizId = null;
+    _quiz.title = `${_quiz.title}`;
+    _quiz.updatedDate = new Date().getTime();
+    _quiz.answers.forEach(answer => {
+      answer.answerId = null;
+      answer.updatedDate = new Date().getTime();
+      answer.options.forEach(option => {
+        option.optionId = null;
+        option.updatedDate = new Date().getTime();
+      })
+    });
+
+    return await this.saveAllQuiz(_quiz);
+  }
+
+  async deleteQuiz(quizId: number): Promise<QuizDTO> {
+    let response = await this._services.deleteQuiz(quizId);
+    return response && response.length ? response[0] : null;
+  }
 
   prepareQueryAnswersOptions(quiz: QuizDTO): { quiz: QuizDTO, answers: QuizAnswerDTO[], answerOptions: QuizAnswerOptionDTO[] } {
     const _quiz: QuizDTO = {
@@ -128,6 +146,7 @@ export class CommonServices {
       updatedDate: quiz.updatedDate,
       startDate: quiz.startDate || 0,
     };
+
     const answers = [];
     const answerOptions = [];
 
@@ -138,7 +157,7 @@ export class CommonServices {
         answers.push(answer);
       }
 
-      answer._options.map(option => {
+      answer.options.map(option => {
         option.answerId = answer.answerId;
         option.optionId = option.optionId == -1 ? null : option.optionId;
         option.isCorrect = option._selected == true;
@@ -159,7 +178,7 @@ export class CommonServices {
     return response;
   }
 
-  async getAnswersByQuiz(quizId: number): Promise<QuizAnswerDTO> {
+  async getAnswersByQuiz(quizId: number): Promise<QuizAnswerDTO[]> {
     return await this._services.getAnswersByQuiz(quizId);
   }
 
@@ -189,49 +208,50 @@ export class CommonServices {
   //#endregion AWNSWERS_OPTIONS
 
   //#region QUIZ_ATTEMPS
-  async getAttemptById(attemptId: number): Promise<AttemptDTO> {
-    return await this._services.getAttemptById(attemptId);
+  async getAllAttempt(): Promise<AttemptDTO[]> {
+    return await this._services.getAllAttempts();
   }
 
-  async getAttemptByQuizId(quizId: number): Promise<Array<AttemptDTO>> {
+  async getAttemptByQuizId(quizId: number): Promise<AttemptDTO[]> {
     return await this._services.getAttemptByQuizId(quizId);
   }
 
-  async getAttemptWithChildsById(attemptId: number): Promise<AttemptDTO> {
-    return await this._services.getAttemptWithChildsById(attemptId);
+  async getAttemptCompleteById(attemptId: number): Promise<AttemptDTO> {
+    return await this._services.getAttemptCompleteById(attemptId);
   }
 
-  async saveQuizAttempt(data: AttemptDTO): Promise<AttemptDTO> {
-    return await this._services.saveQuizAttempt(data);
+  async saveAllAttempt(data: AttemptDTO): Promise<AttemptDTO> {
+    return await this._services.saveAllAttempt(data);
   }
 
   async saveAllQuizAttempt(data: AttemptDTO): Promise<AttemptDTO> {
     const quiz: QuizDTO = await this.getQuizCompleteById(data.quizId);
     data.answers = [];
 
-    quiz.answers.map((answer) => {  
+    quiz.answers.map((answer) => {
       const _answerAttempt: AttemptAnswerDTO = {
-          ...answer,
-          answerAttemptId: null,
-          attemptId: data.attemptId,
-          selectedOptionId: null,
-          isCorrect: false,
-          answerId: answer.answerId,
-          optionsLinked: JSON.stringify(answer._options),
+        ...answer,
+        answerAttemptId: null,
+        attemptId: data.attemptId,
+        selectedOptionId: null,
+        isCorrect: false,
+        answerId: answer.answerId,
+        optionsLinked: JSON.stringify(answer.options),
       };
       data.answers.push(_answerAttempt);
     });
 
     data.answersLinked = JSON.stringify(data.answers);
-    const quizAttempt: AttemptDTO = await this.saveQuizAttempt(data);
-    if(quizAttempt) {
+    // const quizAttempt: AttemptDTO = await this.saveQuizAttempt(data);
+    const quizAttempt: AttemptDTO = getAttemptDTO(1, 1, '', null)
+    if (quizAttempt) {
       quizAttempt.answers = data.answers;
 
       await Promise.all(
         quizAttempt.answers.map(async (answer: AttemptAnswerDTO) => {
           answer.attemptId = quizAttempt.attemptId; // update new attemptID updated
           const responseAnswer = await this._services.saveAnswerAttempt(answer);
-          if(responseAnswer) {
+          if (responseAnswer) {
             answer.answerAttemptId = responseAnswer.answerAttemptId; // update new attemptID updated
           }
 
@@ -239,7 +259,7 @@ export class CommonServices {
         })
       );
     }
-    
+
     return quizAttempt;
   }
 
@@ -461,11 +481,6 @@ export class CommonServices {
     return settings;
   }
 
-  async getActiveUser() {
-    let users = await this._services.getAllUsers();
-    return users && users.length ? users[0] : null;
-  }
-
   async setupDefaultData(existDatabaseStructure = false) {
     if (existDatabaseStructure) {
       const setting = await this.getCurrentSettings();
@@ -484,10 +499,10 @@ export class CommonServices {
   private setDefaultSettings(): SettingsDTO {
     const languages = []
     this.availableLangs.map((lan) => {
-        languages.push({ name: lan, value: lan });
+      languages.push(lan);
     });
 
-    const setting = getSettingsDTO('es', 'dark', getPermissionsDTO(true, true, true, false, false));
+    const setting = getSettingsDTO(this.availableLangs[0].value, 'dark', getPermissionsDTO(true, true, true, false, false));
 
     setting._languages = languages;
     setting._themes = [

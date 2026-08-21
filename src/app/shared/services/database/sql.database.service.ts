@@ -116,22 +116,20 @@ export class DatabaseService {
                 const statements = this.splitStatements(statementSql);
                 let changes = 0;
                 for (const stmt of statements) {
-                    console.log('stmt: ', stmt);
                     const res = await this.db.execute(stmt);
                     if (res && res.changes && res.changes.changes) {
                         changes += res.changes.changes;
                     }
                 }
                 request = { changes: { changes } };
-                console.log('request: ', request);
             } else {
                 request = await this.db.execute(statementSql);
                 await this.sqliteConnection.saveToStore(this.dbName);
             }
             return request;
         } catch (error) {
-            console.info(`ERROR:${ this.origin }:`, error);
-            this._uiServices.notification(`ERROR:${ this.origin }: ${ error.toString() }`)
+            console.info(`ERROR:${this.origin}:`, error);
+            this._uiServices.notification(`ERROR:${this.origin}: ${error.toString()}`)
             return null
         }
     }
@@ -153,8 +151,8 @@ export class DatabaseService {
             }
             return request && request.values ? request.values : null;
         } catch (error) {
-            console.warn(`ERROR:${ this.origin }:`, error);
-            this._uiServices.notification(`ERROR:${ this.origin }: ${ error.toString() }`)
+            console.warn(`ERROR:${this.origin}:`, error);
+            this._uiServices.notification(`ERROR:${this.origin}: ${error.toString()}`)
             return null
         }
     }
@@ -181,8 +179,8 @@ export class DatabaseService {
             }
             return request && request.values ? request.values : null;
         } catch (error) {
-            console.info(`ERROR:${ this.origin }:`, error);
-            this._uiServices.notification(`ERROR:${ this.origin }: ${ error.toString() }`)
+            console.info(`ERROR:${this.origin}:`, error);
+            this._uiServices.notification(`ERROR:${this.origin}: ${error.toString()}`)
 
             if (log) {
                 log(error);
@@ -226,7 +224,7 @@ export class DatabaseService {
             return true;
 
         } catch (error) {
-            console.info(`ERROR:${ this.origin }:`, error);
+            console.info(`ERROR:${this.origin}:`, error);
             return null;
         }
     }
@@ -262,7 +260,7 @@ export class DatabaseService {
             return true;
 
         } catch (error) {
-            console.info(`ERROR:${ this.origin }:`, error);
+            console.info(`ERROR:${this.origin}:`, error);
             return null;
         }
 
@@ -278,18 +276,18 @@ export class DatabaseService {
     }
 
     async getLogById(id: number): Promise<LogDTO[]> {
-        this.origin = `getLogById(${ id }})`;
+        this.origin = `getLogById(${id}})`;
         return await this.executeActionSQL(log_table_querys.selectById.query, [id]);
     }
 
     async postLog(log: LogDTO): Promise<LogDTO> {
-        this.origin = `postLog(${ JSON.stringify(log) })`;
+        this.origin = `postLog(${JSON.stringify(log)})`;
         const response = await this.executeActionSQL(log_table_querys.post.query, [log.date, log.content, log.type]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteLog(id: number): Promise<LogDTO[]> {
-        this.origin = `deleteLog(${ id })`;
+        this.origin = `deleteLog(${id})`;
         return await this.executeActionSQL(log_table_querys.deleteById.query, [id]);
     }
     //#endregion
@@ -301,19 +299,19 @@ export class DatabaseService {
     }
 
     async getLanguageByValue(value: string): Promise<LanguageDTO> {
-        this.origin = `getLanguageByValue(${ value })`;
+        this.origin = `getLanguageByValue(${value})`;
         const response = await this.executeActionSQL(language_table_querys.selectById.query, [value]);
         return response && response.length ? response[0] : null;
     }
 
     async postLanguage(lang: LanguageDTO): Promise<LanguageDTO[]> {
-        this.origin = `postLanguage(${ JSON.stringify(lang) })`;
+        this.origin = `postLanguage(${JSON.stringify(lang)})`;
         const response = await this.executeActionSQL(language_table_querys.post.query, [lang.value, lang.name]);
         return response && response.length ? response[0] : null;
     }
 
     async deleteLanguage(value: string): Promise<LanguageDTO[]> {
-        this.origin = `deleteLanguage(${ value })`;
+        this.origin = `deleteLanguage(${value})`;
         return await this.executeActionSQL(language_table_querys.deleteById.query, [value]);
     }
     //#endregion
@@ -325,7 +323,7 @@ export class DatabaseService {
     }
 
     async getUserById(userId: number): Promise<UserDTO> {
-        this.origin = `getUserById(${ userId }})`;
+        this.origin = `getUserById(${userId}})`;
         const response = await this.executeActionSQL(user_table_querys.selectById.query, [userId]);
         return response && response.length ? response[0] : null;
     }
@@ -337,7 +335,7 @@ export class DatabaseService {
     }
 
     async saveUser(user: UserDTO): Promise<UserDTO> {
-        this.origin = `saveUser(${ JSON.stringify(user) })`;
+        this.origin = `saveUser(${JSON.stringify(user)})`;
         let response: UserDTO = null;
         if (!user.userId) {
             response = await this._postUser(user);
@@ -348,7 +346,7 @@ export class DatabaseService {
     }
 
     private async _postUser(user: UserDTO): Promise<UserDTO> {
-        this.origin = `_postUser(${ JSON.stringify(user) })`;
+        this.origin = `_postUser(${JSON.stringify(user)})`;
         const values = [
             user.uuid ?? null,
             user.userName,
@@ -363,7 +361,7 @@ export class DatabaseService {
     }
 
     private async _putUser(user: UserDTO): Promise<UserDTO> {
-        this.origin = `_putUser(${ JSON.stringify(user) })`;
+        this.origin = `_putUser(${JSON.stringify(user)})`;
         const values = [
             user.userId ?? null,
             user.uuid ?? null,
@@ -399,9 +397,8 @@ export class DatabaseService {
                 }
             });
         }
-        console.log('datalist: ', datalist);
         return datalist;
-        
+
     }
 
     async getAllSettings(): Promise<SettingsDTO[]> {
@@ -419,14 +416,16 @@ export class DatabaseService {
 
     async postSetting(setting: SettingsDTO): Promise<SettingsDTO> {
         this.origin = `postSetting(${JSON.stringify(setting)})`;
-        setting.permissions = this.objectToString(setting.permissions)
+        setting.permissions = typeof setting.permissions !== 'string' ? this.objectToString(setting.permissions) : setting.permissions;
         const response = await this.executeActionSQL(settings_table_querys.post.query, [setting.settingId ?? null, setting.language, setting.permissions, setting.theme]);
         return response && response.length ? response[0] : null;
     }
 
-    async deleteSetting(settingId: number): Promise<SettingsDTO[]> {
+    async deleteSetting(settingId: number): Promise<SettingsDTO> {
         this.origin = `deleteSetting(${settingId})`;
-        return await this.executeActionSQL(settings_table_querys.deleteById.query, [settingId]);
+        let response = await this.executeActionSQL(settings_table_querys.deleteById.query, [settingId]);
+        response = this.normalizeSettings(response);
+        return response && response.length ? response[0] : null;
     }
     //#endregion
 
@@ -459,12 +458,6 @@ export class DatabaseService {
     async getAllQuizzes(): Promise<QuizDTO[]> {
         this.origin = `getAllQuizzes()`;
         return await this.executeActionSQL(quiz_table_querys.selectAll.query);
-    }
-
-    async getQuizById(quizId: number): Promise<QuizDTO> {
-        this.origin = `getQuizById(${quizId})`;
-        const response = await this.executeActionSQL(quiz_table_querys.selectById.query, [quizId]);
-        return response && response.length ? response[0] : null;
     }
 
     async getQuizCompleteById(quizId: number): Promise<QuizDTO> {
@@ -523,10 +516,10 @@ export class DatabaseService {
         return await this.executeActionSQL(quiz_answer_table_querys.selectAll.query);
     }
 
-    async getAnswersByQuiz(quizId: number): Promise<QuizAnswerDTO> {
+    async getAnswersByQuiz(quizId: number): Promise<QuizAnswerDTO[]> {
         this.origin = `getAnswersByQuiz(${quizId})`;
-        const response = await this.executeActionSQL(quiz_answer_table_querys.selectById.query, [quizId]);
-        return response && response.length ? response[0] : null;
+        const response = await this.executeActionSQL(quiz_answer_table_querys.selectByQuizId.query, [quizId]);
+        return response && response.length ? response : null;
     }
 
     async saveAnswer(answer: QuizAnswerDTO): Promise<QuizAnswerDTO> {
@@ -597,25 +590,19 @@ export class DatabaseService {
     //#endregion
 
     //#region Quiz Attempts (quiz_attempt_table)
-    async getAttemptsByUser(userId: number): Promise<AttemptDTO[]> {
-        this.origin = `getAttemptsByUser(${userId})`;
-        return await this.executeActionSQL(attempt_table_querys.selectByUserId.query, [userId]);
+    async getAllAttempts(): Promise<AttemptDTO[]> {
+        this.origin = `getAllAttempts()`;
+        return await this.executeActionSQL(attempt_table_querys.selectAll.query);
     }
-
-    async getAttemptById(quizId: number): Promise<AttemptDTO> {
-        this.origin = `getAttemptById(${quizId})`;
-        const response = await this.executeActionSQL(attempt_table_querys.selectById.query, [quizId]);
-        return response && response.length ? response[0] : null;
-    }
-
+    
     async getAttemptByQuizId(quizId: number): Promise<Array<AttemptDTO>> {
         this.origin = `getAttemptByQuizId(${quizId})`;
         const response = await this.executeActionSQL(attempt_table_querys.selectByQuizId.query, [quizId]);
         return response && response.length ? response : [];
     }
 
-    async getAttemptWithChildsById(attemptId: number): Promise<AttemptDTO> {
-        this.origin = `getAttemptWithChildsById(${attemptId})`;
+    async getAttemptCompleteById(attemptId: number): Promise<AttemptDTO> {
+        this.origin = `getAttemptCompleteById(${attemptId})`;
         const response = await this.executeActionSQL(attempt_table_querys.selectByIdWithRelations.query, [attemptId]);
 
         if (response && response.length > 0) {
@@ -642,7 +629,12 @@ export class DatabaseService {
         return null;
     }
 
-    async saveQuizAttempt(attempt: AttemptDTO): Promise<AttemptDTO> {
+    async saveAllAttempt(attempt: AttemptDTO): Promise<AttemptDTO> {
+
+        return attempt;
+    }
+
+    private async saveQuizAttempt(attempt: AttemptDTO): Promise<AttemptDTO> {
         this.origin = `saveQuizAttempt(${JSON.stringify(attempt)})`;
         let response: AttemptDTO = null;
         if (!attempt.attemptId) {

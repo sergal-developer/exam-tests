@@ -143,7 +143,8 @@ export const settings_table_querys = {
   deleteById: {
     query: `
       DELETE FROM [settings_table]
-      WHERE [settingId] = ?;
+      WHERE [settingId] = ?
+      RETURNING *;
     `
   }
 

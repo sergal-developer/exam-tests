@@ -221,7 +221,7 @@ export class SettingsComponent implements OnInit {
     try {
       const json = JSON.parse(data);
       // crear funcion que agrege el json de un solo paso
-      this._commonServices.saveQuiz(json);
+      // this._commonServices.saveQuiz(json);
       this._uiServices.notification('Plantilla importada exitosamente', { type: 'success', closeTimer: 5000 });
     } catch (error) {
       this._uiServices.notification('Error al importar plantilla', { type: 'warning', closeTimer: 5000 });

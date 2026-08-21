@@ -1,4 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
+import { TransformData } from '../../utils/transformData';
+
+const transform = new TransformData();
 
 //#region INTERFACES
 export interface QuizDTO {
@@ -31,7 +34,7 @@ export interface QuizAnswerDTO {
   updatedDate: number;
 
   // GENERATED
-  _options?: QuizAnswerOptionDTO[];
+  options?: QuizAnswerOptionDTO[];
   _currentOption?: number | null;
   _answerText?: string | null;
 
@@ -82,7 +85,7 @@ export interface AttemptAnswerDTO extends QuizAnswerDTO {
   isCorrect: boolean;
   optionsLinked: string;
 
-  // _options?: QuizAnswerOptionDTO[]; this field exist in QuizAnswerDTO
+  // options?: QuizAnswerOptionDTO[]; this field exist in QuizAnswerDTO
 }
 
 export enum AttemptState {
@@ -128,7 +131,7 @@ export function getQuizAnswerDTO(title: string): QuizAnswerDTO {
     title: title,
     updatedDate: new Date().getTime(),
 
-    _options: [],
+    options: [],
     _currentOption: null,
     _answerText: null,
     _selectedAnswer: '',
@@ -150,9 +153,81 @@ export function getQuizAnswerOptionDTO(content: string, optionIndex: number): Qu
   } as QuizAnswerOptionDTO;
 }
 
+export function normalizeQuizDTO(quiz: QuizDTO): QuizDTO {
+  quiz._attemptsValue = quiz._attemptsValue ?? '-';
+  quiz._bestTimeValue = quiz._bestTimeValue ?? '-';
+  quiz._creationDate = quiz.creationDate ? transform.toDate(new Date(quiz.creationDate), 'MMM/d/yy h:mm a') : '-';
+  quiz._updatedDate = quiz.updatedDate ? transform.toDate(new Date(quiz.updatedDate), 'MMM/d/yy h:mm a') : '-';
+  quiz._startDate = quiz.startDate ? transform.toDate(new Date(quiz.startDate), 'MMM/d/yy h:mm a') : '-';
+  
+  quiz.answers = quiz.answers || [];
+  quiz.answers.map((answer, idxAnswer) => {
+      answer.answerId = answer.answerId || null;
+      answer.quizId = quiz.quizId || null;
+      answer._answerText = `${ idxAnswer + 1 }`;
+      answer.title = answer.title ? answer.title.trim() : '';
+    
+      answer.options = answer.options || [];
+      answer.options.map((option, idxOptions) => {
+        option.answerId = answer.answerId || null;
+        option.optionId = option.optionId || null;
+        option.optionIndex = idxOptions + 1;
+        option.content = option.content ? option.content.trim() : '';
+      });
+  });
+
+  return quiz;
+}
+
+export function getQuizDTOValid(quiz: QuizDTO): { quiz: QuizDTO, answers: QuizAnswerDTO[], answerOptions: QuizAnswerOptionDTO[] }  {
+  const _quiz: QuizDTO = {
+      quizId: quiz.quizId,
+      uuid: quiz.uuid ,
+      title: quiz.title,
+      time: quiz.time || 0,
+      creationDate: quiz.creationDate,
+      updatedDate: quiz.updatedDate,
+      startDate: quiz.startDate || 0,
+  };
+  const answers = [];
+  const answerOptions = [];
+  
+  quiz._attemptsValue = quiz._attemptsValue ?? '-';
+  quiz._bestTimeValue = quiz._bestTimeValue ?? '-';
+  quiz._creationDate = quiz.creationDate ? transform.toDate(new Date(quiz.creationDate), 'MMM/d/yy h:mm a') : '-';
+  quiz._updatedDate = quiz.updatedDate ? transform.toDate(new Date(quiz.updatedDate), 'MMM/d/yy h:mm a') : '-';
+  quiz._startDate = quiz.startDate ? transform.toDate(new Date(quiz.startDate), 'MMM/d/yy h:mm a') : '-';
+  
+  quiz.answers = quiz.answers || [];
+  quiz.answers.map((answer, idxAnswer) => {
+      answer.answerId = answer.answerId || null;
+      answer.quizId = quiz.quizId || null;
+      answer._answerText = `${ idxAnswer + 1 }`;
+      answer.title = answer.title ? answer.title.trim() : '';
+      if (answer.title != '') {
+        answers.push(answer);
+      }
+    
+      answer.options = answer.options || [];
+      answer.options.map((option, idxOptions) => {
+        option.answerId = answer.answerId || null;
+        option.optionId = option.optionId || null;
+        option.optionIndex = idxOptions + 1;
+        option.content = option.content ? option.content.trim() : '';
+
+        if (option.content != '') {
+          answerOptions.push(option);
+        }
+
+      });
+  });
+
+  return { quiz: _quiz, answers: answers, answerOptions: answerOptions };
+}
+
 export function getAttemptDTO(quizId: number, userId: number, title: string, answers: QuizAnswerDTO[]): AttemptDTO {
   const attemptAnswers = answers ? answers.map(ans => {
-    let item: AttemptAnswerDTO = getAttemptAnswerDTO(ans.answerId, ans._options);
+    let item: AttemptAnswerDTO = getAttemptAnswerDTO(ans);
     return item;
   }) : [];
 
@@ -178,16 +253,16 @@ export function getAttemptDTO(quizId: number, userId: number, title: string, ans
   } as AttemptDTO;
 }
 
-export function getAttemptAnswerDTO(answerId: number, options: QuizAnswerOptionDTO[]): AttemptAnswerDTO {
+export function getAttemptAnswerDTO(answer: QuizAnswerDTO): AttemptAnswerDTO {
   return {
     answerAttemptId: null,
     attemptId: null,
-    answerId: answerId,
+    answerId: answer.answerId,
     selectedOptionId: null,
     isCorrect: false,
-    optionsLinked: JSON.stringify(options),
+    optionsLinked: JSON.stringify(answer.options),
 
-    _options: options
+    options: answer.options
   } as AttemptAnswerDTO;
 }
 
@@ -331,7 +406,8 @@ export const quiz_table_querys = {
   deleteById: {
     query: `
       DELETE FROM [quiz_table]
-      WHERE [quizId] = :quizId;
+      WHERE [quizId] = :quizId
+      RETURNING *;
     `
   },
 };
@@ -373,7 +449,7 @@ export const quiz_answer_table_querys = {
     `
   },
 
-  filterBy: {
+  selectByQuizId: {
     query: `
       SELECT *
       FROM [quiz_answer_table]
@@ -413,7 +489,8 @@ export const quiz_answer_table_querys = {
   deleteById: {
     query: `
       DELETE FROM [quiz_answer_table]
-      WHERE [answerId] = ?;
+      WHERE [answerId] = ?
+      RETURNING *;
     `
   }
 
@@ -513,7 +590,8 @@ export const quiz_answer_option_table_querys = {
   deleteById: {
     query: `
       DELETE FROM [quiz_answer_option_table]
-      WHERE [optionId] = :optionId;
+      WHERE [optionId] = :optionId
+      RETURNING *;
     `
   }
 
@@ -554,35 +632,11 @@ export const attempt_table_querys = {
     `
   },
 
-  selectById: {
-    query: `
-      SELECT *
-      FROM [attempt_table]
-      WHERE [attemptId] = ?;
-    `
-  },
-
   selectByQuizId: {
     query: `
       SELECT *
       FROM [attempt_table]
       WHERE [quizId] = ?;
-    `
-  },
-
-  selectByUserId: {
-    query: `
-      SELECT *
-      FROM [attempt_table]
-      WHERE [userId] = ?;
-    `
-  },
-
-  filterBy: {
-    query: `
-      SELECT *
-      FROM [attempt_table]
-      WHERE [quizId] = :quizId;
     `
   },
 
@@ -707,7 +761,8 @@ export const attempt_table_querys = {
   deleteById: {
     query: `
       DELETE FROM [attempt_table]
-      WHERE [attemptId] = :attemptId;
+      WHERE [attemptId] = :attemptId
+      RETURNING *;
     `
   },
 };
@@ -818,7 +873,8 @@ export const attempt_answer_table_querys = {
   deleteById: {
     query: `
       DELETE FROM [attempt_answer_table]
-      WHERE [answerAttemptId] = ?;
+      WHERE [answerAttemptId] = ?
+      RETURNING *;
     `
   }
 

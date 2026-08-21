@@ -133,7 +133,7 @@ export class DashboardComponent implements OnInit {
     quizData.title = `${ quizData.title } - Duplicated`;
     quizData.answers.forEach(answer => {
       answer.answerId = null;
-      answer._options.forEach(option => {
+      answer.options.forEach(option => {
         option.optionId = null;
       })
     });

@@ -21,7 +21,7 @@ export class QuizEditableComponent implements OnInit {
     answerId: new FormControl(0, Validators.required),
     quizId: new FormControl(-1),
     title: new FormControl('', Validators.required),
-    _options: new FormControl([], Validators.required),
+    options: new FormControl([], Validators.required),
   })
 
   formIAGenerated: FormGroup = new FormGroup({
@@ -123,7 +123,7 @@ export class QuizEditableComponent implements OnInit {
       //     answerId: answer.answerId,
       //     content: ,
       //     optionId: -1,
-      //     optionIndex: question._options.length + 1,
+      //     optionIndex: question.options.length + 1,
       //     updatedDate: new Date().getTime(),
 
       //     // GENERATED
@@ -139,7 +139,7 @@ export class QuizEditableComponent implements OnInit {
       //     updatedDate: new Date().getTime(),
       //     isCorrect: false
       //   }
-      //   answer._options.push(newOption);
+      //   answer.options.push(newOption);
       // });
       // this.quiz.questions.push(this.getNewQuestion());
       this.form = this.fb.group({
@@ -163,7 +163,7 @@ export class QuizEditableComponent implements OnInit {
 
       this.quiz.answers.map((answer: QuizAnswerDTO) => {
         const length = this.quiz.answers.length || 0;
-        // answer._options.map((option: IQuizAnswerOptionDTO) => {
+        // answer.options.map((option: IQuizAnswerOptionDTO) => {
         //   option.letter = this.getletter(option.id + 1);
         //   option.selected = false;
         //   option.correctAnswer = option.id == answer.correctAnswer;
@@ -196,7 +196,7 @@ export class QuizEditableComponent implements OnInit {
     const answerItem = this.quiz.answers[this.currentAnswerIndex];
 
     const optionArray = [];
-    answerItem._options.map(opt => {
+    answerItem.options.map(opt => {
       optionArray.push(this.getNewOption(opt))
     });
     this.formQuestion = this.fb.group({
@@ -204,20 +204,20 @@ export class QuizEditableComponent implements OnInit {
       quizId: [answerItem.quizId],
       title: [answerItem.title],
       updatedDate: [answerItem.updatedDate],
-      _options: this.fb.array(optionArray)
+      options: this.fb.array(optionArray)
     });
   }
 
   getOptions(): FormArray {
-    return this.formQuestion.get('_options') as FormArray;
+    return this.formQuestion.get('options') as FormArray;
   }
 
   get validActions(): boolean {
     const formValid = this.form.valid ?? false;
     const formQuestionValid = this.formQuestion.valid ?? false;
     const question: QuizAnswerDTO = this.formQuestion.value;
-    const questionsValid = question._options.length >= 3;
-    const selectedAwnser = question._options.find(opt => opt._selected);
+    const questionsValid = question.options.length >= 3;
+    const selectedAwnser = question.options.find(opt => opt._selected);
     return formValid && formQuestionValid && selectedAwnser && questionsValid;
     
   }
@@ -244,13 +244,13 @@ export class QuizEditableComponent implements OnInit {
     if (cleanUnused) {
       // clean unused data
       this.quiz.answers.map((question: QuizAnswerDTO) => {
-        question._options = question._options.filter((opt: QuizAnswerOptionDTO) => opt.content != '');
-        const correct = question._options.find((opt: QuizAnswerOptionDTO) => opt['_selected']);
+        question.options = question.options.filter((opt: QuizAnswerOptionDTO) => opt.content != '');
+        const correct = question.options.find((opt: QuizAnswerOptionDTO) => opt['_selected']);
         if (correct) {
           question['correctAnswer'] = correct.optionId;
         }
       });
-      this.quiz.answers = this.quiz.answers.filter((question: QuizAnswerDTO) => question._options.length > 0);
+      this.quiz.answers = this.quiz.answers.filter((question: QuizAnswerDTO) => question.options.length > 0);
     }
 
     // // save or update data
@@ -284,7 +284,7 @@ export class QuizEditableComponent implements OnInit {
     const _option = option.value as QuizAnswerOptionDTO;
      console.log('lastValue: ', _option);
     // reset all items
-    this.formQuestion.value._options.map((opt, index) => {
+    this.formQuestion.value.options.map((opt, index) => {
       this.getOptions().controls[index].get('_selected').setValue(false);
     });
 
@@ -295,12 +295,12 @@ export class QuizEditableComponent implements OnInit {
   }
 
   onOptionChange(event: { control: string, value: any }) {
-    const lastIndex = this.formQuestion.value._options.length - 1;
-    const lastValue = this.formQuestion.value._options[lastIndex].content;
+    const lastIndex = this.formQuestion.value.options.length - 1;
+    const lastValue = this.formQuestion.value.options[lastIndex].content;
     if (lastIndex >= 0 && lastValue != '') {
       this.getOptions().push(this.getNewOption());
     } else if (lastIndex > 0 && lastValue == '') {
-      const postlastValue = this.formQuestion.value._options[lastIndex - 1].content;
+      const postlastValue = this.formQuestion.value.options[lastIndex - 1].content;
       if (postlastValue == '') {
         this.getOptions().removeAt(lastIndex);
       }
@@ -1439,7 +1439,7 @@ export class QuizEditableComponent implements OnInit {
       updatedDate: new Date().getTime(),
 
       // GENERATED
-      _options: [],
+      options: [],
       _currentOption: null,
       _answerText: `${this.quiz.answers.length + 1}`,
     }
@@ -1448,14 +1448,14 @@ export class QuizEditableComponent implements OnInit {
       answerId: question.answerId,
       content: '',
       optionId: -1,
-      optionIndex: question._options.length + 1,
+      optionIndex: question.options.length + 1,
       updatedDate: new Date().getTime(),
 
       // GENERATED
       isCorrect: false,
       _selected: false,
     };
-    question._options = [option]
+    question.options = [option]
     return question;
   }
 
@@ -1465,7 +1465,7 @@ export class QuizEditableComponent implements OnInit {
       answerId: question.answerId,
       content: '',
       optionId: null,
-      optionIndex: question._options.length + 1,
+      optionIndex: question.options.length + 1,
       updatedDate: new Date().getTime(),
       // GENERATED
       isCorrect: false,
@@ -1473,7 +1473,7 @@ export class QuizEditableComponent implements OnInit {
     };
 
     if (!optionValue) {
-      const length = this.formQuestion ? this.formQuestion.value._options.length : 0;
+      const length = this.formQuestion ? this.formQuestion.value.options.length : 0;
       option.optionIndex = length + 1;
     } else {
       option.answerId = optionValue.answerId;
