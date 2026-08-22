@@ -285,7 +285,7 @@ export class CommonServicesTesting {
 
         // ELIMINACION DE OPCIONES
         const idxQuizAnswer = this.getRandomIndex(quiz.answers);
-        let quizAnswerOptions = await this.commonServices.getOptionsByAnswer(quiz.answers[idxQuizAnswer].answerId);
+        let quizAnswerOptions = await this.commonServices.getQuizAnswersOptionsByAnswerId(quiz.answers[idxQuizAnswer].answerId);
         this.log('QUIZ OPTIONS: ', quizAnswerOptions);
 
         let idxDeleteAt = this.getRandomIndex(quizAnswerOptions);
@@ -293,11 +293,11 @@ export class CommonServicesTesting {
 
         await Promise.all(Array.from({ length: idxDeleteAt }).map(async (i, index) => {
             const id = quizAnswerOptions[index].optionId;
-            const deleteItem = await this.commonServices.deleteAnswerOption(id);
+            const deleteItem = await this.commonServices.deleteQuizAnswerOption(id);
             this.log('delete OPTION: ', deleteItem);
         }));
 
-        _quizOptions = await this.commonServices.getOptionsByAnswer(quiz.answers[idxQuizAnswer].answerId);
+        _quizOptions = await this.commonServices.getQuizAnswersOptionsByAnswerId(quiz.answers[idxQuizAnswer].answerId);
         this.log('QUIZ OPTIONS UPDATED: ', _quizOptions);
 
         // ELIMINACION DE PREGUNTAS
@@ -337,21 +337,21 @@ export class CommonServicesTesting {
         this.log('Answers linked: ', answers);
 
         await Promise.all(answers.map(async (answer) => {
-            const _options = await this.commonServices.getOptionsByAnswer(answer.answerId);
-            console.log(`OPTIONS linked to Answer #${answer.answerId}: `, _options);
+            const _options = await this.commonServices.getQuizAnswersOptionsByAnswerId(answer.answerId);
+            this.log(`OPTIONS linked to Answer #${answer.answerId}: `, _options);
         }));
 
         const _quiz = await this.commonServices.deleteQuiz(quiz.quizId);
-        console.log('QUIZ ELIMINADO: ', _quiz);
+        this.log('QUIZ ELIMINADO: ', _quiz);
 
         // verificar que ya no existen las relaciones de las preguntas y opciones
         const _quizAnswers = await this.commonServices.getAnswersByQuiz(quiz.quizId);
-        console.log('Answers linked: ', _quizAnswers);
+        this.log('Answers linked: ', _quizAnswers);
 
         if (_quizAnswers) {
             await Promise.all(_quizAnswers.map(async (answer) => {
-                const _options = await this.commonServices.getOptionsByAnswer(answer.answerId);
-                console.log('_options vinculados a las preguntas: ', _options);
+                const _options = await this.commonServices.getQuizAnswersOptionsByAnswerId(answer.answerId);
+                this.log('_options vinculados a las preguntas: ', _options);
             }));
         }
 
@@ -367,138 +367,126 @@ export class CommonServicesTesting {
         //     const quizDeleted = await this.testQuizes_deleteQuiz(quiz);
         //     this.log('QUIZ Deleted: ', quizDeleted);
         // }));
-        
-        const quizzes = await this.testQuizes_getAll();
+
+        let quizzes = await this.testQuizes_getAll();
         this.log('All Quiz: ', quizzes);
 
-        const attempt = await this.testAttempts_createAttempt(quizzes[0].quizId);
-        this.log('ATTEMPT', attempt);
+        if (!quizzes.length) {
+            const quiz = await this.testQuizes_createQuiz(30, 5);
+            this.log('QUIZ CREATED: ', quiz);
 
-        const attemptEdited = await this.testAttempts_editAttempt(attempt);
+            quizzes = await this.testQuizes_getAll();
+            this.log('All Quiz: ', quizzes);
+        }
+
+        const attempts = await this.commonServices.getAttemptByQuizId(quizzes[0].quizId);
+        this.log('attempts: ', attempts);
+
+        // await Promise.all(attempts.map(async (att) => {
+        //     const attempt = await this.commonServices.getAttemptCompleteByAttemptId(att.attemptId);
+        //     const attemptDeleted = await this.commonServices.deleteQuizAttempt(att.attemptId);
+        //     this.log('ATTEMPT Deleted: ', attemptDeleted);
+        // }));
+
+        const attempt = await this.testAttempts_createAttempt(quizzes[0].quizId);
+        this.log('ATTEMPT CREATED', attempt);
+
+        const attemptEdited = await this.testAttempts_editAttempt(attempt.attemptId);
         this.log('ATTEMPT EDITED', attemptEdited);
 
-        const attemptUpdated = await this.testAttempts_editAttemptAnswersANdOptions(attempt);
-        this.log('ATTEMPT UPDATED', attemptUpdated);
+        const attemptDelete = await this.testAttempts_deleteAttempt(attempt.attemptId);
+        this.log('ATTEMPT DELETED', attemptDelete);
 
-        const attemptCompleted = await this.testAttempts_completeAttempt(attempt);
-        this.log('ATTEMPT COMPLETED', attemptCompleted);
-
-        const attemptScore = await this.testAttempts_scoreAttempt(attempt);
-        this.log('ATTEMPT SCORE', attemptScore);
+        const attemptSolved = await this.testAttempts_solveAttempts(quizzes[0].quizId);
+        this.log('ATTEMPT SOLVED', attemptSolved);
     }
 
     private async testAttempts_createAttempt(quizId: number): Promise<AttemptDTO> {
-        const quiz = await this.commonServices.getQuizCompleteById(quizId);
-
-        let attempt = getAttemptDTO(quizId, 1, quiz.title, quiz.answers);
-        console.log('attempt: ', attempt);
-
-        return attempt;
+        const attempt = await this.commonServices.createAttempt(quizId);
+        const attemptSaved = await this.commonServices.getAttemptCompleteByAttemptId(attempt.attemptId);
+        return attemptSaved;
     }
 
-    private async testAttempts_editAttempt(attempt: AttemptDTO): Promise<any> {}
-    
-    private async testAttempts_editAttemptAnswersANdOptions(attempt: AttemptDTO): Promise<any> {}
+    private async testAttempts_editAttempt(attemptId: number): Promise<AttemptDTO> {
+        const attempt = await this.commonServices.getAttemptCompleteByAttemptId(attemptId);
+        attempt.title = `Attemp edited  ${new Date().getTime()}`;
+        attempt.state = AttemptState.progress;
+        attempt.updatedDate = new Date().getTime();
 
-    private async testAttempts_completeAttempt(attempt: AttemptDTO): Promise<any> {}
-
-    private async testAttempts_scoreAttempt(attempt: AttemptDTO): Promise<any> {}
-
-    async _testAttempts(): Promise<void> {
-        const quiz = getQuizDTO('test', 0);
-        const savedQuiz = await this.commonServices.saveAllQuiz(quiz);
-        const quizId = toNumberId(savedQuiz?.quizId);
-        if (!quizId) {
-            this.log('testAttempts: quiz not created');
-            return;
-        }
-
-        const attempt: AttemptDTO = {
-            attemptId: null,
-            quizId,
-            userId: 1,
-            title: 'Intento Common',
-            time: 20,
-            creationDate: Date.now(),
-            startDate: Date.now(),
-            updatedDate: Date.now(),
-            score: 0,
-            state: AttemptState.new,
-            answersLinked: '[]'
-        } as any;
-        /*
-        const savedAttempt = await this.commonServices.saveQuizAttempt(attempt);
-        this.log('saveQuizAttempt', savedAttempt);
-        const attemptId = toNumberId(savedAttempt?.attemptId);
-        this.log('attemptId', attemptId);
-
-        if (attemptId) {
-            const byId = await this.commonServices.getAttemptById(attemptId);
-            this.log('getAttemptById', byId);
-            const byQuiz = await this.commonServices.getAttemptByQuizId(quizId);
-            this.log('getAttemptByQuizId', byQuiz?.length);
-            const withChilds = await this.commonServices.getAttemptWithChildsById(attemptId);
-            this.log('getAttemptWithChildsById', withChilds);
-
-            const answersByAttempt = await this.commonServices.getAnswerAttemptsByAttempt(attemptId);
-            this.log('getAnswerAttemptsByAttempt', answersByAttempt?.length);
-
-            await this.commonServices.deleteQuizAttempt(attemptId);
-            this.log('deleteQuizAttempt -> done', attemptId);
-        }
-
-        await this.commonServices.deleteQuiz(quizId);
-        this.log('cleanup quiz -> done', quizId);
-        */
+        attempt.answers.map((ans, index) => {
+            ans.selectedOptionId = 100;
+            ans.isCorrect = true;
+            ans.options.map((opt, idx) => {
+                opt.updatedDate = new Date().getTime();
+                return opt;
+            })
+            return ans;
+        })
+        return await this.commonServices.saveAllAttempt(attempt);
     }
 
-    async testSaveAllQuizAttempt(): Promise<void> {
-        const quiz = getQuizDTO('test', 0);
-        const savedQuiz = await this.commonServices.saveAllQuiz(quiz);
-        const quizId = toNumberId(savedQuiz?.quizId);
+    private async testAttempts_solveAttempts(quizId: number): Promise<any> {
+        // explore questions
+        let quiz = await this.commonServices.getQuizCompleteById(quizId);
+        const attemptsSolved: AttemptDTO[] = [];
 
-        if (!quizId) {
-            this.log('testSaveAllQuizAttempt: quiz not created');
-            return;
-        }
+        const total = quiz.answers.length;
+        const failing = Math.round(total * 0.20);
+        const passing = Math.round(total * 0.60);
+        const passing_aceptable = Math.round(total * 0.80);
+        const passing_perfect = Math.round(total * 1.00);
 
-        const attempt: AttemptDTO = {
-            attemptId: null,
-            quizId: savedQuiz.quizId,
-            userId: 1,
-            title: savedQuiz.title,
-            updatedDate: Date.now(),
-            startDate: Date.now(),
-            score: 0,
-            state: AttemptState.new,
-            time: 0,
-            answersLinked: '',
-            answers: savedQuiz.answers,
-        } as AttemptDTO;
+        // Solve attempt randomly
+        const attemptRandom = await this._solveAttemptByQuizId(quizId, 0);
+        attemptsSolved.push(attemptRandom);
 
-        attempt.answers.map((ans: AttemptAnswerDTO) => {
-            return {
-                ...ans,
-                attemptId: null,
-                isCorrect: false,
-                title: ans.title,
-                updatedDate: Date.now(),
-                optionsLinked: JSON.stringify(ans.options)
+        // Solve at failing
+        const attemptFailing = await this._solveAttemptByQuizId(quizId, failing);
+        attemptsSolved.push(attemptFailing);
+
+        // Solve at passing
+        const attemptPassing = await this._solveAttemptByQuizId(quizId, passing);
+        attemptsSolved.push(attemptPassing);
+
+        // Solve at passing_aceptable
+        const attemptPassingAceptable = await this._solveAttemptByQuizId(quizId, passing_aceptable);
+        attemptsSolved.push(attemptPassingAceptable);
+
+        // Solve at passing_perfect
+        const attemptPassingPerfect = await this._solveAttemptByQuizId(quizId, passing_perfect);
+        attemptsSolved.push(attemptPassingPerfect);
+
+        return attemptsSolved;
+    }
+
+    private async _solveAttemptByQuizId(quizId: number, successes: number): Promise<AttemptDTO> {
+        const resolveRandom = successes === 0;
+        const correctQuestions = [];
+        const attempt = await this.testAttempts_createAttempt(quizId);
+        attempt.state = AttemptState.progress;
+        attempt.answers.map(ans => {
+            if (resolveRandom) {
+                const idxOpt = this.getRandomIndex(ans.options);
+                ans.selectedOptionId = ans.options[idxOpt].optionId;
+            } else {
+                const correct = ans.options.find(opt => opt.isCorrect);
+                const incorrect = ans.options.find(opt => !opt.isCorrect);
+
+                if(correctQuestions.length < successes) {
+                    ans.selectedOptionId = correct.optionId;
+                    correctQuestions.push(ans);
+                } else {
+                    ans.selectedOptionId = incorrect.optionId;
+                }
             }
+            return ans;
         });
+        let attemptUpdated = await this.commonServices.saveAllAttempt(attempt);
+        return await this.commonServices.evalueAttemptById(attemptUpdated.attemptId);;
+    }
 
-        console.log('CREATE new attempt: ', attempt);
-        debugger;
-        const saved = await this.commonServices.saveAllQuizAttempt(attempt);
-
-        this.log('saveAllQuizAttempt', saved);
-        const attemptId = toNumberId(saved?.attemptId);
-        if (attemptId) {
-            await this.commonServices.deleteQuizAttempt(attemptId);
-            this.log('cleanup attempt -> done', attemptId);
-        }
-        await this.commonServices.deleteQuiz(quizId);
-        this.log('cleanup quiz -> done', quizId);
+    private async testAttempts_deleteAttempt(attemptId: number): Promise<AttemptDTO> {
+        return await this.commonServices.deleteQuizAttempt(attemptId);
     }
     //#endregion ATTEMPTS
 
@@ -539,12 +527,12 @@ export class CommonServicesTesting {
 
     async runAll(): Promise<void> {
         this.log('=== BEGIN COMMON SERVICES TEST ===');
-        // await this.testStructure();
-        // await this.testLogs();
-        // await this.testThemes();
-        // await this.testSettings();
-        // await this.testUsers();
-        // await this.testQuizes();
+        await this.testStructure();
+        await this.testLogs();
+        await this.testThemes();
+        await this.testSettings();
+        await this.testUsers();
+        await this.testQuizes();
         await this.testAttempts();
 
         // await this.testNavigate();

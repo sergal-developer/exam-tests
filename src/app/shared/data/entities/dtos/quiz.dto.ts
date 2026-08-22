@@ -83,6 +83,7 @@ export interface AttemptAnswerDTO extends QuizAnswerDTO {
   //answerId: number; this field exist in QuizAnswerDTO
   selectedOptionId?: number;
   isCorrect: boolean;
+  title: string;
   optionsLinked: string;
 
   // options?: QuizAnswerOptionDTO[]; this field exist in QuizAnswerDTO
@@ -95,9 +96,11 @@ export enum AttemptState {
 }
 
 export enum GradeState {
+  perfect = 'perfect',
   passed = 'passed',
   failed = 'failed',
   barely_passed = 'barely_passed',
+  not_submitted = 'not_submitted',
 }
 //#endregion INTERFACES
 
@@ -159,67 +162,67 @@ export function normalizeQuizDTO(quiz: QuizDTO): QuizDTO {
   quiz._creationDate = quiz.creationDate ? transform.toDate(new Date(quiz.creationDate), 'MMM/d/yy h:mm a') : '-';
   quiz._updatedDate = quiz.updatedDate ? transform.toDate(new Date(quiz.updatedDate), 'MMM/d/yy h:mm a') : '-';
   quiz._startDate = quiz.startDate ? transform.toDate(new Date(quiz.startDate), 'MMM/d/yy h:mm a') : '-';
-  
+
   quiz.answers = quiz.answers || [];
   quiz.answers.map((answer, idxAnswer) => {
-      answer.answerId = answer.answerId || null;
-      answer.quizId = quiz.quizId || null;
-      answer._answerText = `${ idxAnswer + 1 }`;
-      answer.title = answer.title ? answer.title.trim() : '';
-    
-      answer.options = answer.options || [];
-      answer.options.map((option, idxOptions) => {
-        option.answerId = answer.answerId || null;
-        option.optionId = option.optionId || null;
-        option.optionIndex = idxOptions + 1;
-        option.content = option.content ? option.content.trim() : '';
-      });
+    answer.answerId = answer.answerId || null;
+    answer.quizId = quiz.quizId || null;
+    answer._answerText = `${idxAnswer + 1}`;
+    answer.title = answer.title ? answer.title.trim() : '';
+
+    answer.options = answer.options || [];
+    answer.options.map((option, idxOptions) => {
+      option.answerId = answer.answerId || null;
+      option.optionId = option.optionId || null;
+      option.optionIndex = idxOptions + 1;
+      option.content = option.content ? option.content.trim() : '';
+    });
   });
 
   return quiz;
 }
 
-export function getQuizDTOValid(quiz: QuizDTO): { quiz: QuizDTO, answers: QuizAnswerDTO[], answerOptions: QuizAnswerOptionDTO[] }  {
+export function getQuizDTOValid(quiz: QuizDTO): { quiz: QuizDTO, answers: QuizAnswerDTO[], answerOptions: QuizAnswerOptionDTO[] } {
   const _quiz: QuizDTO = {
-      quizId: quiz.quizId,
-      uuid: quiz.uuid ,
-      title: quiz.title,
-      time: quiz.time || 0,
-      creationDate: quiz.creationDate,
-      updatedDate: quiz.updatedDate,
-      startDate: quiz.startDate || 0,
+    quizId: quiz.quizId,
+    uuid: quiz.uuid,
+    title: quiz.title,
+    time: quiz.time || 0,
+    creationDate: quiz.creationDate,
+    updatedDate: quiz.updatedDate,
+    startDate: quiz.startDate || 0,
   };
   const answers = [];
   const answerOptions = [];
-  
+
   quiz._attemptsValue = quiz._attemptsValue ?? '-';
   quiz._bestTimeValue = quiz._bestTimeValue ?? '-';
   quiz._creationDate = quiz.creationDate ? transform.toDate(new Date(quiz.creationDate), 'MMM/d/yy h:mm a') : '-';
   quiz._updatedDate = quiz.updatedDate ? transform.toDate(new Date(quiz.updatedDate), 'MMM/d/yy h:mm a') : '-';
   quiz._startDate = quiz.startDate ? transform.toDate(new Date(quiz.startDate), 'MMM/d/yy h:mm a') : '-';
-  
+
   quiz.answers = quiz.answers || [];
   quiz.answers.map((answer, idxAnswer) => {
-      answer.answerId = answer.answerId || null;
-      answer.quizId = quiz.quizId || null;
-      answer._answerText = `${ idxAnswer + 1 }`;
-      answer.title = answer.title ? answer.title.trim() : '';
-      if (answer.title != '') {
-        answers.push(answer);
+    answer.answerId = answer.answerId || null;
+    answer.quizId = quiz.quizId || null;
+    answer._answerText = `${idxAnswer + 1}`;
+    answer.title = answer.title ? answer.title.trim() : '';
+    if (answer.title != '') {
+      answers.push(answer);
+    }
+
+    answer.options = answer.options || [];
+    answer.options.map((option, idxOptions) => {
+      option.answerId = answer.answerId || null;
+      option.optionId = option.optionId || null;
+      option.optionIndex = idxOptions + 1;
+      option.content = option.content ? option.content.trim() : '';
+
+      if (option.content != '') {
+        answerOptions.push(option);
       }
-    
-      answer.options = answer.options || [];
-      answer.options.map((option, idxOptions) => {
-        option.answerId = answer.answerId || null;
-        option.optionId = option.optionId || null;
-        option.optionIndex = idxOptions + 1;
-        option.content = option.content ? option.content.trim() : '';
 
-        if (option.content != '') {
-          answerOptions.push(option);
-        }
-
-      });
+    });
   });
 
   return { quiz: _quiz, answers: answers, answerOptions: answerOptions };
@@ -241,9 +244,8 @@ export function getAttemptDTO(quizId: number, userId: number, title: string, ans
     score: 0,
     state: AttemptState.new,
     time: 0,
-    answersLinked: JSON.stringify(attemptAnswers),
-
     answers: attemptAnswers,
+    answersLinked: JSON.stringify(attemptAnswers),
     timeEnlapsed: 0,
     correctAnswers: 0,
     validTotalAnswers: 0,
@@ -260,10 +262,116 @@ export function getAttemptAnswerDTO(answer: QuizAnswerDTO): AttemptAnswerDTO {
     answerId: answer.answerId,
     selectedOptionId: null,
     isCorrect: false,
+    title: answer.title,
+    options: answer.options,
     optionsLinked: JSON.stringify(answer.options),
-
-    options: answer.options
   } as AttemptAnswerDTO;
+}
+
+export function getAttemptDTOValid(attempt: AttemptDTO): { attempt: AttemptDTO, answers: AttemptAnswerDTO[] } {
+  const _attempt: AttemptDTO = {
+    attemptId: attempt.attemptId,
+    quizId: attempt.quizId,
+    userId: attempt.userId,
+    title: attempt.title,
+    updatedDate: attempt.updatedDate,
+    startDate: attempt.startDate || null,
+    score: attempt.score || 0,
+    state: attempt.state || AttemptState.new,
+    time: attempt.time || 0,
+    answersLinked: '',
+  };
+  const answers: AttemptAnswerDTO[] = [];
+
+  // generated
+  _attempt.timeEnlapsed = attempt.timeEnlapsed || 0,
+    _attempt.correctAnswers = attempt.correctAnswers || 0,
+    _attempt.validTotalAnswers = attempt.validTotalAnswers || 0,
+    _attempt.grade = attempt.grade || attempt.state == AttemptState.new || _attempt.state == AttemptState.progress ? GradeState.not_submitted : null,
+    _attempt._updatedDate = attempt.updatedDate ? transform.toDate(new Date(_attempt.updatedDate), 'MMM/d/yy h:mm a') : '-';
+  _attempt._startDate = attempt.startDate ? transform.toDate(new Date(_attempt.startDate), 'MMM/d/yy h:mm a') : '-';
+
+  _attempt.answers = attempt.answers || [],
+    _attempt.answers.map((answer, idxAnswer) => {
+      answer.answerAttemptId = answer.answerAttemptId || null;
+      answer.attemptId = _attempt.attemptId || null;
+      answer.answerId = answer.answerId;
+      answer.selectedOptionId = answer.selectedOptionId || null;
+      answer.isCorrect = answer.isCorrect || false;
+      answer.title = answer.title ? answer.title.trim() : '';
+      answer.optionsLinked = answer.optionsLinked || '';
+
+      //Generated 
+      answer.options = answer.options || answer.options;
+      answer._answerText = `${idxAnswer + 1}`;
+      if (answer.title != '') {
+        answers.push(answer);
+      }
+
+      answer.optionsLinked = JSON.stringify(answer.options);
+    });
+  // _attempt.answersLinked = JSON.stringify(_attempt.answers);
+  _attempt.answersLinked = '';
+
+  return { attempt: _attempt, answers: answers };
+}
+
+export function normalizeAttemptDTO(attempt: AttemptDTO): AttemptDTO {
+  attempt.timeEnlapsed = attempt.timeEnlapsed || 0;
+  attempt.correctAnswers = attempt.correctAnswers || 0;
+  attempt.validTotalAnswers = attempt.validTotalAnswers || 0;
+  attempt.grade = attempt.grade || GradeState.not_submitted;
+
+  attempt._updatedDate = attempt.updatedDate ? transform.toDate(new Date(attempt.updatedDate), 'MMM/d/yy h:mm a') : '-';
+  attempt._startDate = attempt.startDate ? transform.toDate(new Date(attempt.startDate), 'MMM/d/yy h:mm a') : '-';
+
+  attempt.answers = attempt.answers || [];
+  attempt.answers.map((answer, idxAnswer) => {
+    answer.answerAttemptId = answer.answerAttemptId || null;
+    answer.attemptId = answer.attemptId || null;
+    answer.answerId = answer.answerId || answer.answerId;
+    answer.selectedOptionId = answer.selectedOptionId || null;
+    answer.isCorrect = answer.isCorrect || false;
+    answer.title = answer.title ? answer.title.trim() : '';
+    answer._answerText = `${idxAnswer + 1}`;
+
+    answer.options = answer.options || [];
+    answer.options.map((option, idxOptions) => {
+      option.answerId = answer.answerId || null;
+      option.optionId = option.optionId || null;
+      option.optionIndex = idxOptions + 1;
+      option.content = option.content ? option.content.trim() : '';
+    });
+  });
+
+  if (attempt.state == AttemptState.completed) {
+    const correctAnswer = attempt.answers.filter(ans => ans.isCorrect);
+    attempt.correctAnswers = correctAnswer.length;
+    attempt.grade = getGrade(attempt);
+  }
+  
+  return attempt;
+}
+
+export function getGrade(attempt: AttemptDTO) {
+  const total = attempt.answers.length;
+  const failing = Math.round(total * 0.20);
+  const passing = Math.round(total * 0.60);
+  const passing_aceptable = Math.round(total * 0.80);
+  const passing_perfect = Math.round(total * 1.00);
+  
+  const correctAnswer = attempt.answers.filter(ans => ans.isCorrect).length;
+  if (correctAnswer <= failing) {
+    return GradeState.failed;
+  } else if (correctAnswer <= passing) {
+    return GradeState.barely_passed;
+  } else if (correctAnswer <= passing_aceptable) {
+    return GradeState.passed;
+  } else if (correctAnswer == passing_perfect) {
+    return GradeState.perfect;
+  }
+
+  return GradeState.not_submitted;
 }
 
 // #endregion INITIALIZE
@@ -634,80 +742,77 @@ export const attempt_table_querys = {
 
   selectByQuizId: {
     query: `
-      SELECT *
-      FROM [attempt_table]
-      WHERE [quizId] = ?;
+      SELECT
+        att.[attemptId],
+        att.[quizId],
+        att.[userId],
+        att.[title],
+        att.[updatedDate],
+        att.[startDate],
+        att.[score],
+        att.[state],
+        att.[time],
+        att.[answersLinked],
+
+        COALESCE(
+          (
+            SELECT json_group_array(
+              json_object(
+                'answerAttemptId', attans.[answerAttemptId],
+                'attemptId', attans.[attemptId],
+                'answerId', attans.[answerId],
+                'selectedOptionId', attans.[selectedOptionId],
+                'isCorrect', attans.[isCorrect],
+                'title', attans.[title],
+                'optionsLinked', attans.[optionsLinked]
+              )
+            )
+            FROM [attempt_answer_table] attans
+            WHERE attans.[attemptId] = att.[attemptId]
+          ),
+          json('[]')
+        ) AS [answers]
+
+      FROM [attempt_table] att
+      WHERE att.[quizId] = ?;
     `
   },
 
   selectByIdWithRelations: {
     query: `
       SELECT
-        qa.[attemptId],
-        qa.[quizId],
-        qa.[userId],
-        qa.[title],
-        qa.[updatedDate],
-        qa.[startDate],
-        qa.[score],
-        qa.[state],
-        qa.[time],
-        qa.[answersLinked],
+        att.[attemptId],
+        att.[quizId],
+        att.[userId],
+        att.[title],
+        att.[updatedDate],
+        att.[startDate],
+        att.[score],
+        att.[state],
+        att.[time],
+        att.[answersLinked],
 
         COALESCE(
           (
             SELECT json_group_array(
               json_object(
-                'answerAttemptId', aa.[answerAttemptId],
-                'attemptId', aa.[attemptId],
-                'answerId', aa.[answerId],
-                'selectedOptionId', aa.[selectedOptionId],
-                'isCorrect', aa.[isCorrect],
-                'optionsLinked', aa.[optionsLinked],
-
-                'answer',
-                CASE
-                  WHEN a.[answerId] IS NOT NULL THEN
-                    json_object(
-                      'answerId', a.[answerId],
-                      'quizId', a.[quizId],
-                      'title', a.[title],
-                      'updatedDate', a.[updatedDate]
-                    )
-                  ELSE NULL
-                END,
-
-                'selectedOption',
-                CASE
-                  WHEN ao.[optionId] IS NOT NULL THEN
-                    json_object(
-                      'optionId', ao.[optionId],
-                      'answerId', ao.[answerId],
-                      'content', ao.[content],
-                      'optionIndex', ao.[optionIndex],
-                      'updatedDate', ao.[updatedDate],
-                      'isCorrect', ao.[isCorrect]
-                    )
-                  ELSE NULL
-                END
+                'answerAttemptId', attans.[answerAttemptId],
+                'attemptId', attans.[attemptId],
+                'answerId', attans.[answerId],
+                'selectedOptionId', attans.[selectedOptionId],
+                'isCorrect', attans.[isCorrect],
+                'title', attans.[title],
+                'optionsLinked', attans.[optionsLinked]
               )
             )
-            FROM [attempt_answer_table] aa
-
-            LEFT JOIN [quiz_answer_table] a
-              ON a.[answerId] = aa.[answerId]
-
-            LEFT JOIN [quiz_answer_option_table] ao
-              ON ao.[optionId] = aa.[selectedOptionId]
-
-            WHERE aa.[attemptId] = qa.[attemptId]
+            FROM [attempt_answer_table] attans
+            WHERE attans.[attemptId] = att.[attemptId]
           ),
           json('[]')
-        ) AS [answerAttempts]
+        ) AS [answers]
 
-      FROM [attempt_table] qa
-
-      WHERE qa.[attemptId] = ?;
+      FROM [attempt_table] att
+      WHERE att.[attemptId] = ?;
     `
   },
 
@@ -777,6 +882,7 @@ export const attempt_answer_table_querys = {
         [answerId] INTEGER,
         [selectedOptionId] INTEGER,
         [isCorrect] BOOLEAN,
+        [title] TEXT,
         [optionsLinked] TEXT,
 
         FOREIGN KEY ([attemptId])
@@ -836,9 +942,10 @@ export const attempt_answer_table_querys = {
         [answerId],
         [selectedOptionId],
         [isCorrect],
+        [title],
         [optionsLinked]
       )
-      VALUES (:attemptId, :answerId, :selectedOptionId, :isCorrect, :optionsLinked)
+      VALUES (:attemptId, :answerId, :selectedOptionId, :isCorrect, :title, :optionsLinked)
       ON CONFLICT(answerAttemptId) DO UPDATE SET 
             [attemptId] = excluded.[attemptId], 
             [answerId] = excluded.[answerId], 
@@ -857,14 +964,16 @@ export const attempt_answer_table_querys = {
         [answerId],
         [selectedOptionId],
         [isCorrect],
+        [title],
         [optionsLinked]
       )
-      VALUES (:attempt_answer_table, :attemptId, :answerId, :selectedOptionId, :isCorrect, :optionsLinked)
+      VALUES (:attempt_answer_table, :attemptId, :answerId, :selectedOptionId, :isCorrect, :title, :optionsLinked)
       ON CONFLICT(answerAttemptId) DO UPDATE SET 
             [attemptId] = excluded.[attemptId], 
             [answerId] = excluded.[answerId], 
             [selectedOptionId] = excluded.[selectedOptionId], 
             [isCorrect] = excluded.[isCorrect],
+            [title] = excluded.[title],
             [optionsLinked] = excluded.[optionsLinked]
       RETURNING *;
     `

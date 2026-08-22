@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { QuizAnswerDTO, QuizAnswerOptionDTO, LogDTO, AttemptAnswerDTO, AttemptDTO, QuizDTO, SettingsDTO, ThemeDTO, UserDTO, ThemePropertiesDTO, getSettingsDTO, getPermissionsDTO, getQuizDTOValid, normalizeQuizDTO, getAttemptDTO } from '../data/entities/dtos';
+import { QuizAnswerDTO, QuizAnswerOptionDTO, LogDTO, AttemptAnswerDTO, AttemptDTO, QuizDTO, SettingsDTO, ThemeDTO, UserDTO, ThemePropertiesDTO, getSettingsDTO, getPermissionsDTO, getQuizDTOValid, normalizeQuizDTO, getAttemptDTO, getAttemptDTOValid, normalizeAttemptDTO, AttemptState } from '../data/entities/dtos';
 import { Utils } from '../data/utils/utils';
 import { DatabaseService } from './database/sql.database.service';
 import { v4 as uuidv4 } from 'uuid';
@@ -103,7 +103,7 @@ export class CommonServices {
         // Guardar todas las opciones y esperar a que terminen
         await Promise.all(answer.options.map(async (option: QuizAnswerOptionDTO) => {
           option.answerId = answer.answerId;
-          const responseOption = await this._services.saveAnswerOption(option);
+          const responseOption = await this._services.saveQuizAnswerOption(option);
           option.optionId = responseOption.optionId;
         }))
       })
@@ -172,7 +172,7 @@ export class CommonServices {
   }
   //#endregion QUIZ
 
-  //#region QUIZ_AWNSWERS
+  //#region QUIZ_ANSWERS
   async getAllAnswers(): Promise<QuizAnswerDTO[]> {
     let response: QuizAnswerDTO[] = await this._services.getAllAnswers();
     return response;
@@ -190,94 +190,106 @@ export class CommonServices {
     let response = await this._services.deleteAnswer(id);
     return response && response.length ? response[0] : null;
   }
-  //#endregion QUIZ_AWNSWERS
+  //#endregion QUIZ_ANSWERS
 
-  //#region AWNSWERS_OPTIONS
-  async getOptionsByAnswer(answerId: number): Promise<QuizAnswerOptionDTO[]> {
-    return await this._services.getOptionsByAnswer(answerId);
+  //#region QUIZ_ANSWER_OPTIONS
+  async getQuizAnswersOptionsByAnswerId(answerId: number): Promise<QuizAnswerOptionDTO[]> {
+    return await this._services.getQuizAnswersOptionsByAnswerId(answerId);
   }
 
-  async saveAnswerOption(data: QuizAnswerOptionDTO): Promise<QuizAnswerOptionDTO> {
-    return await this._services.saveAnswerOption(data);
+  async saveQuizAnswerOption(data: QuizAnswerOptionDTO): Promise<QuizAnswerOptionDTO> {
+    return await this._services.saveQuizAnswerOption(data);
   }
 
-  async deleteAnswerOption(id: number): Promise<QuizAnswerOptionDTO> {
-    let response = await this._services.deleteAnswerOption(id);
+  async deleteQuizAnswerOption(id: number): Promise<QuizAnswerOptionDTO> {
+    let response = await this._services.deleteQuizAnswerOption(id);
     return response && response.length ? response[0] : null;
   }
-  //#endregion AWNSWERS_OPTIONS
+  //#endregion QUIZ_ANSWER_OPTIONS
 
-  //#region QUIZ_ATTEMPS
-  async getAllAttempt(): Promise<AttemptDTO[]> {
+  //#region ATTEMPTS
+  async getAllAttempts(): Promise<AttemptDTO[]> {
     return await this._services.getAllAttempts();
   }
 
   async getAttemptByQuizId(quizId: number): Promise<AttemptDTO[]> {
-    return await this._services.getAttemptByQuizId(quizId);
+    const attempts = await this._services.getAttemptByQuizId(quizId);
+    attempts.map(att => {
+      return normalizeAttemptDTO(att);
+    });
+    return attempts;
   }
 
-  async getAttemptCompleteById(attemptId: number): Promise<AttemptDTO> {
-    return await this._services.getAttemptCompleteById(attemptId);
+  async getAttemptCompleteByAttemptId(attemptId: number): Promise<AttemptDTO> {
+    const attempt = await this._services.getAttemptCompleteByAttemptId(attemptId);
+    return normalizeAttemptDTO(attempt);
   }
 
-  async saveAllAttempt(data: AttemptDTO): Promise<AttemptDTO> {
-    return await this._services.saveAllAttempt(data);
+  async createAttempt(quizId: number): Promise<AttemptDTO> {
+    const quiz = await this.getQuizCompleteById(quizId);
+    const _attempt = getAttemptDTO(quizId, 1, quiz.title, quiz.answers);
+    const attempt = await this.saveAllAttempt(_attempt);
+    return normalizeAttemptDTO(attempt);
   }
 
-  async saveAllQuizAttempt(data: AttemptDTO): Promise<AttemptDTO> {
-    const quiz: QuizDTO = await this.getQuizCompleteById(data.quizId);
-    data.answers = [];
+  async saveAllAttempt(attempt: AttemptDTO): Promise<AttemptDTO> {
+    let data = getAttemptDTOValid(attempt);
+    attempt = data.attempt;
 
-    quiz.answers.map((answer) => {
-      const _answerAttempt: AttemptAnswerDTO = {
-        ...answer,
-        answerAttemptId: null,
-        attemptId: data.attemptId,
-        selectedOptionId: null,
-        isCorrect: false,
-        answerId: answer.answerId,
-        optionsLinked: JSON.stringify(answer.options),
-      };
-      data.answers.push(_answerAttempt);
+    // Guardar el attempt primero
+    const responseQuiz: AttemptDTO = await this._services.saveAttempt(attempt);
+    attempt.attemptId = responseQuiz.attemptId;
+
+    // Preparar nuevamente los datos con el attemptId
+    data = getAttemptDTOValid(attempt);
+    attempt = data.attempt;
+
+    await Promise.all(
+      attempt.answers.map(async (answer: AttemptAnswerDTO) => {
+        const responseAnswer = await this._services.saveAttemptAnswers(answer);
+        answer.answerAttemptId = responseAnswer.answerAttemptId;
+      })
+    );
+
+    attempt.answers = data.answers;
+    data = getAttemptDTOValid(attempt);
+    attempt = data.attempt;
+    return normalizeAttemptDTO(attempt)
+  }
+
+  async evalueAttemptById(attemptId: number): Promise<AttemptDTO> {
+    let attempt = await this.getAttemptCompleteByAttemptId(attemptId);
+ 
+    attempt.answers.map(ans => {
+      const optCorrect = ans.options.find(opt => opt.isCorrect);
+      ans.isCorrect = optCorrect ? ans.selectedOptionId == optCorrect.optionId : false;
+      return ans;
     });
 
-    data.answersLinked = JSON.stringify(data.answers);
-    // const quizAttempt: AttemptDTO = await this.saveQuizAttempt(data);
-    const quizAttempt: AttemptDTO = getAttemptDTO(1, 1, '', null)
-    if (quizAttempt) {
-      quizAttempt.answers = data.answers;
+    const total = attempt.answers.length;
+    const correctAnswers = attempt.answers.filter(ans => ans.isCorrect);
 
-      await Promise.all(
-        quizAttempt.answers.map(async (answer: AttemptAnswerDTO) => {
-          answer.attemptId = quizAttempt.attemptId; // update new attemptID updated
-          const responseAnswer = await this._services.saveAnswerAttempt(answer);
-          if (responseAnswer) {
-            answer.answerAttemptId = responseAnswer.answerAttemptId; // update new attemptID updated
-          }
+    attempt.score = (correctAnswers.length * 100) / total;
+    attempt.state = AttemptState.completed;
 
-          return answer;
-        })
-      );
-    }
-
-    return quizAttempt;
+    attempt = await this.saveAllAttempt(attempt);
+    return attempt;
   }
 
-  async deleteQuizAttempt(attemptId: number): Promise<AttemptDTO[]> {
+  async deleteQuizAttempt(attemptId: number): Promise<AttemptDTO> {
     return await this._services.deleteQuizAttempt(attemptId);
   }
+  //#endregion ATTEMPTS
 
-  //#endregion QUIZ_ATTEMPS
-
-  //#region AWNSWERS_ATTEMPTS
-  async getAnswerAttemptsByAttempt(attemptId: number): Promise<AttemptAnswerDTO[]> {
-    return await this._services.getAnswerAttemptsByAttempt(attemptId);
+  //#region ANSWERS_ATTEMPTS
+  async getAttemptAnswersByAttemptId(attemptId: number): Promise<AttemptAnswerDTO[]> {
+    return await this._services.getAttemptAnswersByAttemptId(attemptId);
   }
 
-  async saveAnswerAttempt(data: AttemptAnswerDTO): Promise<AttemptAnswerDTO> {
-    return await this._services.saveAnswerAttempt(data);
+  async saveAttemptAnswers(data: AttemptAnswerDTO): Promise<AttemptAnswerDTO> {
+    return await this._services.saveAttemptAnswers(data);
   }
-  //#endregion AWNSWERS_ATTEMPTS
+  //#endregion ANSWERS_ATTEMPTS
 
   //#region LOGS
   async getAllLogs(): Promise<LogDTO[]> {
@@ -327,7 +339,6 @@ export class CommonServices {
   //#endregion NAVIGATION
 
   //#endregion PUBLIC METHODS
-
 
   //#region DEFAULT_DATA
   defaultThemeLight: ThemePropertiesDTO = {

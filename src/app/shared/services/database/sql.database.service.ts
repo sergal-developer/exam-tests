@@ -553,13 +553,13 @@ export class DatabaseService {
     //#endregion
 
     //#region Answer Options (answer_option_table)
-    async getOptionsByAnswer(answerId: number): Promise<QuizAnswerOptionDTO[]> {
-        this.origin = `getOptionsByAnswer(${answerId})`;
+    async getQuizAnswersOptionsByAnswerId(answerId: number): Promise<QuizAnswerOptionDTO[]> {
+        this.origin = `getQuizAnswersOptionsByAnswerId(${answerId})`;
         return await this.executeActionSQL(quiz_answer_option_table_querys.selectByAnswerId.query, [answerId]);
     }
 
-    async saveAnswerOption(option: QuizAnswerOptionDTO): Promise<QuizAnswerOptionDTO> {
-        this.origin = `saveAnswerOption(${JSON.stringify(option)})`;
+    async saveQuizAnswerOption(option: QuizAnswerOptionDTO): Promise<QuizAnswerOptionDTO> {
+        this.origin = `saveQuizAnswerOption(${JSON.stringify(option)})`;
         let response: QuizAnswerOptionDTO = null;
         if (!option.optionId) {
             response = await this._postAnswerOption(option);
@@ -583,8 +583,8 @@ export class DatabaseService {
         return response && response.length ? response[0] : null;
     }
 
-    async deleteAnswerOption(optionId: number): Promise<QuizAnswerOptionDTO[]> {
-        this.origin = `deleteAnswerOption(${optionId})`;
+    async deleteQuizAnswerOption(optionId: number): Promise<QuizAnswerOptionDTO[]> {
+        this.origin = `deleteQuizAnswerOption(${optionId})`;
         return await this.executeActionSQL(quiz_answer_option_table_querys.deleteById.query, [optionId]);
     }
     //#endregion
@@ -594,36 +594,53 @@ export class DatabaseService {
         this.origin = `getAllAttempts()`;
         return await this.executeActionSQL(attempt_table_querys.selectAll.query);
     }
-    
+
     async getAttemptByQuizId(quizId: number): Promise<Array<AttemptDTO>> {
         this.origin = `getAttemptByQuizId(${quizId})`;
         const response = await this.executeActionSQL(attempt_table_querys.selectByQuizId.query, [quizId]);
-        return response && response.length ? response : [];
+        if (response && response.length > 0) {
+            const dataCollection = response;
+            dataCollection.map((data) => {
+                if (typeof data.answers === 'string') {
+                    data.answers = JSON.parse(data.answers);
+
+                    if (data.answers && data.answers.length) {
+                        data.answers.map(ans => {
+                            ans.options = [];
+                            if (typeof ans.optionsLinked === 'string') {
+                                ans.options = JSON.parse(ans.optionsLinked);
+                            }
+                            return ans;
+                        });
+                    }
+                }
+                return data;
+            });
+            return dataCollection;
+        }
+        return [];
     }
 
-    async getAttemptCompleteById(attemptId: number): Promise<AttemptDTO> {
+    async getAttemptCompleteByAttemptId(attemptId: number): Promise<AttemptDTO> {
         this.origin = `getAttemptCompleteById(${attemptId})`;
         const response = await this.executeActionSQL(attempt_table_querys.selectByIdWithRelations.query, [attemptId]);
 
         if (response && response.length > 0) {
             const data = response[0];
-            // Como SQLite devuelve los grupos JSON como cadenas de texto, 
-            // los parseamos para que vuelvan a ser arrays/objetos de JavaScript nativos.
             if (typeof data.answers === 'string') {
                 data.answers = JSON.parse(data.answers);
 
                 if (data.answers && data.answers.length) {
                     data.answers.map(ans => {
-                        if (typeof data.optionsLinked === 'string') {
-                            data.optionsLinked = JSON.parse(data.optionsLinked);
+                        ans.options = [];
+                        if (typeof ans.optionsLinked === 'string') {
+                            ans.options = JSON.parse(ans.optionsLinked);
                         }
+                        return ans;
                     });
                 }
             }
 
-            if (typeof data.answersLinked === 'string') {
-                data.answersLinked = JSON.parse(data.answersLinked);
-            }
             return data;
         }
         return null;
@@ -634,48 +651,47 @@ export class DatabaseService {
         return attempt;
     }
 
-    private async saveQuizAttempt(attempt: AttemptDTO): Promise<AttemptDTO> {
-        this.origin = `saveQuizAttempt(${JSON.stringify(attempt)})`;
+    async saveAttempt(attempt: AttemptDTO): Promise<AttemptDTO> {
+        this.origin = `saveAttempt(${JSON.stringify(attempt)})`;
         let response: AttemptDTO = null;
         if (!attempt.attemptId) {
-            response = await this._postQuizAttempt(attempt);
+            response = await this._postAttempt(attempt);
         } else {
-            response = await this._putQuizAttempt(attempt);
+            response = await this._putAttempt(attempt);
         }
         return response;
     }
 
-    private async _postQuizAttempt(attempt: AttemptDTO): Promise<AttemptDTO> {
-        this.origin = `_postQuizAttempt(${JSON.stringify(attempt)})`;
+    private async _postAttempt(attempt: AttemptDTO): Promise<AttemptDTO> {
+        this.origin = `_postAttempt(${JSON.stringify(attempt)})`;
         const response = await this.executeActionSQL(attempt_table_querys.post.query, [attempt.quizId, attempt.userId, attempt.title, attempt.updatedDate, attempt.startDate, attempt.score, attempt.state, attempt.time, attempt.answersLinked]);
         return response && response.length ? response[0] : null;
     }
 
-    private async _putQuizAttempt(attempt: AttemptDTO): Promise<AttemptDTO> {
-        this.origin = `_putQuizAttempt(${JSON.stringify(attempt)})`;
+    private async _putAttempt(attempt: AttemptDTO): Promise<AttemptDTO> {
+        this.origin = `_putAttempt(${JSON.stringify(attempt)})`;
         const response = await this.executeActionSQL(attempt_table_querys.put.query, [attempt.attemptId ?? null, attempt.quizId, attempt.userId, attempt.title, attempt.updatedDate, attempt.startDate, attempt.score, attempt.state, attempt.time, attempt.answersLinked]);
         return response && response.length ? response[0] : null;
     }
 
-    async deleteQuizAttempt(attemptId: number): Promise<AttemptDTO[]> {
+    async deleteQuizAttempt(attemptId: number): Promise<AttemptDTO> {
         this.origin = `deleteQuizAttempt(${attemptId})`;
         return await this.executeActionSQL(attempt_table_querys.deleteById.query, [attemptId]);
     }
     //#endregion
 
     //#region Answer Attempts (answer_attempt_table)
-    async getAnswerAttemptsByAttempt(attemptId: number): Promise<AttemptAnswerDTO[]> {
-        this.origin = `getAnswerAttemptsByAttempt(${attemptId})`;
+    async getAttemptAnswersByAttemptId(attemptId: number): Promise<AttemptAnswerDTO[]> {
+        this.origin = `getAttemptAnswersByAttemptId(${attemptId})`;
         return await this.executeActionSQL(attempt_answer_table_querys.selectByAttemptId.query, [attemptId]);
     }
 
-    async saveAnswerAttempt(ansAttempt: AttemptAnswerDTO): Promise<AttemptAnswerDTO> {
-        this.origin = `saveAnswerAttempt(${JSON.stringify(ansAttempt, null, 2)})`;
+    async saveAttemptAnswers(ansAttempt: AttemptAnswerDTO): Promise<AttemptAnswerDTO> {
+        this.origin = `saveAttemptAnswers(${JSON.stringify(ansAttempt, null, 2)})`;
         let response: AttemptAnswerDTO = null;
         if (!ansAttempt.answerAttemptId) {
             response = await this._postAnswerAttempt(ansAttempt);
         } else {
-            console.log('ansAttempt: ', ansAttempt);
             response = await this._putAnswerAttempt(ansAttempt);
         }
         return response;
@@ -684,14 +700,14 @@ export class DatabaseService {
     private async _postAnswerAttempt(ansAttempt: AttemptAnswerDTO): Promise<AttemptAnswerDTO> {
         this.origin = `_postAnswerAttempt(${JSON.stringify(ansAttempt)})`;
         const correctVal = ansAttempt.isCorrect ? 1 : 0;
-        const response = await this.executeActionSQL(attempt_answer_table_querys.post.query, [ansAttempt.attemptId, ansAttempt.answerId, ansAttempt.selectedOptionId, correctVal, ansAttempt.optionsLinked]);
+        const response = await this.executeActionSQL(attempt_answer_table_querys.post.query, [ansAttempt.attemptId, ansAttempt.answerId, ansAttempt.selectedOptionId, correctVal, ansAttempt.title, ansAttempt.optionsLinked]);
         return response && response.length ? response[0] : null;
     }
 
     private async _putAnswerAttempt(ansAttempt: AttemptAnswerDTO): Promise<AttemptAnswerDTO> {
         this.origin = `_putAnswerAttempt(${JSON.stringify(ansAttempt)})`;
         const correctVal = ansAttempt.isCorrect ? 1 : 0;
-        const response = await this.executeActionSQL(attempt_answer_table_querys.put.query, [ansAttempt.answerAttemptId ?? null, ansAttempt.attemptId, ansAttempt.answerId, ansAttempt.selectedOptionId, correctVal, ansAttempt.optionsLinked]);
+        const response = await this.executeActionSQL(attempt_answer_table_querys.put.query, [ansAttempt.answerAttemptId ?? null, ansAttempt.attemptId, ansAttempt.answerId, ansAttempt.selectedOptionId, correctVal, ansAttempt.title, ansAttempt.optionsLinked]);
         return response && response.length ? response[0] : null;
     }
 

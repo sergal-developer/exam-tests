@@ -105,7 +105,7 @@ export class QuizComponent implements OnInit {
   }
 
   async getAttemptData(id: number): Promise<AttemptDTO> {
-    let attempt: AttemptDTO = await this._commonService.getAttemptCompleteById(id);
+    let attempt: AttemptDTO = await this._commonService.getAttemptCompleteByAttemptId(id);
     console.log('getAttemptData: ', attempt);
     
     debugger;

@@ -88,15 +88,15 @@ export class DashboardComponent implements OnInit {
     // data.questions = this.transform.shuffleArray(data.questions);
 
     // SAVE DATA
-    const attempt = await this._commonServices.saveAllQuizAttempt(data);
-    console.log('attempt: ', attempt);
+    // const attempt = await this._commonServices.saveAllQuizAttempt(data);
+    // console.log('attempt: ', attempt);
 
-    if (attempt) {
-      this.goToCompleteAttempt(attempt);
-    } else {
-      // GLOBAL.service_error_attempt
-      this._uiServices.notification('Ocurrio un error al generar la evaluacion, intente nuvamente', { type: 'error' })
-    }
+    // if (attempt) {
+    //   this.goToCompleteAttempt(attempt);
+    // } else {
+    //   // GLOBAL.service_error_attempt
+    //   this._uiServices.notification('Ocurrio un error al generar la evaluacion, intente nuvamente', { type: 'error' })
+    // }
   }
 
   async deleteQuiz(quiz: QuizDTO) {
