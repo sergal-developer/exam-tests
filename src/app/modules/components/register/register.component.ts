@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewEncapsulation, } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { UserDTO } from 'src/app/shared/data/entities/dtos';
+import { SettingsDTO, UserDTO } from 'src/app/shared/data/entities/dtos';
 import { CommonServices } from 'src/app/shared/services/common.services';
 import { UiServices } from 'src/app/shared/services/ui.services';
 import { v4 as uuidv4 } from 'uuid';
@@ -28,6 +28,9 @@ export class RegisterComponent implements OnInit {
     service_fail_save: '',
   };
 
+  languages = []
+  settings: SettingsDTO;
+
   uistate = 'init';
 
   constructor(private fb: FormBuilder,
@@ -37,6 +40,7 @@ export class RegisterComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this._uiServices.showLoader(true);
     this.form = this.fb.group({
       name: ['', Validators.required],
       image: ['', Validators.required],
@@ -50,6 +54,8 @@ export class RegisterComponent implements OnInit {
       this.translate.get(['service_sucess_save', 'service_fail_save']).subscribe((res) => {
         this.translateLabels = res;
       });
+
+      this._uiServices.showLoader(false);
     }, 800);
   }
 
@@ -58,7 +64,11 @@ export class RegisterComponent implements OnInit {
 
   //#region DATA
   async checkInitialSettings() {
-    const settings = await this._commonServices.saveDefaultData();
+    this.settings = await this._commonServices.saveDefaultData();
+    console.log('settings: ', this.settings);
+    if(this.settings) {
+      this.languages = this.settings._languages;
+    }
     const profile = await this._commonServices.getCurrentUser()
     if (profile) {
       this._commonServices.navigate('dashboard');
@@ -106,6 +116,23 @@ export class RegisterComponent implements OnInit {
       image.selected = image.url == item.url ? true : false;
     });
     this.form.get('image').setValue(item.url);
+  }
+
+  async changeLanguage(language) {
+    const languages = [];
+    this.settings._languages.map((lan) => {
+      languages.push(lan.value);
+    })
+    this.translate.addLangs(languages);
+    this.settings.language = language;
+
+    this.translate.setDefaultLang(this.settings.language);
+    await this._commonServices.saveSettings({
+      language: this.settings.language,
+      permissions: this.settings.permissions,
+      theme: this.settings.theme,
+      settingId: this.settings.settingId
+    });
   }
   //#endregion EVENTS
 }

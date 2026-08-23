@@ -26,7 +26,7 @@
   "form_time_required": "Time is required",
   "form_question": "Question",
   "form_question_required": "The question is required",
-  "form_answer": "Answer",
+  "form_answer": "New Answer",
   "form_answer_required": "The answer is required",
   "form_answer_num": "Number of questions",
   "form_answer_num_required": "The number is required",
@@ -105,5 +105,9 @@
   "customize": "Customize",
   "help_attempt": "Each assessment generates a new record and orders the questions randomly.",
   "ia_subtitle": "Wait a minute, the artificial intelligence is creating the questions.",
-  "help_quiz_title": "Write a question that has multiple answer options, remember that only one option can be correct."
+  "help_quiz_title": "Write a question that has multiple answer options, remember that only one option can be correct.",
+  "help_quiz_options": "Enter the correct answer and click the radio button to select it",
+  "answer_text_default": "Question",
+  "answer_option_text_default": "Answer",
+  "answer_option_correct_text_default": "Correct Answer"
 }

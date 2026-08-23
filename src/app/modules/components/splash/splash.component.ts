@@ -18,6 +18,7 @@ export class SplashComponent implements OnInit {
     public _uiServices: UiServices) { }
 
   async ngOnInit() {
+    this._uiServices.showLoader(true);
     const existStructure = await this.loadDatabaseStructure();
     this.checkInit(existStructure);
   }
@@ -40,5 +41,7 @@ export class SplashComponent implements OnInit {
     setTimeout(() => {
       this._commonServices.navigate(module);
     }, this.timeDelay);
+    
+      this._uiServices.showLoader(false);
   }
 }

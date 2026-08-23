@@ -26,7 +26,7 @@
   "form_time_required": "El tiempo es requerido",
   "form_question": "Pregunta",
   "form_question_required": "La pregunta es requerida",
-  "form_answer": "Respuesta",
+  "form_answer": "Nueva Respuesta",
   "form_answer_required": "La respuesta es requerida",
   "form_answer_num": "Número de preguntas",
   "form_answer_num_required": "El número es requerido",
@@ -105,5 +105,9 @@
   "customize": "Personalizar",
   "help_attempt": "Cada evaluación genera un nuevo registro y ordena las preguntas aleatoriamente.",
   "ia_subtitle": "Espere un momento la inteligencia articifial esta creando las preguntas.",
-  "help_quiz_title": "Escriba una pregunta que tenga múltiples opciones de respuesta, recuerda que solo una opcion puede ser correcta."
+  "help_quiz_title": "Escriba una pregunta que tenga múltiples opciones de respuesta, recuerda que solo una opcion puede ser correcta.",
+  "help_quiz_options": "Escribe la respuesta correcta y da click en el radio para marcarla",
+  "answer_text_default": "¿Pregunta",
+  "answer_option_text_default": "Respuesta",
+  "answer_option_correct_text_default": "Respuesta Correcta"
 }

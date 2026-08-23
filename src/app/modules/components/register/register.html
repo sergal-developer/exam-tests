@@ -8,7 +8,17 @@
     <div class="root-container register-form">
         <div class="simple-section">
             <div class="_content">
+                
                 <h2>{{ 'register_title' | translate }}</h2>
+
+                <ng-container *ngIf="languages.length">
+                    <ng-container *ngFor="let lan of languages">
+                        <button class="link"
+                            [ngClass]="{'primary': lan.value == settings.language, 'link': lan.value != settings.language }"
+                            (click)="changeLanguage(lan.value)">{{ lan.value | translate }}</button>
+                    </ng-container>
+                </ng-container>
+
                 <h1>{{ 'register_title_question' | translate }}</h1>
 
                 <form [formGroup]="form">

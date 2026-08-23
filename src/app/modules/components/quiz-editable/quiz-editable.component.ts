@@ -1,10 +1,10 @@
 import { Component, Input, OnInit, ViewEncapsulation, } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { QuizAnswerDTO, QuizAnswerOptionDTO, QuizDTO, SettingsDTO } from 'src/app/shared/data/entities/dtos';
+import { getQuizAnswerDTO, getQuizAnswerOptionDTO, getQuizDTO, normalizeQuizDTO, QuizAnswerDTO, QuizAnswerOptionDTO, QuizDTO, SettingsDTO } from 'src/app/shared/data/entities/dtos';
+import { Utils } from 'src/app/shared/data/utils/utils';
 import { CommonServices } from 'src/app/shared/services/common.services';
 import { UiServices } from 'src/app/shared/services/ui.services';
-import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'quiz-editable',
@@ -18,8 +18,8 @@ export class QuizEditableComponent implements OnInit {
   form: FormGroup;
 
   formQuestion: FormGroup = new FormGroup({
-    answerId: new FormControl(0, Validators.required),
-    quizId: new FormControl(-1),
+    answerId: new FormControl(null),
+    quizId: new FormControl(null),
     title: new FormControl('', Validators.required),
     options: new FormControl([], Validators.required),
   })
@@ -45,7 +45,10 @@ export class QuizEditableComponent implements OnInit {
     service_sucess_generation: '',
     service_fail_update: '',
     generation_questions_questions: '',
-    ia_subtitle: ''
+    ia_subtitle: '',
+    answer_text_default: '',
+    answer_option_text_default: '',
+    answer_option_correct_text_default: '',
   };
 
   durationFormShow = false;
@@ -53,6 +56,7 @@ export class QuizEditableComponent implements OnInit {
   loadingDataAi = false;
   settings: SettingsDTO = null;
   isEdit = false;
+  _helper = new Utils();
   //#endregion INTERNAL
 
   constructor(private _commonService: CommonServices,
@@ -63,6 +67,7 @@ export class QuizEditableComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this._uiService.showLoader(true);
     this.setupLanguage(() => {
       this.setupComponent();
     });
@@ -80,13 +85,14 @@ export class QuizEditableComponent implements OnInit {
 
   //#region DATA
   async setupComponent(injectData?: QuizDTO) {
-
+    this.currentAnswerIndex = 0;
     this.isEdit = this.quizId ? true : false;
     this.formIAGenerated = this.fb.group({
       topic: ['', Validators.required],
       questions: [2, Validators.required],
       options: [4, Validators.required],
     });
+
     this.form = this.fb.group({
       title: [this.translateLabels.new_quiz, Validators.required],
       time: [''],
@@ -94,102 +100,93 @@ export class QuizEditableComponent implements OnInit {
 
     this.durationFormShow = false;
 
-      this.quiz = {
-        quizId: null,
-        title: '',
-        answers: [],
-        creationDate: new Date().getTime(),
-        updatedDate: new Date().getTime(),
-        time: 0,
-      }
-      this.quiz.answers = [];
+    this.quiz = getQuizDTO('', 0);
+    this.quiz.answers = [this.getNewQuestionForm()];
 
-      /*
-    if (this.quizId && !injectData) {
-      // no se esta injectando datos y recupera el examen solicitado
-      this.quiz = await this.getQuizData(this.quizId);
+    /*
+  if (this.quizId && !injectData) {
+    // no se esta injectando datos y recupera el examen solicitado
+    this.quiz = await this.getQuizData(this.quizId);
 
-      let data = this._commonService.prepareQueryAnswersOptions(this.quiz);
-      console.log('setupComponent: ', data);
+    let data = this._commonService.prepareQueryAnswersOptions(this.quiz);
+    console.log('setupComponent: ', data);
 
-      if (!this.quiz) {
-        this._uiService.notification(this.translateLabels.service_fail_get, { type: 'error', closeTimer: 3000 });
-        return;
-      }
+    if (!this.quiz) {
+      this._uiService.notification(this.translateLabels.service_fail_get, { type: 'error', closeTimer: 3000 });
+      return;
+    }
 
-      // add blanck spaces in questions
-      // this.quiz.answers.map((answer: QuizAnswerDTO) => {
-      //   const newOption: QuizAnswerOptionDTO = {
-      //     answerId: answer.answerId,
-      //     content: ,
-      //     optionId: -1,
-      //     optionIndex: question.options.length + 1,
-      //     updatedDate: new Date().getTime(),
+    // add blanck spaces in questions
+    // this.quiz.answers.map((answer: QuizAnswerDTO) => {
+    //   const newOption: QuizAnswerOptionDTO = {
+    //     answerId: answer.answerId,
+    //     content: ,
+    //     optionId: -1,
+    //     optionIndex: question.options.length + 1,
+    //     updatedDate: new Date().getTime(),
 
-      //     // GENERATED
-      //     isCorrect: false,
-      //     _selected: false,
-      //   };
-      //   const length = this.quiz.answers.length || 0;
-      //   const newOption: QuizAnswerOptionDTO = {
-      //     answerId: answer.answerId,
-      //     content: '',
-      //     optionIndex: length + 1,
-      //     optionId: length + 1,
-      //     updatedDate: new Date().getTime(),
-      //     isCorrect: false
-      //   }
-      //   answer.options.push(newOption);
+    //     // GENERATED
+    //     isCorrect: false,
+    //     _selected: false,
+    //   };
+    //   const length = this.quiz.answers.length || 0;
+    //   const newOption: QuizAnswerOptionDTO = {
+    //     answerId: answer.answerId,
+    //     content: '',
+    //     optionIndex: length + 1,
+    //     optionId: length + 1,
+    //     updatedDate: new Date().getTime(),
+    //     isCorrect: false
+    //   }
+    //   answer.options.push(newOption);
+    // });
+    // this.quiz.questions.push(this.getNewQuestion());
+    this.form = this.fb.group({
+      title: [this.quiz.title, Validators.required],
+      time: [this.quiz.time],
+    });
+
+    if (this.quiz.time != 0) {
+      this.durationFormShow = true;
+    }
+
+  } else if (injectData) {
+    // BACKUP OLD DATA 
+    const oldQuiz: QuizDTO = JSON.parse(JSON.stringify(this.quiz));
+    this.quiz = injectData;
+    this.quiz.quizId = this.quizId;
+
+    // RECOVER OLD DATA
+    this.quiz.title = oldQuiz.title == '' ? this.quiz.title : oldQuiz.title;
+    this.quiz.answers = oldQuiz.answers.length > 1 ? [...oldQuiz.answers, ...this.quiz.answers] : this.quiz.answers;
+
+    this.quiz.answers.map((answer: QuizAnswerDTO) => {
+      const length = this.quiz.answers.length || 0;
+      // answer.options.map((option: IQuizAnswerOptionDTO) => {
+      //   option.letter = this.getletter(option.id + 1);
+      //   option.selected = false;
+      //   option.correctAnswer = option.id == answer.correctAnswer;
+      //   option.selected = option.id == answer.correctAnswer;
       // });
-      // this.quiz.questions.push(this.getNewQuestion());
-      this.form = this.fb.group({
-        title: [this.quiz.title, Validators.required],
-        time: [this.quiz.time],
-      });
+    });
+    // this.quiz.questions.push(this.getNewQuestion());
+    this.form = this.fb.group({
+      title: [this.quiz.title, Validators.required],
+      time: [this.quiz.time],
+    });
 
-      if (this.quiz.time != 0) {
-        this.durationFormShow = true;
-      }
+    if (this.quiz.time != 0) {
+      this.durationFormShow = true;
+    }
 
-    } else if (injectData) {
-      // BACKUP OLD DATA 
-      const oldQuiz: QuizDTO = JSON.parse(JSON.stringify(this.quiz));
-      this.quiz = injectData;
-      this.quiz.quizId = this.quizId;
+  } else {
+    */
 
-      // RECOVER OLD DATA
-      this.quiz.title = oldQuiz.title == '' ? this.quiz.title : oldQuiz.title;
-      this.quiz.answers = oldQuiz.answers.length > 1 ? [...oldQuiz.answers, ...this.quiz.answers] : this.quiz.answers;
-
-      this.quiz.answers.map((answer: QuizAnswerDTO) => {
-        const length = this.quiz.answers.length || 0;
-        // answer.options.map((option: IQuizAnswerOptionDTO) => {
-        //   option.letter = this.getletter(option.id + 1);
-        //   option.selected = false;
-        //   option.correctAnswer = option.id == answer.correctAnswer;
-        //   option.selected = option.id == answer.correctAnswer;
-        // });
-      });
-      // this.quiz.questions.push(this.getNewQuestion());
-      this.form = this.fb.group({
-        title: [this.quiz.title, Validators.required],
-        time: [this.quiz.time],
-      });
-
-      if (this.quiz.time != 0) {
-        this.durationFormShow = true;
-      }
-
-    } else {
-      */
-      this.quiz.answers = [this.getNewQuestion()];
     // }
 
-    this.currentAnswerIndex = 0;
-    this.setCurrentAnswer();
 
-    let quiz = this._commonService.prepareQueryAnswersOptions(this.quiz);
-      console.log('QUIZ: ', quiz, this.quiz);
+    this.setCurrentAnswer();
+    this._uiService.showLoader(false);
   }
 
   setCurrentAnswer() {
@@ -197,10 +194,16 @@ export class QuizEditableComponent implements OnInit {
 
     const optionArray = [];
     answerItem.options.map(opt => {
-      optionArray.push(this.getNewOption(opt))
+      optionArray.push(this.getNewOptionForm(opt))
     });
+
+    const optionEmpty = answerItem.options[answerItem.options.length - 1].content !== '';
+    if (optionEmpty) {
+      optionArray.push(this.getNewOptionForm())
+    }
+
     this.formQuestion = this.fb.group({
-      answerId: [answerItem.answerId, Validators.required],
+      answerId: [answerItem.answerId],
       quizId: [answerItem.quizId],
       title: [answerItem.title],
       updatedDate: [answerItem.updatedDate],
@@ -208,7 +211,7 @@ export class QuizEditableComponent implements OnInit {
     });
   }
 
-  getOptions(): FormArray {
+  getFormOptions(): FormArray {
     return this.formQuestion.get('options') as FormArray;
   }
 
@@ -219,73 +222,55 @@ export class QuizEditableComponent implements OnInit {
     const questionsValid = question.options.length >= 3;
     const selectedAwnser = question.options.find(opt => opt._selected);
     return formValid && formQuestionValid && selectedAwnser && questionsValid;
-    
   }
 
-  async updateQuiz(cleanUnused = false) {
-    const { title, time } = this.form.value;
-    this.quiz.title = title.length > 30 ? title.slice(0, 28) : title;
-    this.quiz.time = time;
-    this.quiz.creationDate = new Date().getTime();
-    this.quiz.updatedDate = new Date().getTime();
+  async updateQuiz() {
+    return new Promise(async (resolve, reject) => {
+      this._uiService.showLoader(true);
+      // save the last changes
+      this.quiz.answers[this.currentAnswerIndex] = this.formQuestion.value;
 
-    const valuePrev = this.quiz.answers[this.currentAnswerIndex];
-    const valueNew = this.formQuestion.value;
-    this.quiz.answers[this.currentAnswerIndex] = this.formQuestion.value;
+      // refine request
+      const quizRequest = this.quiz = this._quizRefined(true);
+      const response = await this._commonService.saveAllQuiz(quizRequest);
+      if (!response) {
+        this._uiService.notification(this.translateLabels.service_fail_update);
+        this._uiService.showLoader(false);
+        resolve(false);
+      }
 
-    console.log(' this.quiz: ', this.quiz);
-    this.quiz = await this._commonService.saveAllQuiz(this.quiz);
-    console.log('this.quiz: ', this.quiz);
-
-    if (!this.quiz) {
-      this._uiService.notification(this.translateLabels.service_fail_update);
-    }
-
-    if (cleanUnused) {
-      // clean unused data
-      this.quiz.answers.map((question: QuizAnswerDTO) => {
-        question.options = question.options.filter((opt: QuizAnswerOptionDTO) => opt.content != '');
-        const correct = question.options.find((opt: QuizAnswerOptionDTO) => opt['_selected']);
-        if (correct) {
-          question['correctAnswer'] = correct.optionId;
-        }
-      });
-      this.quiz.answers = this.quiz.answers.filter((question: QuizAnswerDTO) => question.options.length > 0);
-    }
-
-    // // save or update data
-    // if (this.quiz.quizId) {
-    //   // await this._commonService.updateQuiz(this.quiz.id, this.quiz);
-    // } else {
-    //   this.quiz.quizId = -1;
-    //   // await this._commonService.saveQuiz(this.quiz);
-    // }
-    
-    // const data = await this._commonService.searchQuiz(this.quiz.id);
-    // const data = null;
-    // this.quiz = data;
-
-    
+      const _quiz = await this._commonService.getQuizCompleteById(response.quizId);
+      this.quiz = normalizeQuizDTO(_quiz);
+      this._uiService.showLoader(false);
+      resolve(true);
+    })
   }
 
   async getQuizData(id: number) {
     const data = await this._commonService.getQuizCompleteById(id);
-    console.log('data: ', data);
     if (!data) {
       this._uiService.notification(this.translateLabels.service_fail_get);
       return null;
     }
     return data;
   }
+
+  finishCreation() {
+    this.updateQuiz();
+    this.gotoDashboard();
+  }
+
+  saveQuiz() {
+    this.updateQuiz();
+  }
   //#endregion DATA
 
   //#region EVENTS
   selectAnswerCorrect(option: FormGroup) {
     const _option = option.value as QuizAnswerOptionDTO;
-     console.log('lastValue: ', _option);
     // reset all items
     this.formQuestion.value.options.map((opt, index) => {
-      this.getOptions().controls[index].get('_selected').setValue(false);
+      this.getFormOptions().controls[index].get('_selected').setValue(false);
     });
 
     // assing correct
@@ -294,15 +279,23 @@ export class QuizEditableComponent implements OnInit {
     }
   }
 
-  onOptionChange(event: { control: string, value: any }) {
+  onOptionChange(event: { control: string, value: any }, option: FormGroup) {
+    // if (event.value && option.controls['isCorrect'].value) {
+    //   option.controls['_selected'].patchValue(false);
+    //   setTimeout(() => {
+    //     option.controls['_selected'].updateValueAndValidity();
+    //   }, 100);
+    // }
+
     const lastIndex = this.formQuestion.value.options.length - 1;
     const lastValue = this.formQuestion.value.options[lastIndex].content;
     if (lastIndex >= 0 && lastValue != '') {
-      this.getOptions().push(this.getNewOption());
+      this.getFormOptions().push(this.getNewOptionForm());
     } else if (lastIndex > 0 && lastValue == '') {
-      const postlastValue = this.formQuestion.value.options[lastIndex - 1].content;
+      const optionLast = this.formQuestion.value.options[lastIndex - 1];
+      const postlastValue = optionLast.content;
       if (postlastValue == '') {
-        this.getOptions().removeAt(lastIndex);
+        this.getFormOptions().removeAt(lastIndex);
       }
     }
   }
@@ -311,37 +304,30 @@ export class QuizEditableComponent implements OnInit {
     this._commonService.navigate('dashboard', this.quiz.quizId ? this.quiz.quizId.toString() : '');
   }
 
-  nextQuestion() {
-    if (this.currentAnswerIndex >= this.quiz.answers.length - 1) {
+  async nextQuestion() {
+    if (this.currentAnswerIndex <= this.quiz.answers.length - 1) {
       this.quiz.answers[this.currentAnswerIndex] = this.formQuestion.value;
-      this.quiz.answers.push(this.getNewQuestion());
-      // this.updateQuiz();
+
+      await this.updateQuiz();
+
       this.currentAnswerIndex = this.currentAnswerIndex + 1;
-      this.setCurrentAnswer();
+      if (this.currentAnswerIndex > this.quiz.answers.length - 1) {
+        this.quiz.answers.push(this.getNewQuestionForm());
+      }
 
-      let data = this._commonService.prepareQueryAnswersOptions(this.quiz);
-      console.log('data: ', data);
+      this.setCurrentAnswer();
+      this._getQuizUpdated();
     }
   }
 
-  prevQuestion() {
+  async prevQuestion() {
     if (this.currentAnswerIndex != 0) {
-      // this.updateQuiz();
-
+      this.quiz.answers[this.currentAnswerIndex] = this.formQuestion.value;
       this.currentAnswerIndex = this.currentAnswerIndex - 1;
+
       this.setCurrentAnswer();
-      let data = this._commonService.prepareQueryAnswersOptions(this.quiz);
-      console.log('data: ', data);
+      this._getQuizUpdated();
     }
-  }
-
-  finishCreation() {
-    this.updateQuiz(true);
-    this.gotoDashboard();
-  }
-
-  saveQuiz() {
-    this.updateQuiz();
   }
 
   editDuration() {
@@ -1424,6 +1410,40 @@ export class QuizEditableComponent implements OnInit {
 
   //#region CONVERTERS
 
+  private _getQuizUpdated() {
+    const options = [];
+    this.quiz.answers.map(ans => {
+      ans.options.map(opt => {
+        options.push(opt);
+      })
+    });
+  }
+
+  private _quizRefined(cleanUnused = false): QuizDTO {
+    const _quiz = JSON.parse(JSON.stringify(this.quiz));
+
+    const { title, time } = this.form.value;
+    _quiz.title = title;
+    _quiz.time = time;
+    _quiz.updatedDate = new Date().getTime();
+
+    _quiz.answers = JSON.parse(JSON.stringify(_quiz.answers)) || [];
+    if (cleanUnused) {
+      _quiz.answers = _quiz.answers.filter((opt: QuizAnswerDTO) => opt.title !== '');
+    }
+    _quiz.answers.map((answer: QuizAnswerDTO) => {
+      if (cleanUnused) {
+        answer.options = answer.options.filter((opt: QuizAnswerOptionDTO) => opt.content !== '');
+      }
+      answer.options.map(opt => {
+        opt.isCorrect = opt._selected;
+        return opt;
+      });
+      return answer;
+    });
+    return _quiz;
+  }
+
   getletter(index) {
     const ascii = 64; // 65 es el código ASCII de 'A', 90 es el de 'Z'
     const asciiLimit = 90;
@@ -1431,46 +1451,21 @@ export class QuizEditableComponent implements OnInit {
     return String.fromCharCode(letter)
   }
 
-  getNewQuestion() {
-    const question: QuizAnswerDTO = {
-      answerId: -1,
-      quizId: this.quiz.quizId,
-      title: '',
-      updatedDate: new Date().getTime(),
+  getNewQuestionForm() {
+    const question = getQuizAnswerDTO(`${this.translateLabels.answer_text_default} #${this.currentAnswerIndex + 1}?`);
+    const questions = [
+      getQuizAnswerOptionDTO(`${ this.translateLabels.answer_option_text_default } 1`, 1),
+      getQuizAnswerOptionDTO(`${ this.translateLabels.answer_option_text_default } 2`, 2),
+      getQuizAnswerOptionDTO('', 3),
+    ];
 
-      // GENERATED
-      options: [],
-      _currentOption: null,
-      _answerText: `${this.quiz.answers.length + 1}`,
-    }
-
-    const option: QuizAnswerOptionDTO = {
-      answerId: question.answerId,
-      content: '',
-      optionId: -1,
-      optionIndex: question.options.length + 1,
-      updatedDate: new Date().getTime(),
-
-      // GENERATED
-      isCorrect: false,
-      _selected: false,
-    };
-    question.options = [option]
+    question.options.push(...questions);
     return question;
   }
 
-  getNewOption(optionValue?: QuizAnswerOptionDTO) {
+  getNewOptionForm(optionValue?: QuizAnswerOptionDTO) {
     const question = this.quiz.answers[this.currentAnswerIndex];
-    const option: QuizAnswerOptionDTO = {
-      answerId: question.answerId,
-      content: '',
-      optionId: null,
-      optionIndex: question.options.length + 1,
-      updatedDate: new Date().getTime(),
-      // GENERATED
-      isCorrect: false,
-      _selected: false,
-    };
+    const option = getQuizAnswerOptionDTO('', question.options.length + 1);
 
     if (!optionValue) {
       const length = this.formQuestion ? this.formQuestion.value.options.length : 0;
@@ -1483,7 +1478,7 @@ export class QuizEditableComponent implements OnInit {
       option.updatedDate = optionValue.updatedDate;
       // GENERATED
       option.isCorrect = optionValue.isCorrect;
-      option._selected = optionValue.isCorrect;
+      option._selected = optionValue._selected;
     }
     return this.fb.group(option)
   }

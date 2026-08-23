@@ -15,6 +15,10 @@ export class UiServices {
     icon: ''
   };
 
+  public _loader = {
+    show: false,
+  }
+
   constructor() { }
 
   ///#region NOTIFICATIONS
@@ -80,6 +84,10 @@ export class UiServices {
         return root.style.getPropertyValue(`--${key}`);
     }
     return null;
+  }
+
+  public showLoader(show: boolean) {
+    this._loader.show = show;
   }
   //#endregion
 }

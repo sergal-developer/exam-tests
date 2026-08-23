@@ -43,5 +43,18 @@ export class MatInputComponent implements OnInit, ControlValueAccessor {
     valueChange(event) {
         this.onChange.emit({ control: this.formName || this.title, value: this.ngControl.value });
     }
+
+    valueChangeTextarea(event) {
+        this.valueChange(event);
+
+        // const textarea = event.target as HTMLTextAreaElement;
+        // textarea.style.height = 'auto';
+        // textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+
+    onClickInput(event) {
+        const input = event.currentTarget as HTMLInputElement;
+        input.select();
+    }
     //#endregion
 }

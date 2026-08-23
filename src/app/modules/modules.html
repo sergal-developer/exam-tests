@@ -1,4 +1,8 @@
-<button class="log-button" (click)="showSQL()">data</button>
+<!-- <button class="log-button" (click)="showSQL()">data</button> -->
+ <div class="main-loader" *ngIf="_uiServices._loader.show" >
+    <div class="loader"></div>
+ </div>
+
 <div class="wrapper {{ uistate }} {{ uisubstate }}">
     <div class="screen-collection {{ '__' + screen }}">
 

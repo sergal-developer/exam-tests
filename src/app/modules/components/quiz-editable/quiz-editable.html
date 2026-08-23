@@ -3,7 +3,7 @@
     <div class="item clickable" (click)="gotoDashboard()">
         <h2> <span class="material-icons">arrow_back</span></h2>
     </div>
-    <div class="item editable-title" *ngIf="form && !showIAForm">
+    <div class="item editable-title" *ngIf="form">
         <mat-input [title]="'form_title' | translate" [mesageError]="'form_title_required' | translate"
             [formControl]="form.get('title')">
         </mat-input>
@@ -58,7 +58,7 @@
 </div>
 
 <div class="root-container">
-    <ng-container *ngIf="!showIAForm">
+    <ng-container>
         <div class="simple-section" *ngIf="formQuestion">
             <div class="_question">
 
@@ -76,9 +76,15 @@
                     </mat-input>
                 </div>
 
-                <div class="_answer_collection gray-backdrop drop-padding drop-bottom">
-                    <ng-container *ngIf="formQuestion.get('_options').controls">
-                        <ng-container *ngFor="let option of formQuestion.get('_options').controls">
+                <div class="exam-section _help">
+                        <span class="material-icons _accent color">
+                            help
+                        </span>
+                        <div>{{ 'help_quiz_options' | translate }}</div>
+                    </div>
+                <div class="_answer_collection gray-backdrop drop-padding drop-bottom" *ngIf="formQuestion.get('options')">
+                    <ng-container *ngIf="formQuestion.get('options').controls">
+                        <ng-container *ngFor="let option of formQuestion.get('options').controls">
                             <div class="_answer flat" [ngClass]="{'correct': option.get('_selected')?.value }">
                                 <div class="_answer_selection" (click)="selectAnswerCorrect(option)">
                                     <span *ngIf="!option.get('_selected').value" class="material-icons">
@@ -91,7 +97,7 @@
                                     <mat-input class="flat-form" [title]="'form_answer' | translate"
                                         [mesageError]="'form_answer_required' | translate"
                                         [formControl]="option.get('content')" [formName]="'content'" [multiline]="true"
-                                        (onChange)="onOptionChange($event)">
+                                        (onChange)="onOptionChange($event, option)">
                                     </mat-input>
                                 </div>
                             </div>
@@ -109,6 +115,19 @@
                             {{ 'action_prev' | translate }}
                         </div>
                     </button>
+
+                    <!-- <button class="primary" (click)="saveQuiz()" *ngIf="quiz && quiz.answers.length > 1">
+                        <div class="inner">
+                            {{ 'action_save' | translate }}
+                        </div>
+                    </button> -->
+
+                    <button class="primary" (click)="finishCreation()" [disabled]="!validActions" *ngIf="quiz && quiz.answers.length > 1">
+                        <div class="inner">
+                            {{ 'action_finish' | translate }}
+                        </div>
+                    </button>
+
                     <button class="link uppercase" (click)="nextQuestion()" [disabled]="!validActions">
                         <div class="inner">
                             {{ 'action_next' | translate }}
@@ -118,17 +137,7 @@
                         </div>
                     </button>
 
-                    <button class="primary" (click)="saveQuiz()" *ngIf="quiz && quiz.answers.length > 1">
-                        <div class="inner">
-                            {{ 'action_save' | translate }}
-                        </div>
-                    </button>
-
-                    <button class="primary" (click)="finishCreation()" *ngIf="quiz && quiz.answers.length > 1">
-                        <div class="inner">
-                            {{ 'action_finish' | translate }}
-                        </div>
-                    </button>
+                    
                 </div>
             </div>
         </div>
@@ -148,9 +157,9 @@
                             [mesageError]="'form_answer_num_required' | translate"
                             [formControl]="formIAGenerated.get('questions')">
                         </mat-input>
-                        <mat-input [title]="'form_answer_options' | translate"
-                            [mesageError]="'form_answer_options_required' | translate"
-                            [formControl]="formIAGenerated.get('_options')">
+                        <mat-input [title]="'form_answeroptions' | translate"
+                            [mesageError]="'form_answeroptions_required' | translate"
+                            [formControl]="formIAGenerated.get('options')">
                         </mat-input>
                     </div>
                 </div>

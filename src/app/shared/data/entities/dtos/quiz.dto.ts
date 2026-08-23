@@ -176,6 +176,10 @@ export function normalizeQuizDTO(quiz: QuizDTO): QuizDTO {
       option.optionId = option.optionId || null;
       option.optionIndex = idxOptions + 1;
       option.content = option.content ? option.content.trim() : '';
+      option.isCorrect = option.isCorrect ? true : false;
+      
+      // Generated
+      option._selected = option.isCorrect ? true : false;
     });
   });
 

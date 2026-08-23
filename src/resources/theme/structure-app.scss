@@ -7,7 +7,7 @@
 }
 
 .debugger * * {
-    outline: 1px solid rgba(255, 3, 255, 0.1);
+    outline: 1px solid rgba(255, 3, 255, 0.3);
 }
 
 h1,
@@ -887,7 +887,7 @@ h6 {
         ._error_message {
             background: var(--answerIncorrectBorderColor);
             color: var(--answerCorrectColor);
-            font-size: rem(16px);        
+            font-size: rem(16px);
             padding: 5px 10px;
             border-radius: 10px;
         }
@@ -1000,21 +1000,24 @@ h6 {
                 padding: 0;
 
                 ._answer_selection {
-                    padding: 7px;
+                    padding: 5px 20px;
                     display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-right: 1px solid #646464;
                 }
 
-                .mat-form-field {
-                    .mat-label-text {
-                        opacity: 0 !important;
-                    }
+                //     // .mat-form-field {
+                //     //     .mat-label-text {
+                //     //         opacity: 0 !important;
+                //     //     }
 
-                    .empty {
-                        .mat-label-text {
-                            opacity: 1 !important;
-                        }
-                    }
-                }
+                //     //     .empty {
+                //     //         .mat-label-text {
+                //     //             opacity: 1 !important;
+                //     //         }
+                //     //     }
+                //     // }
             }
         }
     }

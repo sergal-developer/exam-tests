@@ -34,7 +34,7 @@ export class SettingsComponent implements OnInit {
     { url: "/assets/avatar-7.svg", selected: false },
     { url: "/assets/avatar-8.svg", selected: false },
   ];
-  availableThemes = ['light', 'dark', 'custom']
+  availableThemes = ['light', 'dark']
   form: FormGroup;
   themeProps: Array<{ name: string, value: string }> = null;
   customizeColorsMode = false;

@@ -34,8 +34,8 @@ export class DashboardComponent implements OnInit {
     private _uiServices: UiServices) { }
 
   async ngOnInit() {
+    this._uiServices.showLoader(true);
     await this.getSettings();
-
     setTimeout(() => {
       this.uistate = '';
       this.init();
@@ -56,6 +56,8 @@ export class DashboardComponent implements OnInit {
         this.showDetails(quiz);
       }
     }
+
+    this._uiServices.showLoader(false);
   }
 
   async getSettings() {
@@ -129,7 +131,7 @@ export class DashboardComponent implements OnInit {
   async duplicateQuiz(quiz: QuizDTO) {
     const quizData = await this._commonServices.getQuizCompleteById(quiz.quizId);
     // prepare data to save as nre record
-    quizData.quizId = null;
+    quizData.quizId = null;;
     quizData.title = `${ quizData.title } - Duplicated`;
     quizData.answers.forEach(answer => {
       answer.answerId = null;
