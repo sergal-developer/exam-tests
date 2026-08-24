@@ -41,7 +41,7 @@ export class SplashComponent implements OnInit {
     setTimeout(() => {
       this.commonServices.navigate(module);
     }, this.timeDelay);
-    
-      this.uiServices.showLoader(false);
+
+    this.uiServices.showLoader(false);
   }
 }
