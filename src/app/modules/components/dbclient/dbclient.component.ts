@@ -52,9 +52,9 @@ export class DbClientComponent implements OnInit {
 
   //#endregion INTERNAL VARS
 
-  constructor(private _commonService: CommonServices,
+  constructor(private commonServices: CommonServices,
     private services: DatabaseService,
-    public _uiServices: UiServices) { }
+    public uiServices: UiServices) { }
 
   async ngOnInit() {
     this.changeView('functions')
@@ -101,7 +101,7 @@ export class DbClientComponent implements OnInit {
 
   //#region EVENTS
   gotoDashboard() {
-    this._commonService.navigate('dashboard');
+    this.commonServices.navigate('dashboard');
   }
 
   async executeQuery() {
@@ -115,7 +115,7 @@ export class DbClientComponent implements OnInit {
       if (rawQuery) {
         this._executeFunction();
       } else {
-        const logs = await runCommonServicesTests(this._commonService);
+        const logs = await runCommonServicesTests(this.commonServices);
         console.log('logs: ', logs);
       }
     }
@@ -146,13 +146,13 @@ export class DbClientComponent implements OnInit {
 
     try {
       if (!query) {
-        response = await this._commonService[nameQuery]();
+        response = await this.commonServices[nameQuery]();
       } else {
 
-        console.log('function: ', nameQuery, this._commonService[nameQuery]);
+        console.log('function: ', nameQuery, this.commonServices[nameQuery]);
         const params = JSON.parse(rawQuery);
         console.log('params: ', params);
-        response = await this._commonService[nameQuery](params);;
+        response = await this.commonServices[nameQuery](params);;
         console.log('response: ', response);
       }
     } catch (error) {

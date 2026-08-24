@@ -69,6 +69,7 @@
   "action_edit": "Edit",
   "action_delete": "Delete",
   "action_reset": "Reset",
+  "attempt_status_perfect": "Perfect!!",
   "attempt_status_complete": "Completed",
   "attempt_status_approved": "Approved",
   "attempt_status_passed": "Passed narrowly",
@@ -109,5 +110,6 @@
   "help_quiz_options": "Enter the correct answer and click the radio button to select it",
   "answer_text_default": "Question",
   "answer_option_text_default": "Answer",
-  "answer_option_correct_text_default": "Correct Answer"
+  "answer_option_correct_text_default": "Correct Answer",
+  "attempt_error_generation": "An error occurred while generating the attempt; please try again."
 }

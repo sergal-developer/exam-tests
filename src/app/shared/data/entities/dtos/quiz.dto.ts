@@ -53,6 +53,7 @@ export interface QuizAnswerOptionDTO {
 
   // GENERATED
   _selected?: boolean;
+  _chosenAnswer?: boolean; // @Param: se eleciona cuando el usuario eluje la respuesta en la interfaz
 }
 
 export interface AttemptDTO extends QuizDTO {
@@ -75,6 +76,7 @@ export interface AttemptDTO extends QuizDTO {
   grade?: GradeState;
   _updatedDate?: string;
   _startDate?: string;
+  _score?: string;
 }
 
 export interface AttemptAnswerDTO extends QuizAnswerDTO {

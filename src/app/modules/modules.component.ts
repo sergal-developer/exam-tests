@@ -30,8 +30,8 @@ export class ModuleComponent implements OnInit, AfterViewInit {
   constructor(
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
-    public _uiServices: UiServices,
-    private _commonService: CommonServices,
+    public uiServices: UiServices,
+    private commonServices: CommonServices,
     private translate: TranslateService,
     private services: DatabaseService) {
 
@@ -64,14 +64,14 @@ export class ModuleComponent implements OnInit, AfterViewInit {
   async loadDatabaseStructure() {
     const structure = await this.services.initialDatabase();
     if (!structure) {
-      this._uiServices.notification("Error al establecer conexion SQL.", { type: 'error', closeTimer: 0 })
+      this.uiServices.notification("Error al establecer conexion SQL.", { type: 'error', closeTimer: 0 })
     }
     return structure ? true : false;
   }
 
   async setupDefaultData(existDatabaseStructure = false) {
     let settings: SettingsDTO;
-    settings = await this._commonService.setupDefaultData(existDatabaseStructure);
+    settings = await this.commonServices.setupDefaultData(existDatabaseStructure);
 
     const availableLangs = settings._languages.map(lang => {
       return lang.value;
@@ -89,7 +89,7 @@ export class ModuleComponent implements OnInit, AfterViewInit {
     setting._themes.map((x: ThemeDTO) => x.content['zoomLevel'] = '100%');
     const theme = setting._themes.find(x => x.id == setting.theme);
     if (theme) {
-      this._uiServices.applyTheme(theme);
+      this.uiServices.applyTheme(theme);
     }
   }
 
@@ -104,6 +104,6 @@ export class ModuleComponent implements OnInit, AfterViewInit {
   }
 
   showSQL() {
-      this._commonService.navigate('dbclient');
+      this.commonServices.navigate('dbclient');
   }
 }

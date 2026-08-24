@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { QuizAnswerDTO, QuizAnswerOptionDTO, LogDTO, AttemptAnswerDTO, AttemptDTO, QuizDTO, SettingsDTO, ThemeDTO, UserDTO, ThemePropertiesDTO, getSettingsDTO, getPermissionsDTO, getQuizDTOValid, normalizeQuizDTO, getAttemptDTO, getAttemptDTOValid, normalizeAttemptDTO, AttemptState } from '../data/entities/dtos';
-import { Utils } from '../data/utils/utils';
-import { DatabaseService } from './database/sql.database.service';
 import { v4 as uuidv4 } from 'uuid';
+import { AttemptAnswerDTO, AttemptDTO, AttemptState, LogDTO, QuizAnswerDTO, QuizAnswerOptionDTO, QuizDTO, SettingsDTO, ThemeDTO, ThemePropertiesDTO, UserDTO, getAttemptDTO, getAttemptDTOValid, getPermissionsDTO, getQuizDTOValid, getSettingsDTO, normalizeAttemptDTO, normalizeQuizDTO } from '../data/entities/dtos';
+import { DatabaseService } from './database/sql.database.service';
 
 @Injectable()
 export class CommonServices {
@@ -28,7 +27,7 @@ export class CommonServices {
   }
 
   async getSettingCompleteById(settingId: number = 0): Promise<SettingsDTO> {
-    return await this._services.getSettingCompleteById(settingId);
+    return await this._services.getSettingCompleteById(this.verifyNumber(settingId));
   }
 
   async saveSettings(data: SettingsDTO): Promise<SettingsDTO> {
@@ -36,7 +35,7 @@ export class CommonServices {
   }
 
   async deleteSettingById(id: number): Promise<any> {
-    return await this._services.deleteSetting(id);
+    return await this._services.deleteSetting(this.verifyNumber(id));
   }
   //#endregion SETTINGS
 
@@ -56,7 +55,7 @@ export class CommonServices {
   }
 
   async getUserById(userId: number) {
-    return await this._services.getUserById(userId);
+    return await this._services.getUserById(this.verifyNumber(this.verifyNumber(userId)));
   }
 
   async getCurrentUser(): Promise<UserDTO> {
@@ -68,7 +67,7 @@ export class CommonServices {
   }
 
   async deleteUser(userId: number) {
-    let response = await this._services.deleteUser(userId);
+    let response = await this._services.deleteUser(this.verifyNumber(this.verifyNumber(userId)));
     return response && response.length ? response[0] : null;
   }
   //#endregion USERS
@@ -80,7 +79,7 @@ export class CommonServices {
   }
 
   async getQuizCompleteById(quizId: number): Promise<QuizDTO> {
-    let quiz = await this._services.getQuizCompleteById(quizId);
+    let quiz = await this._services.getQuizCompleteById(this.verifyNumber(quizId));
     return quiz ? normalizeQuizDTO(quiz) : null;
   }
 
@@ -113,8 +112,8 @@ export class CommonServices {
   }
 
   async duplicateQuiz(quizId: number): Promise<QuizDTO> {
-    // return await this._services.getQuizCompleteById(quizId);
-    const _quiz = await this._services.getQuizCompleteById(quizId);
+    const _quiz = await this._services.getQuizCompleteById(this.verifyNumber(quizId));
+
     // clean _quiz to save as new record
     _quiz.quizId = null;
     _quiz.title = `${_quiz.title}`;
@@ -132,7 +131,7 @@ export class CommonServices {
   }
 
   async deleteQuiz(quizId: number): Promise<QuizDTO> {
-    let response = await this._services.deleteQuiz(quizId);
+    let response = await this._services.deleteQuiz(this.verifyNumber(quizId));
     return response && response.length ? response[0] : null;
   }
 
@@ -179,7 +178,7 @@ export class CommonServices {
   }
 
   async getAnswersByQuiz(quizId: number): Promise<QuizAnswerDTO[]> {
-    return await this._services.getAnswersByQuiz(quizId);
+    return await this._services.getAnswersByQuiz(this.verifyNumber(quizId));
   }
 
   async saveAnswer(data: QuizAnswerDTO): Promise<QuizAnswerDTO> {
@@ -187,14 +186,14 @@ export class CommonServices {
   }
 
   async deleteAnswer(id: number): Promise<QuizAnswerDTO> {
-    let response = await this._services.deleteAnswer(id);
+    let response = await this._services.deleteAnswer(this.verifyNumber(id));
     return response && response.length ? response[0] : null;
   }
   //#endregion QUIZ_ANSWERS
 
   //#region QUIZ_ANSWER_OPTIONS
   async getQuizAnswersOptionsByAnswerId(answerId: number): Promise<QuizAnswerOptionDTO[]> {
-    return await this._services.getQuizAnswersOptionsByAnswerId(answerId);
+    return await this._services.getQuizAnswersOptionsByAnswerId(this.verifyNumber(answerId));
   }
 
   async saveQuizAnswerOption(data: QuizAnswerOptionDTO): Promise<QuizAnswerOptionDTO> {
@@ -202,7 +201,7 @@ export class CommonServices {
   }
 
   async deleteQuizAnswerOption(id: number): Promise<QuizAnswerOptionDTO> {
-    let response = await this._services.deleteQuizAnswerOption(id);
+    let response = await this._services.deleteQuizAnswerOption(this.verifyNumber(id));
     return response && response.length ? response[0] : null;
   }
   //#endregion QUIZ_ANSWER_OPTIONS
@@ -213,7 +212,7 @@ export class CommonServices {
   }
 
   async getAttemptByQuizId(quizId: number): Promise<AttemptDTO[]> {
-    const attempts = await this._services.getAttemptByQuizId(quizId);
+    const attempts = await this._services.getAttemptByQuizId(this.verifyNumber(quizId));
     attempts.map(att => {
       return normalizeAttemptDTO(att);
     });
@@ -221,13 +220,13 @@ export class CommonServices {
   }
 
   async getAttemptCompleteByAttemptId(attemptId: number): Promise<AttemptDTO> {
-    const attempt = await this._services.getAttemptCompleteByAttemptId(attemptId);
+    const attempt = await this._services.getAttemptCompleteByAttemptId(this.verifyNumber(attemptId));
     return normalizeAttemptDTO(attempt);
   }
 
   async createAttempt(quizId: number): Promise<AttemptDTO> {
-    const quiz = await this.getQuizCompleteById(quizId);
-    const _attempt = getAttemptDTO(quizId, 1, quiz.title, quiz.answers);
+    const quiz = await this.getQuizCompleteById(this.verifyNumber(quizId));
+    const _attempt = getAttemptDTO(this.verifyNumber(quizId), 1, quiz.title, quiz.answers);
     const attempt = await this.saveAllAttempt(_attempt);
     return normalizeAttemptDTO(attempt);
   }
@@ -258,8 +257,8 @@ export class CommonServices {
   }
 
   async evalueAttemptById(attemptId: number): Promise<AttemptDTO> {
-    let attempt = await this.getAttemptCompleteByAttemptId(attemptId);
- 
+    let attempt = await this.getAttemptCompleteByAttemptId(this.verifyNumber(attemptId));
+
     attempt.answers.map(ans => {
       const optCorrect = ans.options.find(opt => opt.isCorrect);
       ans.isCorrect = optCorrect ? ans.selectedOptionId == optCorrect.optionId : false;
@@ -273,17 +272,17 @@ export class CommonServices {
     attempt.state = AttemptState.completed;
 
     attempt = await this.saveAllAttempt(attempt);
-    return attempt;
+    return normalizeAttemptDTO(attempt);
   }
 
   async deleteQuizAttempt(attemptId: number): Promise<AttemptDTO> {
-    return await this._services.deleteQuizAttempt(attemptId);
+    return await this._services.deleteQuizAttempt(this.verifyNumber(attemptId));
   }
   //#endregion ATTEMPTS
 
   //#region ANSWERS_ATTEMPTS
   async getAttemptAnswersByAttemptId(attemptId: number): Promise<AttemptAnswerDTO[]> {
-    return await this._services.getAttemptAnswersByAttemptId(attemptId);
+    return await this._services.getAttemptAnswersByAttemptId(this.verifyNumber(attemptId));
   }
 
   async saveAttemptAnswers(data: AttemptAnswerDTO): Promise<AttemptAnswerDTO> {
@@ -297,7 +296,7 @@ export class CommonServices {
   }
 
   async getLogById(id: number): Promise<LogDTO> {
-    const response = await this._services.getLogById(id);
+    const response = await this._services.getLogById(this.verifyNumber(id));
     return response && response.length ? response[0] : null;
   }
 
@@ -306,7 +305,7 @@ export class CommonServices {
   }
 
   async deleteLog(id: number): Promise<LogDTO[]> {
-    return await this._services.deleteLog(id);
+    return await this._services.deleteLog(this.verifyNumber(id));
   }
   //#endregion LOGS
 
@@ -341,6 +340,20 @@ export class CommonServices {
   //#endregion PUBLIC METHODS
 
   //#region DEFAULT_DATA
+
+  verifyNumber(id: any): number {
+    let num: number = null;
+    if (id != null) {
+      if (typeof id === 'string') {
+        num = parseInt(id);
+        console.warn(`El id {${id}} es de tipo cadena.`)
+      } else {
+        num = id;
+      }
+    }
+    return num;
+  }
+
   defaultThemeLight: ThemePropertiesDTO = {
     appBackground: '#bebebe',
     appColor: '#2d2d2d',

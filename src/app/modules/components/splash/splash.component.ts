@@ -13,20 +13,20 @@ export class SplashComponent implements OnInit {
   timeDelay = 1500;
   state = 'enter'
 
-  constructor(private _commonServices: CommonServices,
-    private services: DatabaseService,
-    public _uiServices: UiServices) { }
+  constructor(private commonServices: CommonServices,
+    private databaseService: DatabaseService,
+    public uiServices: UiServices) { }
 
   async ngOnInit() {
-    this._uiServices.showLoader(true);
+    this.uiServices.showLoader(true);
     const existStructure = await this.loadDatabaseStructure();
     this.checkInit(existStructure);
   }
 
   async loadDatabaseStructure() {
-    const structure = await this.services.initialDatabase();
+    const structure = await this.databaseService.initialDatabase();
     if (!structure) {
-      this._uiServices.notification("Error al establecer conexion SQL.", { type: 'error', closeTimer: 0 })
+      this.uiServices.notification("Error al establecer conexion SQL.", { type: 'error', closeTimer: 0 })
     }
     return structure ? true : false;
   }
@@ -34,14 +34,14 @@ export class SplashComponent implements OnInit {
   async checkInit(existDatabaseStructure = false) {
     let module = ScreenEnum.register;
     if (existDatabaseStructure) {
-      const profile = await this._commonServices.getCurrentUser();
+      const profile = await this.commonServices.getCurrentUser();
       module = !profile ? ScreenEnum.register : ScreenEnum.dashboard;
     }
 
     setTimeout(() => {
-      this._commonServices.navigate(module);
+      this.commonServices.navigate(module);
     }, this.timeDelay);
     
-      this._uiServices.showLoader(false);
+      this.uiServices.showLoader(false);
   }
 }

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation, } from '@angular/core';
-import { QuizAnswerDTO, PermissionsDTO, AttemptDTO, QuizDTO, UserDTO } from 'src/app/shared/data/entities/dtos';
-import { AttemptState } from 'src/app/shared/data/enumerables/enumerables';
+import { TranslateService } from '@ngx-translate/core';
+import { QuizAnswerDTO, PermissionsDTO, AttemptDTO, QuizDTO, UserDTO, AttemptState, SettingsDTO } from 'src/app/shared/data/entities/dtos';
 import { TransformData } from 'src/app/shared/data/utils/transformData';
 import { CommonServices } from 'src/app/shared/services/common.services';
 import { UiServices } from 'src/app/shared/services/ui.services';
@@ -22,6 +22,7 @@ export class DashboardComponent implements OnInit {
 
   transform = new TransformData();
   user: UserDTO = null;
+  settings: SettingsDTO = null;
   permissions = {
     create: false,
     duplicate: false,
@@ -30,49 +31,70 @@ export class DashboardComponent implements OnInit {
     ai: false
   }
 
-  constructor(private _commonServices: CommonServices,
-    private _uiServices: UiServices) { }
+  translateLabels = {
+    attempt_error_generation: '',
+  };
+
+  constructor(private commonServices: CommonServices,
+    private uiServices: UiServices,
+    private translate: TranslateService) { }
 
   async ngOnInit() {
-    this._uiServices.showLoader(true);
-    await this.getSettings();
-    setTimeout(() => {
-      this.uistate = '';
-      this.init();
-    }, 800);
+    this.uiServices.showLoader(true);
+    this.setupLanguage(async () => {
+      setTimeout(() => {
+        this.uistate = '';
+        this.init();
+      }, 800);
+    });
 
+  }
+
+  async setupLanguage(next) {
+    this.settings = await this.commonServices.getCurrentSettings();
+    this.user = await this.commonServices.getCurrentUser();
+    this.permissions = this.settings.permissions as PermissionsDTO;
+
+    this.translate.setDefaultLang(this.settings.language);
+    const keys = Object.keys(this.translateLabels);
+    this.translate.get(keys).subscribe((res) => {
+      this.translateLabels = res;
+      next();
+    });
   }
 
   //#region DATA
   async init() {
-    const list = await this._commonServices.getAllQuizs();
-    if(list) {
-      this.listQuiz = this.normalizeQuiz(list);
+    this.uiServices.showLoader(true);
+    const list = await this.commonServices.getAllQuizs();
+    if (list) {
+      this.listQuiz = list;
     }
 
     if (this.selected) {
       const quiz = this.listQuiz.find((quiz) => quiz.quizId == this.selected);
-      if(this.listQuiz.length && quiz) {
+      if (this.listQuiz.length && quiz) {
         this.showDetails(quiz);
       }
     }
 
-    this._uiServices.showLoader(false);
-  }
-
-  async getSettings() {
-    const settings = await this._commonServices.saveDefaultData();
-    this.user = await this._commonServices.getCurrentUser();
-    this.permissions = settings.permissions as PermissionsDTO;
+    this.uiServices.showLoader(false);
   }
 
   async getAttempts(quiz: QuizDTO) {
-    const attempts = await this._commonServices.getAttemptByQuizId(quiz.quizId);
-    console.log('attempt: ', attempts);
+    const attempts = await this.commonServices.getAttemptByQuizId(quiz.quizId);
     this.listAttempts = attempts && attempts.length ? this.normalizeAttempt(attempts) : [];
   }
 
   async createattempt() {
+    const attempt = await this.commonServices.createAttempt(this.currentQuiz.quizId);
+    if (attempt) {
+      this.uiServices.notification(`Examen Duplicado correctamente`, { type: 'info', closeTimer: 3000 });
+      this.goToCompleteAttempt(attempt);
+    } else {
+      this.uiServices.notification(this.translateLabels.attempt_error_generation, { type: 'error' })
+    }
+
     const data: AttemptDTO = {
       attemptId: null,
       quizId: this.currentQuiz.quizId,
@@ -90,68 +112,60 @@ export class DashboardComponent implements OnInit {
     // data.questions = this.transform.shuffleArray(data.questions);
 
     // SAVE DATA
-    // const attempt = await this._commonServices.saveAllQuizAttempt(data);
-    // console.log('attempt: ', attempt);
+    // const attempt = await this.commonServices.saveAllQuizAttempt(data);
 
     // if (attempt) {
     //   this.goToCompleteAttempt(attempt);
     // } else {
     //   // GLOBAL.service_error_attempt
-    //   this._uiServices.notification('Ocurrio un error al generar la evaluacion, intente nuvamente', { type: 'error' })
+    //   this.uiServices.notification('Ocurrio un error al generar la evaluacion, intente nuvamente', { type: 'error' })
     // }
-  }
-
-  async deleteQuiz(quiz: QuizDTO) {
-    console.log('quiz: ', quiz);
-    await this._commonServices.deleteQuiz(quiz.quizId);
-    this.init();
-    this.returnMain();
   }
 
   async resetAttemps(quiz: QuizDTO) {
     await Promise.all(
-      this.listAttempts.map(async(attemp) => {
-        await this._commonServices.deleteQuizAttempt(attemp.attemptId);
+      this.listAttempts.map(async (attemp) => {
+        await this.commonServices.deleteQuizAttempt(attemp.attemptId);
       })
     );
-    
+
     this.returnMain();
   }
   //#endregion DATA
 
   //#region EVENTS
   createQuiz() {
-    this._commonServices.navigate('quizcreate');
+    this.commonServices.navigate('quizcreate');
   }
 
   editQuiz(quiz: QuizDTO) {
-    this._commonServices.navigate('quizedit', quiz.quizId.toString());
+    this.commonServices.navigate('quizedit', quiz.quizId.toString());
   }
 
   async duplicateQuiz(quiz: QuizDTO) {
-    const quizData = await this._commonServices.getQuizCompleteById(quiz.quizId);
-    // prepare data to save as nre record
-    quizData.quizId = null;;
-    quizData.title = `${ quizData.title } - Duplicated`;
-    quizData.answers.forEach(answer => {
-      answer.answerId = null;
-      answer.options.forEach(option => {
-        option.optionId = null;
-      })
-    });
-    console.log('quizData: ', quizData);
-    const quizNew = await this._commonServices.saveAllQuiz(quizData);
-    console.log('quizNew: ', quizNew);
-    this._commonServices.navigate('quizedit', `${ quizNew.quizId }`);
+    const quizData = await this.commonServices.duplicateQuiz(quiz.quizId);
+    if (quizData) {
+      this.uiServices.notification(`Examen Duplicado correctamente`, { type: 'info', closeTimer: 3000 });
+      this.commonServices.navigate('quizedit', `${quizData.quizId}`);
+    }
   }
-  
+
+  async deleteQuiz(quiz: QuizDTO) {
+    const _quiz = await this.commonServices.deleteQuiz(quiz.quizId);
+    if (_quiz) {
+      this.uiServices.notification(`Examen Eliminado correctamente`, { type: 'success', closeTimer: 3000 });
+      this.init();
+      this.returnMain();
+    }
+  }
+
 
   goToCompleteAttempt(attempt: AttemptDTO) {
-    this._commonServices.navigate('attemptevalue',  attempt.attemptId.toString());
+    this.commonServices.navigate('attemptevalue', attempt.attemptId.toString());
   }
 
   goToReviewAttempt(attempt: AttemptDTO) {
-    this._commonServices.navigate('attemptreview', attempt.attemptId.toString());
+    this.commonServices.navigate('attemptreview', attempt.attemptId.toString());
   }
 
   async showDetails(quiz: QuizDTO) {
@@ -169,7 +183,7 @@ export class DashboardComponent implements OnInit {
     });
 
     this.valueChange('secondary');
-    this._commonServices.navigate('dashboard', this.currentQuiz.quizId.toString());
+    this.commonServices.navigate('dashboard', this.currentQuiz.quizId.toString());
   }
 
   returnMain() {
@@ -180,26 +194,15 @@ export class DashboardComponent implements OnInit {
     this.currentQuiz = null;
     this.valueChange('primary');
 
-    this._commonServices.navigate('dashboard');
+    this.commonServices.navigate('dashboard');
   }
 
-  valueChange(value: string ) {
+  valueChange(value: string) {
     this.onChange.emit({ action: 'ui_update', value: value });
   }
   //#endregion EVENTS
 
   //#region CONVERTERS
-  normalizeQuiz(list: QuizDTO[]) {
-    list.map((item) => {
-      item._attemptsValue = item._attemptsValue ?? '-';
-      item._bestTimeValue = item._bestTimeValue ?? '-';
-
-      item._creationDate = this.transform.toDate(new Date(item.creationDate), 'MMM/d/yy h:mm a');
-      item._updatedDate = this.transform.toDate(new Date(item.updatedDate), 'MMM/d/yy h:mm a');
-    })
-    return list;
-  }
-
   normalizeAttempt(list: AttemptDTO[]) {
     list.map((item) => {
       item._startDate = this.transform.toDate(new Date(item.startDate), 'MMM/d/yy h:mm');

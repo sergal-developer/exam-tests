@@ -34,13 +34,13 @@ export class RegisterComponent implements OnInit {
   uistate = 'init';
 
   constructor(private fb: FormBuilder,
-    private _commonServices: CommonServices,
-    private _uiServices: UiServices,
+    private commonServices: CommonServices,
+    private uiServices: UiServices,
     private translate: TranslateService
   ) { }
 
   ngOnInit() {
-    this._uiServices.showLoader(true);
+    this.uiServices.showLoader(true);
     this.form = this.fb.group({
       name: ['', Validators.required],
       image: ['', Validators.required],
@@ -55,7 +55,7 @@ export class RegisterComponent implements OnInit {
         this.translateLabels = res;
       });
 
-      this._uiServices.showLoader(false);
+      this.uiServices.showLoader(false);
     }, 800);
   }
 
@@ -64,14 +64,13 @@ export class RegisterComponent implements OnInit {
 
   //#region DATA
   async checkInitialSettings() {
-    this.settings = await this._commonServices.saveDefaultData();
-    console.log('settings: ', this.settings);
+    this.settings = await this.commonServices.saveDefaultData();
     if(this.settings) {
       this.languages = this.settings._languages;
     }
-    const profile = await this._commonServices.getCurrentUser()
+    const profile = await this.commonServices.getCurrentUser()
     if (profile) {
-      this._commonServices.navigate('dashboard');
+      this.commonServices.navigate('dashboard');
     }
   }
 
@@ -88,18 +87,18 @@ export class RegisterComponent implements OnInit {
       current: true,
     };
 
-    await this._commonServices.saveUser(data);    
+    await this.commonServices.saveUser(data);    
 
-    let user = await this._commonServices.getCurrentUser();
+    let user = await this.commonServices.getCurrentUser();
     if (user) {
-      this._uiServices.notification(this.translateLabels.service_sucess_save, { type: 'success', closeTimer: 1500 });
+      this.uiServices.notification(this.translateLabels.service_sucess_save, { type: 'success', closeTimer: 1500 });
       this.uistate = 'exit';
       setTimeout(() => {
-        this._commonServices.navigate('dashboard');
+        this.commonServices.navigate('dashboard');
       }, 1500);
     } else {
       this.uistate = '';
-      this._uiServices.notification(this.translateLabels.service_fail_save, { type: 'error', closeTimer: 1500 });
+      this.uiServices.notification(this.translateLabels.service_fail_save, { type: 'error', closeTimer: 1500 });
     }
   }
 
@@ -127,7 +126,7 @@ export class RegisterComponent implements OnInit {
     this.settings.language = language;
 
     this.translate.setDefaultLang(this.settings.language);
-    await this._commonServices.saveSettings({
+    await this.commonServices.saveSettings({
       language: this.settings.language,
       permissions: this.settings.permissions,
       theme: this.settings.theme,

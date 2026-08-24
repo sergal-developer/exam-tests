@@ -69,6 +69,7 @@
   "action_edit": "Editar",
   "action_delete": "Eliminar",
   "action_reset": "Reiniciar",
+  "attempt_status_perfect": "Perfecto!!",
   "attempt_status_complete": "Completado",
   "attempt_status_approved": "Aprobado",
   "attempt_status_passed": "Aprobaste por poco",
@@ -109,5 +110,6 @@
   "help_quiz_options": "Escribe la respuesta correcta y da click en el radio para marcarla",
   "answer_text_default": "¿Pregunta",
   "answer_option_text_default": "Respuesta",
-  "answer_option_correct_text_default": "Respuesta Correcta"
+  "answer_option_correct_text_default": "Respuesta Correcta",
+  "attempt_error_generation": "Se produjo un error al generar el intento; por favor, inténtelo de nuevo."
 }

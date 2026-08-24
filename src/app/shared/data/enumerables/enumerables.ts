@@ -27,18 +27,6 @@ export enum ScreenEnum {
     game = 'game',
 }
 
-export enum AttemptState {
-    new = 'new',
-    progress = 'progress',
-    completed = 'completed'
-}
-
-export enum GradeState {
-    passed = 'passed',
-    failed = 'failed',
-    barely_passed = 'barely_passed',
-}
-
 export enum GamesEnum {
     ColorNumbers = 'ColorNumbers',
     Comparison = 'Comparison',

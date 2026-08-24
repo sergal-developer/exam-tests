@@ -39,8 +39,8 @@ export class SettingsComponent implements OnInit {
   themeProps: Array<{ name: string, value: string }> = null;
   customizeColorsMode = false;
 
-  constructor(private _commonServices: CommonServices,
-    private _uiServices: UiServices,
+  constructor(private commonServices: CommonServices,
+    private uiServices: UiServices,
     private translate: TranslateService,
     private fb: FormBuilder
   ) { }
@@ -51,9 +51,8 @@ export class SettingsComponent implements OnInit {
 
   //#region DATA
   async getSettings() {
-    this.settings = await this._commonServices.getSettingCompleteById();
-    console.log('this.settings: ', this.settings);
-    this.profile = await this._commonServices.getCurrentUser();
+    this.settings = await this.commonServices.getSettingCompleteById();
+    this.profile = await this.commonServices.getCurrentUser();
 
     this.form = this.fb.group({
       name: [this.profile.userName, Validators.required],
@@ -79,14 +78,14 @@ export class SettingsComponent implements OnInit {
     if (this.updating) { return; }
     this.updating = true;
 
-    await this._commonServices.saveSettings({
+    await this.commonServices.saveSettings({
       language: this.settings.language,
       permissions: this.settings.permissions,
       theme: this.settings.theme,
       settingId: this.settings.settingId
     });
-    this.settings = await this._commonServices.getCurrentSettings();
-    this._uiServices.notification('Permisos actualizados');
+    this.settings = await this.commonServices.getCurrentSettings();
+    this.uiServices.notification('Permisos actualizados');
     this.updating = false;
 
   }
@@ -100,7 +99,7 @@ export class SettingsComponent implements OnInit {
     this.settings.language = language;
 
     this.translate.setDefaultLang(this.settings.language);
-    await this._commonServices.saveSettings({
+    await this.commonServices.saveSettings({
       language: this.settings.language,
       permissions: this.settings.permissions,
       theme: this.settings.theme,
@@ -113,8 +112,8 @@ export class SettingsComponent implements OnInit {
     if (this.settings._themes.length) {
       const theme = this.settings._themes.find(x => x.id == this.settings.theme);
       if (theme) {
-        this._uiServices.applyTheme(theme);
-        await this._commonServices.saveSettings({
+        this.uiServices.applyTheme(theme);
+        await this.commonServices.saveSettings({
           language: this.settings.language,
           permissions: this.settings.permissions,
           theme: this.settings.theme,
@@ -188,7 +187,7 @@ export class SettingsComponent implements OnInit {
         theme.content = { ...themeContent, ...changes }
       }
       setTimeout(() => {
-        this._uiServices.applyTheme(theme);
+        this.uiServices.applyTheme(theme);
       }, 300);
     }
   }
@@ -203,13 +202,13 @@ export class SettingsComponent implements OnInit {
       uuid: this.profile.uuid,
       userId: this.profile.userId,
     };
-    const result = await this._commonServices.saveUser(user);
+    const result = await this.commonServices.saveUser(user);
     return result;
   }
 
   // #region IMPORT/EXPORTS
   export() {
-    const exams = this._commonServices.getAllQuizs();
+    const exams = this.commonServices.getAllQuizs();
     this.copyClipboard(JSON.stringify(exams));
     this.downloadJSON(JSON.stringify(exams), 'collection-exam.json');
   }
@@ -221,10 +220,10 @@ export class SettingsComponent implements OnInit {
     try {
       const json = JSON.parse(data);
       // crear funcion que agrege el json de un solo paso
-      // this._commonServices.saveQuiz(json);
-      this._uiServices.notification('Plantilla importada exitosamente', { type: 'success', closeTimer: 5000 });
+      // this.commonServices.saveQuiz(json);
+      this.uiServices.notification('Plantilla importada exitosamente', { type: 'success', closeTimer: 5000 });
     } catch (error) {
-      this._uiServices.notification('Error al importar plantilla', { type: 'warning', closeTimer: 5000 });
+      this.uiServices.notification('Error al importar plantilla', { type: 'warning', closeTimer: 5000 });
     }
   }
 
@@ -241,9 +240,9 @@ export class SettingsComponent implements OnInit {
       downloadElement.click();
       document.body.removeChild(downloadElement);
       URL.revokeObjectURL(url);
-      this._uiServices.notification('Exportación exitosa', { type: 'info', closeTimer: 3000 });
+      this.uiServices.notification('Exportación exitosa', { type: 'info', closeTimer: 3000 });
     } catch (error: any) {
-      this._uiServices.notification(error, { type: 'warning', closeTimer: 5000 });
+      this.uiServices.notification(error, { type: 'warning', closeTimer: 5000 });
     }
   }
 
@@ -258,7 +257,7 @@ export class SettingsComponent implements OnInit {
 
       lector.onerror = (evento: any) => {
         console.warn("Error al leer el archivo:", evento.target.error);
-        this._uiServices.notification('Error al leer el archivo', { type: 'warning', closeTimer: 5000 });
+        this.uiServices.notification('Error al leer el archivo', { type: 'warning', closeTimer: 5000 });
         resolve('');
       };
 

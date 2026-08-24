@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation, } from '@angular/core';
-import { QuizAnswerDTO, QuizAnswerOptionDTO, AttemptAnswerDTO, AttemptDTO, QuizDTO } from 'src/app/shared/data/entities/dtos';
-import { AttemptState, GradeState } from 'src/app/shared/data/enumerables/enumerables';
+import { AttemptAnswerDTO, AttemptDTO, AttemptState, GradeState, QuizAnswerOptionDTO, QuizDTO } from 'src/app/shared/data/entities/dtos';
+import { ScreenEnum } from 'src/app/shared/data/enumerables/enumerables';
 import { CommonServices } from 'src/app/shared/services/common.services';
 import { UiServices } from 'src/app/shared/services/ui.services';
 
@@ -17,7 +17,7 @@ export class QuizComponent implements OnInit {
   //#region INTERNAL
   attempt: AttemptDTO = null;
   currentAnswerIndex = 0;
-  currentAnswer: QuizAnswerDTO = null;
+  currentAnswer: AttemptAnswerDTO = null;
 
   readonly = false;
   progress = 0;
@@ -33,22 +33,25 @@ export class QuizComponent implements OnInit {
   zoomlevel = '100%';
   zoomlevelLabel = '1.1x';
   settings = null
+  
+  redirect = { module: ScreenEnum.dashboard, action: '' };
   //#endregion INTERNAL
 
-  constructor(private _commonService: CommonServices,
-    private _uiService: UiServices
+  constructor(private commonServices: CommonServices,
+    private uiServices: UiServices
   ) { }
 
   async ngOnInit() {
-    // this.settings = await this._commonService.getActiveSettings();
+    this.uiServices.showLoader(true);
+    this.settings = await this.commonServices.getSettingCompleteById(0);
 
     await this.getData();
     this.setupComponent();
 
     setTimeout(() => {
-      this.zoomlevel = this._uiService.getThemeKey('zoomLevel');
+      this.zoomlevel = this.uiServices.getThemeKey('zoomLevel');
       this.zoomlevelLabel = this.getZoomLevel(this.zoomlevel);
-      this.setZoom();
+      this.uiServices.showLoader(false);
     }, 500);
   }
 
@@ -56,86 +59,62 @@ export class QuizComponent implements OnInit {
   async getData() {
     if (this.id) {
       this.id = JSON.parse(JSON.stringify(this.id));
-      const quiz = await this.getAttemptData(this.id);
+      const attempt = await this.getAttemptData(this.id);
+      this.attempt = attempt;
 
-      // this.attempt = { ...quiz };
+      if (this.attempt.state == AttemptState.new) {
+        this.attempt.startDate = new Date().getTime();
+        this.attempt.state = AttemptState.progress;
+      }
 
+      if (this.attempt.state == AttemptState.progress) {
+        let idxLastResponse = this.attempt.answers.findIndex((item) => !item.selectedOptionId);
+        if (idxLastResponse != -1) {
+          idxLastResponse = idxLastResponse == 0 ? 0 : idxLastResponse - 1;
+        } else {
+          idxLastResponse = this.attempt.answers.length - 1;
+        }
 
-      console.log('this.attempt: ', this.attempt);
+        setTimeout(() => {
+          this.gotoQuestion(idxLastResponse);
+        }, 500);
+      }
 
-      // if (this.attempt.state == 'completed') {
-      //   this.attempt._score = this.attempt.score.toFixed(2);
-      // } else {
-      //   const indedxLastResponse = this.attempt.questions.findIndex((item) => !item.selectedAnswer);
-      //   if (indedxLastResponse > 0) {
-      //     setTimeout(() => {
-      //       this.gotoQuestion(indedxLastResponse - 1);
-      //     }, 500);
-      //   }
-      // }
+      if (this.attempt.state == 'completed') {
+        this.attempt._score = this.attempt.score.toFixed(2);
+        this.showFinishPage();
+      }
 
-      // if (!this.attempt.startDate) {
-      //   this.attempt.startDate = new Date().getTime();
-      // }
+      this.readonly = this.attempt.state == AttemptState.completed;
 
       if (!this.attempt) {
-        this._uiService.notification('Ocurrio un error al recuperar los datos', { type: 'error', closeTimer: 3000 });
+        this.uiServices.notification('Ocurrio un error al recuperar los datos', { type: 'error', closeTimer: 3000 });
         return false;
       }
+
+      this.redirect.module = ScreenEnum.dashboard;
+      this.redirect.action = `${ this.attempt.quizId }`;
     }
     return true;
   }
 
   async setupComponent() {
-    if(!this.attempt) {
+    if (!this.attempt) {
       return;
     }
-    
-    this.readonly = this.attempt.state == AttemptState.completed;
+
+    // this.readonly = this.attempt.state == AttemptState.completed;
     this.currentAnswerIndex = 0;
-    // this.currentAnswer = this.attempt.questions[this.currentAnswerIndex];
+    // this.currentAnswer = this.attempt.answers[this.currentAnswerIndex];
 
     this.getProgress();
-
     if (this.readonly) {
       this.showFinishPage();
     }
-
-    // this.setCurrentAnswer();
   }
 
   async getAttemptData(id: number): Promise<AttemptDTO> {
-    let attempt: AttemptDTO = await this._commonService.getAttemptCompleteByAttemptId(id);
-    console.log('getAttemptData: ', attempt);
-    
-    debugger;
-    if(attempt && !attempt.answers?.length) {
-      attempt.answers = [];
-      const quizAnswers: QuizDTO = await this._commonService.getQuizCompleteById(attempt.quizId);
-      quizAnswers.answers.map((answer) => {
-        // creacion de AttemptAnswerDTO
-        const _answerAttempt: AttemptAnswerDTO = {
-          answerAttemptId: null,
-          attemptId: attempt.attemptId,
-          selectedOptionId: null,
-          isCorrect: false,
-          answerId: answer.answerId,
-          optionsLinked: JSON.stringify(answer.options),
-          ...answer
-        };
-        console.log('_answerAttempt: ', _answerAttempt);
-        attempt.answers.push(_answerAttempt);
-      });
-
-      attempt.answersLinked = JSON.stringify(attempt.answers);
-    }
-    
-    console.log('data: ', attempt);
-    // const data = [];
-    if (!attempt) {
-      this._uiService.notification('La información no pudo recuperarse correctamente');
-      return null;
-    }
+    let attempt: AttemptDTO = await this.commonServices.getAttemptCompleteByAttemptId(id);
     return attempt;
   }
 
@@ -143,6 +122,11 @@ export class QuizComponent implements OnInit {
     if (this.savingData) {
       return;
     }
+
+    if( this.attempt.state == AttemptState.completed) {
+      return;
+    }
+
     this.savingData = true;
 
     this.getProgress();
@@ -150,17 +134,15 @@ export class QuizComponent implements OnInit {
 
     if (isFinish) {
       this.attempt.state = AttemptState.completed;
-      this.attempt = this.getAssessment();
-      this.attempt = this.getGrade();
-
+      this.attempt = await this.getAssessment();
     } else {
       this.attempt.state = AttemptState.progress;
     }
 
     this.attempt.updatedDate = new Date().getTime();
     this.readonly = this.attempt.state == AttemptState.completed;
-
-    // await this._commonService.updateAttempt(this.attempt.attemptId, this.attempt, 'attemptId');
+    const reponse = await this.commonServices.saveAllAttempt(this.attempt);
+    this.attempt = reponse;
 
     if (this.attempt.state == AttemptState.completed) {
       this.showFinishPage();
@@ -174,16 +156,16 @@ export class QuizComponent implements OnInit {
   selectOption(option: QuizAnswerOptionDTO) {
     if (this.readonly) { return; }
 
-    // if (option.selected) {
-    //   this.nextAnswer();
-    // } else {
-    //   // reset all selections
-    //   this.currentAnswer.options.map(opt => {
-    //     opt.selected = opt.id == option.id ? true : false;
-    //   });
-    // }
+    if (option._chosenAnswer) {
+      this.nextAnswer();
+    } else {
+      // reset all selections
+      this.currentAnswer.options.map(opt => {
+        opt._chosenAnswer = opt.optionId == option.optionId ? true : false;
+      });
+    }
 
-    // this.currentAnswer.selectedAnswer = option.id;
+    this.currentAnswer.selectedOptionId = option.optionId;
   }
 
   prevAnswer() {
@@ -192,17 +174,17 @@ export class QuizComponent implements OnInit {
     }
 
     this.currentAnswerIndex = this.currentAnswerIndex - 1;
-    // this.currentAnswer = this.attempt.questions[this.currentAnswerIndex];
+    this.currentAnswer = this.attempt.answers[this.currentAnswerIndex];
     this.updateResults();
   }
 
   nextAnswer() {
-    if (this.currentAnswerIndex >= this.attempt.validTotalAnswers - 1) {
+    if (this.currentAnswerIndex >= this.attempt.answers.length - 1) {
       return;
     }
 
     this.currentAnswerIndex = this.currentAnswerIndex + 1;
-    // this.currentAnswer = this.attempt.questions[this.currentAnswerIndex];
+    this.currentAnswer = this.attempt.answers[this.currentAnswerIndex];
     this.updateResults();
   }
 
@@ -219,7 +201,7 @@ export class QuizComponent implements OnInit {
   }
 
   getProgress() {
-    this.progress = (100 / (this.attempt.validTotalAnswers)) * (this.currentAnswerIndex + 1);
+    this.progress = (100 / (this.attempt.answers.length)) * (this.currentAnswerIndex + 1);
     this.progresStyle = `width: ${this.progress}%`;
   }
 
@@ -232,6 +214,7 @@ export class QuizComponent implements OnInit {
     this.setupComponent();
     this.currentSection = 'show';
     this.valueChange('primary');
+    this.gotoQuestion(0);
   }
 
   closeResults() {
@@ -240,15 +223,15 @@ export class QuizComponent implements OnInit {
   }
 
   gotoQuestion(index) {
-    this.currentAnswerIndex = index - 1;
-    this.nextAnswer();
+    this.currentAnswerIndex = index;
     this.getProgress();
     this.currentSection = 'show';
     this.valueChange('primary');
+    this.currentAnswer = this.attempt.answers[this.currentAnswerIndex];
   }
 
   gotoDashboard() {
-    this._commonService.navigate('dashboard');
+    this.commonServices.navigate('dashboard');
   }
 
   valueChange(value: string) {
@@ -262,47 +245,30 @@ export class QuizComponent implements OnInit {
       currentLevel >= 160 ? 70 + increment : 100;
 
     this.zoomlevel = `${lavel}%`;
-    this._uiService.applyThemeKey('zoomLevel', this.zoomlevel);
+    this.uiServices.applyThemeKey('zoomLevel', this.zoomlevel);
     this.zoomlevelLabel = this.getZoomLevel(this.zoomlevel);
-    
-    // this._uiService.applyTheme(this.settings.themeProps[this.settings.theme.toLowerCase()])
+
+    // this.uiServices.applyTheme(this.settings.themeProps[this.settings.theme.toLowerCase()])
   }
 
   setZoom() {
-    this._uiService.applyThemeKey('zoomLevel', this.zoomlevel);
+    this.uiServices.applyThemeKey('zoomLevel', this.zoomlevel);
   }
   //#endregion EVENTS
 
   //#region CONVERTERS
-  getAssessment() {
-    let score = 0;
-    const correctAnswers = [];
-    const answerTotal = this.attempt.answers.length;
-    // this.attempt.answers.map((item: AnswerDTO) => {
-    //   // item._isCorrect = item.correctAnswer == item.selectedAnswer;
-    //   // if (item.isCorrect) {
-    //   //   correctAnswers.push(item);
-    //   // }
-    // });
-    score = (100 / answerTotal) * correctAnswers.length;
-    this.attempt.score = score;
-    // this.attempt._score = Math.floor(this.attempt.score).toString();
-    // this.attempt._score = Math.floor(this.attempt.score) >= 8 ? Math.floor(this.attempt.score).toString() : this.attempt.score.toFixed(1);
-    this.attempt.correctAnswers = correctAnswers.length;
-    return this.attempt;
-  }
+  async getAssessment() {
 
-  getGrade() {
-    const score = this.attempt.score;
-    this.attempt.grade = score > 75 ? GradeState.passed :
-      score > 60 && score < 75.9 ? GradeState.barely_passed : score > 0 && score < 59.9 ? GradeState.failed : GradeState.failed;
-
+    const reponse = await this.commonServices.saveAllAttempt(this.attempt)
+    const attempt = await this.commonServices.evalueAttemptById(reponse.attemptId);
+    this.attempt = attempt;
     return this.attempt;
   }
 
   getZoomLevel(zoomLevel: string) {
+    zoomLevel = zoomLevel || "100%";
     const num = parseInt(zoomLevel.replace('%', ''));
-    return `${ num / 100 }x`;
+    return `${num / 100}x`;
   }
   //#endregion CONVERTERS
 }

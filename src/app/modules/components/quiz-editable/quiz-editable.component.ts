@@ -59,22 +59,22 @@ export class QuizEditableComponent implements OnInit {
   _helper = new Utils();
   //#endregion INTERNAL
 
-  constructor(private _commonService: CommonServices,
-    private _uiService: UiServices,
+  constructor(private commonServices: CommonServices,
+    private uiServices: UiServices,
     private fb: FormBuilder,
     private translate: TranslateService
   ) {
   }
 
   async ngOnInit() {
-    this._uiService.showLoader(true);
+    this.uiServices.showLoader(true);
     this.setupLanguage(() => {
       this.setupComponent();
     });
   }
 
   async setupLanguage(next) {
-    this.settings = await this._commonService.getCurrentSettings();
+    this.settings = await this.commonServices.getCurrentSettings();
     this.translate.setDefaultLang(this.settings.language);
     const keys = Object.keys(this.translateLabels);
     this.translate.get(keys).subscribe((res) => {
@@ -103,90 +103,21 @@ export class QuizEditableComponent implements OnInit {
     this.quiz = getQuizDTO('', 0);
     this.quiz.answers = [this.getNewQuestionForm()];
 
-    /*
-  if (this.quizId && !injectData) {
-    // no se esta injectando datos y recupera el examen solicitado
-    this.quiz = await this.getQuizData(this.quizId);
 
-    let data = this._commonService.prepareQueryAnswersOptions(this.quiz);
-    console.log('setupComponent: ', data);
+    if (this.quizId) {
+      const _quiz = await this.commonServices.getQuizCompleteById(this.quizId);
 
-    if (!this.quiz) {
-      this._uiService.notification(this.translateLabels.service_fail_get, { type: 'error', closeTimer: 3000 });
-      return;
+      if (!this.quiz) {
+        this.uiServices.notification(this.translateLabels.service_fail_get, { type: 'error', closeTimer: 3000 });
+        this.uiServices.showLoader(false);
+        return;
+      }
+
+      this.quiz = normalizeQuizDTO(_quiz);
     }
-
-    // add blanck spaces in questions
-    // this.quiz.answers.map((answer: QuizAnswerDTO) => {
-    //   const newOption: QuizAnswerOptionDTO = {
-    //     answerId: answer.answerId,
-    //     content: ,
-    //     optionId: -1,
-    //     optionIndex: question.options.length + 1,
-    //     updatedDate: new Date().getTime(),
-
-    //     // GENERATED
-    //     isCorrect: false,
-    //     _selected: false,
-    //   };
-    //   const length = this.quiz.answers.length || 0;
-    //   const newOption: QuizAnswerOptionDTO = {
-    //     answerId: answer.answerId,
-    //     content: '',
-    //     optionIndex: length + 1,
-    //     optionId: length + 1,
-    //     updatedDate: new Date().getTime(),
-    //     isCorrect: false
-    //   }
-    //   answer.options.push(newOption);
-    // });
-    // this.quiz.questions.push(this.getNewQuestion());
-    this.form = this.fb.group({
-      title: [this.quiz.title, Validators.required],
-      time: [this.quiz.time],
-    });
-
-    if (this.quiz.time != 0) {
-      this.durationFormShow = true;
-    }
-
-  } else if (injectData) {
-    // BACKUP OLD DATA 
-    const oldQuiz: QuizDTO = JSON.parse(JSON.stringify(this.quiz));
-    this.quiz = injectData;
-    this.quiz.quizId = this.quizId;
-
-    // RECOVER OLD DATA
-    this.quiz.title = oldQuiz.title == '' ? this.quiz.title : oldQuiz.title;
-    this.quiz.answers = oldQuiz.answers.length > 1 ? [...oldQuiz.answers, ...this.quiz.answers] : this.quiz.answers;
-
-    this.quiz.answers.map((answer: QuizAnswerDTO) => {
-      const length = this.quiz.answers.length || 0;
-      // answer.options.map((option: IQuizAnswerOptionDTO) => {
-      //   option.letter = this.getletter(option.id + 1);
-      //   option.selected = false;
-      //   option.correctAnswer = option.id == answer.correctAnswer;
-      //   option.selected = option.id == answer.correctAnswer;
-      // });
-    });
-    // this.quiz.questions.push(this.getNewQuestion());
-    this.form = this.fb.group({
-      title: [this.quiz.title, Validators.required],
-      time: [this.quiz.time],
-    });
-
-    if (this.quiz.time != 0) {
-      this.durationFormShow = true;
-    }
-
-  } else {
-    */
-
-    // }
-
 
     this.setCurrentAnswer();
-    this._uiService.showLoader(false);
+    this.uiServices.showLoader(false);
   }
 
   setCurrentAnswer() {
@@ -226,30 +157,30 @@ export class QuizEditableComponent implements OnInit {
 
   async updateQuiz() {
     return new Promise(async (resolve, reject) => {
-      this._uiService.showLoader(true);
+      this.uiServices.showLoader(true);
       // save the last changes
       this.quiz.answers[this.currentAnswerIndex] = this.formQuestion.value;
 
       // refine request
       const quizRequest = this.quiz = this._quizRefined(true);
-      const response = await this._commonService.saveAllQuiz(quizRequest);
+      const response = await this.commonServices.saveAllQuiz(quizRequest);
       if (!response) {
-        this._uiService.notification(this.translateLabels.service_fail_update);
-        this._uiService.showLoader(false);
+        this.uiServices.notification(this.translateLabels.service_fail_update);
+        this.uiServices.showLoader(false);
         resolve(false);
       }
 
-      const _quiz = await this._commonService.getQuizCompleteById(response.quizId);
+      const _quiz = await this.commonServices.getQuizCompleteById(response.quizId);
       this.quiz = normalizeQuizDTO(_quiz);
-      this._uiService.showLoader(false);
+      this.uiServices.showLoader(false);
       resolve(true);
     })
   }
 
   async getQuizData(id: number) {
-    const data = await this._commonService.getQuizCompleteById(id);
+    const data = await this.commonServices.getQuizCompleteById(id);
     if (!data) {
-      this._uiService.notification(this.translateLabels.service_fail_get);
+      this.uiServices.notification(this.translateLabels.service_fail_get);
       return null;
     }
     return data;
@@ -301,7 +232,7 @@ export class QuizEditableComponent implements OnInit {
   }
 
   gotoDashboard() {
-    this._commonService.navigate('dashboard', this.quiz.quizId ? this.quiz.quizId.toString() : '');
+    this.commonServices.navigate('dashboard', this.quiz.quizId ? this.quiz.quizId.toString() : '');
   }
 
   async nextQuestion() {
@@ -354,14 +285,14 @@ export class QuizEditableComponent implements OnInit {
     data.language = this.settings.language == 'es' ? 'español' : 'ingles';
 
 
-    this._uiService.notification(`<h3><span class="material-icons">auto_awesome</span> ${this.translateLabels.generation_questions}</h3> <br> <p>${this.translateLabels.ia_subtitle}</p>`, { closeTimer: -1, type: 'full-IA' });
+    this.uiServices.notification(`<h3><span class="material-icons">auto_awesome</span> ${this.translateLabels.generation_questions}</h3> <br> <p>${this.translateLabels.ia_subtitle}</p>`, { closeTimer: -1, type: 'full-IA' });
     // const response: any = await this.mockDataAI();
-    const response: any = await this._commonService.geminiGenerate(data);
+    const response: any = await this.commonServices.geminiGenerate(data);
 
     if (!response) {
-      this._uiService.notification(this.translateLabels.service_fail_generate, { type: 'error', closeTimer: 3000 });
+      this.uiServices.notification(this.translateLabels.service_fail_generate, { type: 'error', closeTimer: 3000 });
     } else {
-      this._uiService.notification(`${this.translateLabels.service_sucess_generation} ${response.questions.length} ${this.translateLabels.generation_questions_questions}.`, { closeTimer: 2500 });
+      this.uiServices.notification(`${this.translateLabels.service_sucess_generation} ${response.questions.length} ${this.translateLabels.generation_questions_questions}.`, { closeTimer: 2500 });
 
       setTimeout(() => {
         const quiz: QuizDTO = {
@@ -1454,8 +1385,8 @@ export class QuizEditableComponent implements OnInit {
   getNewQuestionForm() {
     const question = getQuizAnswerDTO(`${this.translateLabels.answer_text_default} #${this.currentAnswerIndex + 1}?`);
     const questions = [
-      getQuizAnswerOptionDTO(`${ this.translateLabels.answer_option_text_default } 1`, 1),
-      getQuizAnswerOptionDTO(`${ this.translateLabels.answer_option_text_default } 2`, 2),
+      getQuizAnswerOptionDTO(`${this.translateLabels.answer_option_text_default} 1`, 1),
+      getQuizAnswerOptionDTO(`${this.translateLabels.answer_option_text_default} 2`, 2),
       getQuizAnswerOptionDTO('', 3),
     ];
 

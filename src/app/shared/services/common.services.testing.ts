@@ -482,7 +482,7 @@ export class CommonServicesTesting {
             return ans;
         });
         let attemptUpdated = await this.commonServices.saveAllAttempt(attempt);
-        return await this.commonServices.evalueAttemptById(attemptUpdated.attemptId);;
+        return await this.commonServices.evalueAttemptById(attemptUpdated.attemptId);
     }
 
     private async testAttempts_deleteAttempt(attemptId: number): Promise<AttemptDTO> {

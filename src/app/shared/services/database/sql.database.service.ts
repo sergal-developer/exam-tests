@@ -39,7 +39,7 @@ export class DatabaseService {
     origin: string = '';
 
     constructor(
-        private _uiServices: UiServices,
+        private uiServices: UiServices,
     ) {
         this.isAndroid = Capacitor.getPlatform() === 'android';
         this.sqliteConnection = new SQLiteConnection(CapacitorSQLite);
@@ -129,7 +129,7 @@ export class DatabaseService {
             return request;
         } catch (error) {
             console.info(`ERROR:${this.origin}:`, error);
-            this._uiServices.notification(`ERROR:${this.origin}: ${error.toString()}`)
+            this.uiServices.notification(`ERROR:${this.origin}: ${error.toString()}`)
             return null
         }
     }
@@ -152,7 +152,7 @@ export class DatabaseService {
             return request && request.values ? request.values : null;
         } catch (error) {
             console.warn(`ERROR:${this.origin}:`, error);
-            this._uiServices.notification(`ERROR:${this.origin}: ${error.toString()}`)
+            this.uiServices.notification(`ERROR:${this.origin}: ${error.toString()}`)
             return null
         }
     }
@@ -180,7 +180,7 @@ export class DatabaseService {
             return request && request.values ? request.values : null;
         } catch (error) {
             console.info(`ERROR:${this.origin}:`, error);
-            this._uiServices.notification(`ERROR:${this.origin}: ${error.toString()}`)
+            this.uiServices.notification(`ERROR:${this.origin}: ${error.toString()}`)
 
             if (log) {
                 log(error);
@@ -193,7 +193,7 @@ export class DatabaseService {
         await this.createDataStructure();
         const structure = await this.getStructure()
         if (!structure) {
-            this._uiServices.notification("Error al establecer conexion SQL.", { type: 'error', closeTimer: 0 })
+            this.uiServices.notification("Error al establecer conexion SQL.", { type: 'error', closeTimer: 0 })
         }
         return structure ? true : false;
     }
