@@ -3,6 +3,7 @@ import { ScreenEnum } from 'src/app/shared/data/enumerables/enumerables';
 import { CommonServices } from 'src/app/shared/services/common.services';
 import { DatabaseService } from 'src/app/shared/services/database/sql.database.service';
 import { UiServices } from 'src/app/shared/services/ui.services';
+import { Cpu, Sparkles, Icons, icons } from "lucide";
 
 @Component({
   selector: 'splash',
@@ -13,11 +14,18 @@ export class SplashComponent implements OnInit {
   timeDelay = 1500;
   state = 'enter'
 
+  isMenuOpen = false;
+  ico = {
+    cpu: icons.Cpu,
+    sparkles: icons.Sparkles
+  }
+
   constructor(private commonServices: CommonServices,
     private databaseService: DatabaseService,
     public uiServices: UiServices) { }
 
   async ngOnInit() {
+
     this.uiServices.showLoader(true);
     const existStructure = await this.loadDatabaseStructure();
     this.checkInit(existStructure);
@@ -39,7 +47,7 @@ export class SplashComponent implements OnInit {
     }
 
     setTimeout(() => {
-      this.commonServices.navigate(module);
+      // this.commonServices.navigate(module);
     }, this.timeDelay);
 
     this.uiServices.showLoader(false);

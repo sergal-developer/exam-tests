@@ -1,4 +1,5 @@
 import { Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { Menu, X } from "lucide";
 
 @Component({
   selector: 'm-icon',
