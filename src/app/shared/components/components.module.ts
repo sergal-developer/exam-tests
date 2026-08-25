@@ -6,7 +6,8 @@ import { LogoComponent } from "./logo/logo.component";
 import { MatAutocompleteComponent } from "./mat-autocomplete/mat-autocomplete.component";
 import { MatInputComponent } from "./mat-input/mat-input.component";
 import { ModalComponent } from "./modal/modal.component";
-import { IconComponent } from "./morph-icon/morph-icon.component";
+import { MorphIconComponent } from "./morph-icon/morph-icon.component";
+import { LucideIconComponent } from "./lucide-icon/lucide-icon.component";
 
 @NgModule ( {
     imports : [
@@ -19,14 +20,16 @@ import { IconComponent } from "./morph-icon/morph-icon.component";
         MatInputComponent,
         MatAutocompleteComponent,
         ModalComponent,
-        IconComponent
+        MorphIconComponent,
+        LucideIconComponent
     ],
     exports: [
         LogoComponent,
         MatInputComponent,
         MatAutocompleteComponent,
         ModalComponent,
-        IconComponent
+        MorphIconComponent,
+        LucideIconComponent
     ],
     schemas: [
         CUSTOM_ELEMENTS_SCHEMA
