@@ -5,7 +5,7 @@ import { AfterViewInit, Component, ElementRef, HostListener, Input, NgZone, OnCh
     template: `
     <div
       #container
-      class="dynamic-expand {{ design }}"
+      class="dynamic-expand {{ className }} {{ design }}"
       [style.height.px]="height" >
       <div #content class="dynamic-expand__content">
         <ng-content></ng-content>
@@ -17,13 +17,13 @@ import { AfterViewInit, Component, ElementRef, HostListener, Input, NgZone, OnCh
 })
 export class SectionDinamicComponent implements AfterViewInit, OnChanges, OnDestroy {
     @Input()
-    isOpen = true;
+    className: string = '';
 
     @Input()
     design: 'acrilic' | 'glass' | 'gold' = 'acrilic';
 
     @Input()
-    minHeight = 150;
+    minHeight = 30;
 
     @ViewChild('content', { static: true })
     content!: ElementRef<HTMLElement>;
@@ -38,15 +38,13 @@ export class SectionDinamicComponent implements AfterViewInit, OnChanges, OnDest
     ) { }
 
     ngAfterViewInit(): void {
-        const element =
-            this.elementRef.nativeElement;
+        const element = this.elementRef.nativeElement;
         element.style.setProperty(
-            '--controlMinHeight-x',
+            '--controlMinHeight',
             `${this.minHeight}px`
         );
 
         this.height = this.minHeight;
-        console.log('this.height: ', this.height);
         this.createResizeObserver();
 
         // Esperamos a que Angular termine de renderizar
@@ -69,17 +67,12 @@ export class SectionDinamicComponent implements AfterViewInit, OnChanges, OnDest
      * del contenido interno.
      */
     private createResizeObserver(): void {
-
         this.ngZone.runOutsideAngular(() => {
-
             this.resizeObserver = new ResizeObserver(() => {
-
                 this.ngZone.run(() => {
                     this.updateHeight();
                 });
-
             });
-
             this.resizeObserver.observe(
                 this.content.nativeElement
             );
@@ -90,7 +83,7 @@ export class SectionDinamicComponent implements AfterViewInit, OnChanges, OnDest
      * Calcula nuevamente la altura.
      */
     private updateHeight(): void {
-        // this.height = this.minHeight;
+        this.height = this.minHeight;
         const element = this.content.nativeElement;
         this.height = element.scrollHeight;
     }
@@ -99,45 +92,32 @@ export class SectionDinamicComponent implements AfterViewInit, OnChanges, OnDest
         this.resizeObserver?.disconnect();
     }
 
-    @HostListener('mousemove', ['$event'])
-    onMouseMove(event: MouseEvent): void {
-
-        const element =
-            this.elementRef.nativeElement;
-
-        const rect =
-            element.getBoundingClientRect();
-
-        const x =
-            ((event.clientX - rect.left) / rect.width) * 100;
-
-        const y =
-            ((event.clientY - rect.top) / rect.height) * 100;
-
-        element.style.setProperty(
-            '--mouse-x',
-            `${x}%`
-        );
-
-        element.style.setProperty(
-            '--mouse-y',
-            `${y}%`
-        );
+    @HostListener('pointermove', ['$event'])
+    onMouseMove(event: PointerEvent): void {
+        console.log('Pointer Type: ', event.pointerType);
+        this._onMove(event);
     }
 
-    @HostListener('mouseleave')
+    @HostListener('pointerleave')
     onMouseLeave(): void {
-        const element =
-            this.elementRef.nativeElement;
-        
-        element.style.setProperty(
-            '--mouse-x',
-            '50%'
-        );
+        this._resetMove();
+    }
 
-        element.style.setProperty(
-            '--mouse-y',
-            '50%'
-        );
+    //#region EVENTS
+    private _onMove(event) {
+        const element = this.elementRef.nativeElement;
+        const rect = element.getBoundingClientRect();
+
+        const x = ((event.clientX - rect.left) / rect.width) * 100;
+        const y =((event.clientY - rect.top) / rect.height) * 100;
+
+        element.style.setProperty( '--mouse-x', `${x}%`);
+        element.style.setProperty( '--mouse-y', `${y}%`);
+    }
+
+    private _resetMove() {
+        const element = this.elementRef.nativeElement;
+        element.style.setProperty('--mouse-x', '50%');
+        element.style.setProperty('--mouse-y', '50%');
     }
 }

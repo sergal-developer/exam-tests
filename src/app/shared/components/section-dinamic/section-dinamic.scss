@@ -1,7 +1,7 @@
 :host {
     --mouse-x: 50%;
     --mouse-y: 50%;
-    --controlMinHeight: 100px;
+    --controlMinHeight: 30px;
     display: block;
     width: 100%;
 }
@@ -13,6 +13,10 @@
     transition: height 300ms ease;
     border-radius: 20px;
     min-height: var(--controlMinHeight);
+
+    &.rounded {
+        border-radius: 200px;
+    }
 }
 
 .dynamic-expand__content {
@@ -38,7 +42,7 @@
         pointer-events: none;
         z-index: -1;
         background:
-            radial-gradient(circle 200px at var(--mouse-x) var(--mouse-y),
+            radial-gradient(circle 100px at var(--mouse-x) var(--mouse-y),
                 rgba(255, 255, 255, 0.9) 0%,
                 rgba(255, 255, 255, 0.45) 20%,
                 rgba(255, 255, 255, 0.12) 45%,
@@ -75,18 +79,18 @@
         pointer-events: none;
         z-index: -1;
         background:
-            radial-gradient(circle 200px at var(--mouse-x) var(--mouse-y),
+            radial-gradient(circle 100px at var(--mouse-x) var(--mouse-y),
                 #ffffffba 0%,
                 #ffffff8e 20%,
                 #ffffff20 45%,
                 transparent 70%);
 
-        background: 
-            radial-gradient(circle 100px at var(--mouse-x) var(--mouse-y),            
-            #ffffffba 0%,
-            #eeaeca 30%, 
-            #94bbe9 70%,
-            transparent 100%);
+        // background: 
+        //     radial-gradient(circle 100px at var(--mouse-x) var(--mouse-y),            
+        //     #ffffffba 0%,
+        //     #eeaeca 30%, 
+        //     #94bbe9 70%,
+        //     transparent 100%);
         
         mask:
             linear-gradient(#000 0 0) content-box,

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, } from '@angular/core';
+import { Component, OnInit, QueryList, ViewChildren, ViewEncapsulation, } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { SettingsDTO, UserDTO } from 'src/app/shared/data/entities/dtos';
@@ -6,6 +6,9 @@ import { UxUtils } from 'src/app/shared/data/utils/uxUtils';
 import { CommonServices } from 'src/app/shared/services/common.services';
 import { UiServices } from 'src/app/shared/services/ui.services';
 import { v4 as uuidv4 } from 'uuid';
+import { IconNode, icons } from "lucide";
+import { MorphIconComponent } from 'src/app/shared/components/morph-icon/morph-icon.component';
+
 
 @Component({
   selector: 'register',
@@ -14,6 +17,8 @@ import { v4 as uuidv4 } from 'uuid';
 })
 export class RegisterComponent implements OnInit {
   //#region INTERNAL
+  @ViewChildren(MorphIconComponent) morphIcons!: QueryList<MorphIconComponent>;
+
   form: FormGroup;
   defaultAvatars = [
     { url: "/assets/avatar-1.svg", selected: false },
@@ -34,6 +39,29 @@ export class RegisterComponent implements OnInit {
 
   uistate = 'init';
   uxUtils = new UxUtils();
+
+  sections = {
+    language: false,
+    user: false,
+    avatar: false,
+  }
+
+  _icon = {
+    start: icons.GraduationCap, // icons.GraduationCap,
+    end: icons.BookOpenText,
+    label: 'Logo',
+    strokeWidth: 1,
+    size: 120
+  }
+
+  luIcon = {
+    language: icons.Globe,
+    user: icons.UserRound,
+    avatar: icons.SquareUserRound,
+    left: icons.ChevronLeft,
+    right: icons.ChevronRight,
+    register: icons.UserPlus
+  }
   //#endregion INTERNAL
 
   constructor(private fb: FormBuilder,
@@ -44,7 +72,6 @@ export class RegisterComponent implements OnInit {
 
 
   //#region LIFECYCLE
-  intervalRef: any;
   async ngOnInit() {
     this.uiServices.showLoader(true);
     this.form = this.fb.group({
@@ -138,12 +165,6 @@ export class RegisterComponent implements OnInit {
     });
   }
 
-  sections = {
-    language: false,
-    user: false,
-    avatar: false,
-  }
-
   resetSections() {
     this.sections = {
       language: false,
@@ -153,42 +174,53 @@ export class RegisterComponent implements OnInit {
   }
 
   async configUser() {
-    this.resetSections();
-    await this.uxUtils.wait(300);
-    this.sections.user = true;
+    this._changeSection('user');
   }
 
   async configLanguage() {
-    this.resetSections();
-    await this.uxUtils.wait(300);
-    this.sections.language = true;
+    this._changeSection('language');
   }
 
   async configAvatar() {
+    this._changeSection('avatar');
+  }
+
+  getCurrentNav(): { total: number, index: number } {
+    const keys = Object.keys(this.sections);
+    let _index = -1;
+    keys.map((key, index) => {
+      if (this.sections[key] == true) {
+        _index = index;
+        return;
+      }
+      console.log('this.sections[key]: ', this.sections[key]);
+    });
+    return { total: keys.length, index: _index };
+  }
+
+  prev() {
+    const nav = this.getCurrentNav();
+    if(nav.index > 0) {
+      const newIndex = nav.index - 1;
+      const keys = Object.keys(this.sections);
+      console.log('index: ', keys[newIndex]);
+      this._changeSection(keys[newIndex]);
+    }
+  }
+  next() {
+    const nav = this.getCurrentNav();
+    if(nav.index < nav.total - 1) {
+      const newIndex = nav.index + 1;
+      const keys = Object.keys(this.sections);
+      console.log('index: ', keys[newIndex]);
+      this._changeSection(keys[newIndex]);
+    }
+  }
+
+  private async _changeSection(key: string) {
     this.resetSections();
     await this.uxUtils.wait(300);
-    this.sections.avatar = true;
+    this.sections[key] = true;
   }
-
-
-  mouseEffeects() {
-    const cards = document.querySelectorAll('._content');
-    console.log('cards: ', cards);
-
-    cards.forEach((card: any) => {
-      card.addEventListener('mousemove', (event: MouseEvent) => {
-        const rect = card.getBoundingClientRect();
-        console.log('rect: ', rect);
-        const x =
-          ((event.clientX - rect.left) / rect.width) * 100;
-        const y =
-          ((event.clientY - rect.top) / rect.height) * 100;
-        card.style.setProperty('--mouse-x', `${x}%`);
-        card.style.setProperty('--mouse-y', `${y}%`);
-      });
-    });
-
-  }
-
   //#endregion EVENTS
 }

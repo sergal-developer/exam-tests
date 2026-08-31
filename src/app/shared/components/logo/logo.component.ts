@@ -58,20 +58,15 @@ export class LogoComponent implements AfterViewInit {
 
     async animateLog() {
         this.elementLogo = document.querySelector('#logoApp');
-        console.log('elementLogo: ', this.elementLogo);
         this.elementLogo.classList.add('init');
         await this.uxUtils.waitForAnimation(this.elementLogo);
-        console.log('Animación init terminada');
 
         this.elementLogo.classList.add('transitionend');
         await this.uxUtils.waitForAnimation(this.elementLogo);
-
-        console.log('Animación terminada');
     }
 
     currentIndex = 0;
     gotThroughIcons(next?: Function) {
-        console.log('this.currentIndex: ', this.currentIndex, this.listIcons.length);
         if (this.currentIndex <= this.listIcons.length - 2) {
             const start: IconNode = this.listIcons[this.currentIndex];
             const end: IconNode = this.listIcons[this.currentIndex + 1];

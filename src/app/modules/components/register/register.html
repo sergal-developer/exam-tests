@@ -7,7 +7,7 @@
 
 
     <div class="root-container register-form">
-        <section-dinamic design="acrilic">
+        <section-dinamic design="glass">
             <div class="simple-section" *ngIf="sections.language">
                 <div class="_content flex centred">
                     <h2>{{ 'register_title' | translate }}</h2>
@@ -77,29 +77,43 @@
                             </div>
                         </div>
 
-                        <div class="mat-form-field">
-                            <div class="_collection">
-                                <button (click)="register()" type="submit" [disabled]="!validateData()">
-                                    {{ 'singup' | translate }}
-                                </button>
-                            </div>
-                        </div>
                     </form>
                 </div>
             </div>
         </section-dinamic>
 
-        <section-dinamic design="acrilic">
-            <div class="navigation-bar">
+        <section-dinamic design="acrilic" className="rounded">
+            <div class="_navbarBottom">
 
-                <button class="link primaryText" (click)="configLanguage()">{{ 'action_step_language' | translate }}
-                </button>
+                <div class="_nav_item _nav_action _prev" (click)="prev()" [attr.disabled]="sections.language">
+                    <lu-icon [icon]="luIcon.left"></lu-icon><span>{{ 'action_prev' | translate }}</span>
+                </div>
 
-                <button class="link primaryText" (click)="configUser()">{{ 'action_step_language' | translate }}
-                </button>
+                <div class="_nav_item_collection">
+                    <div class="_nav_item" [ngClass]="{'current': sections.language }" (click)="configLanguage()">
+                        <lu-icon [icon]="luIcon.language"></lu-icon>
+                        <div class="_nav_item_title">{{ 'action_step_language' | translate }}</div>
+                    </div>
 
-                <button class="link primaryText" (click)="configAvatar()">{{ 'action_step_avatar' | translate }}
-                </button>
+                    <div class="_nav_item" [ngClass]="{'current': sections.user }" (click)="configUser()">
+                        <lu-icon [icon]="luIcon.user"></lu-icon>
+                        <div class="_nav_item_title">{{ 'action_step_user' | translate }}</div>
+                    </div>
+
+                    <div class="_nav_item" [ngClass]="{'current': sections.avatar }" (click)="configAvatar()">
+                        <lu-icon [icon]="luIcon.avatar"></lu-icon>
+                        <div class="_nav_item_title">{{ 'action_step_avatar' | translate }}</div>
+                    </div>
+                </div>
+
+                <div class="_nav_item _nav_action _next" (click)="next()" *ngIf="!validateData()" [attr.disabled]="sections.avatar">
+                    <span>{{ 'action_next' | translate }}</span><lu-icon [icon]="luIcon.right"></lu-icon>
+                </div>
+
+                <div class="_nav_item _nav_action _next _register" (click)="register()" *ngIf="validateData()">
+                    <span>{{ 'singup' | translate }}</span><lu-icon [icon]="luIcon.register"></lu-icon>
+                </div>
+
             </div>
         </section-dinamic>
 

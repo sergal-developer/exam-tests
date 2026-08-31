@@ -1932,6 +1932,70 @@ h6 {
 }
 
 
+._navbarBottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    gap: 10px;
+
+    ._nav_item {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 5px;
+        padding: 10px;
+        border-radius: 50px;
+        transition: all 300ms ease;
+        cursor: pointer;
+
+        ._nav_item_title {
+            display: none;
+        }
+
+        &:hover,
+        &.current {
+            background: #ffffff10;
+        }
+
+        &.current {
+            color: var(--primary);
+            background: var(--appColor);
+
+            // margin-right: auto;
+            ._nav_item_title {
+                display: block;
+            }
+        }
+    }
+
+    ._nav_item_collection {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    ._nav_action {
+        &._next {
+            margin-left: 20px;
+        }
+
+        &._prev {
+            margin-right: 20px;
+        }
+
+        &._register {
+            color: var(--appColor);
+            background: var(--primary);
+        }
+
+        &[disabled='true']{
+            opacity: 0.2;
+        }
+    }
+}
+
 // Effects 
 
 // .acrilic {
