@@ -356,6 +356,7 @@ export class CommonServices {
 
   defaultThemeLight: ThemePropertiesDTO = {
     appBackground: '#bebebe',
+    appBackgroundTransparent: '#bebebe50',
     appColor: '#2d2d2d',
     appFontSize: '16px',
     textFontSize: '16px',
@@ -377,6 +378,7 @@ export class CommonServices {
     formErrorColor: '#a70019',
     formBackground: 'rgba(222, 222, 222, 0.7)',
     formBackgroundSolid: '#494949',
+    formBackgroundTransparent: '#49494973',
     notificationColor: '#d0d0d0',
     notificationColorContrast: '#000000',
     notificationSuccess: '#8e9f0f',
@@ -418,6 +420,7 @@ export class CommonServices {
 
   defaultThemeDark: ThemePropertiesDTO = {
     appBackground: '#000000',
+    appBackgroundTransparent: '#00000050',
     appColor: '#d0d0d0',
     appFontSize: '16px',
     textFontSize: '16px',
@@ -439,6 +442,7 @@ export class CommonServices {
     formErrorColor: '#f08d9c',
     formBackground: 'rgba(33, 33, 33, 0.7)',
     formBackgroundSolid: '#494949',
+    formBackgroundTransparent: '#49494973',
     notificationColor: '#d0d0d0',
     notificationColorContrast: '#000000',
     notificationSuccess: '#8e9f0f',

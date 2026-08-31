@@ -1,23 +1,111 @@
 <div class="_animation_state {{ uistate }}">
-    <div class="root-hero ">
+    <!-- <div class="root-hero ">
         <div class="image">
             <img src="../../assets/people.svg" alt="">
         </div>
-    </div>
+    </div> -->
+
 
     <div class="root-container register-form">
-        <div class="simple-section">
-            <div class="_content">
-                
-                <h2>{{ 'register_title' | translate }}</h2>
+        <section-dinamic design="acrilic">
+            <div class="simple-section" *ngIf="sections.language">
+                <div class="_content flex centred">
+                    <h2>{{ 'register_title' | translate }}</h2>
+                    <p>{{ 'register_language'| translate }}</p>
 
-                <ng-container *ngIf="languages.length">
-                    <ng-container *ngFor="let lan of languages">
-                        <button class="link"
-                            [ngClass]="{'primary': lan.value == settings.language, 'link': lan.value != settings.language }"
-                            (click)="changeLanguage(lan.value)">{{ lan.value | translate }}</button>
-                    </ng-container>
-                </ng-container>
+                    <div class="flex horizontal" *ngIf="languages.length">
+                        <ng-container *ngFor="let lan of languages">
+                            <button class="btn" [ngClass]="{
+                                    'primary': lan.value == settings.language, 
+                                    'unselected': lan.value != settings.language }"
+                                (click)="changeLanguage(lan.value)">{{ lan.value | translate }}</button>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+
+            <div class="simple-section" *ngIf="sections.user">
+                <div class="_content flex centred">
+                    <h2>{{ 'register_title_question' | translate }}</h2>
+
+                    <form [formGroup]="form">
+                        <div class="mat-form-field">
+                            <mat-input [title]="'form_name' | translate"
+                                [mesageError]="'form_name_required' | translate" [formControl]="form.get('name')">
+                            </mat-input>
+                        </div>
+
+                        <div class="mat-form-field">
+                            <div class="mat-label-text">
+                                <label for="legal" class="mat-checkbox">
+                                    <input type="checkbox" id="legal" [formControl]="form.get('legal')">
+                                    <div>
+                                        {{ 'help_accept_terms' | translate }}
+                                        <a href="https://sergal.site/#/legal/simexam/terms" target="_blank">{{
+                                            'terms_conditions' | translate }}</a>, {{ 'help_accept_terms_join' |
+                                        translate
+                                        }}
+                                        <a href="https://sergal.site/#/legal/simexam/privacy" target="_blank">{{
+                                            'privacy_policy' | translate }} </a>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="simple-section" *ngIf="sections.avatar">
+                <div class="_content flex centred">
+                    <h2>{{ 'form_image' | translate }}</h2>
+
+                    <form [formGroup]="form">
+                        <div class="mat-form-field">
+                            <div class="_collection">
+                                <div class="avatar-image" *ngFor="let item of defaultAvatars"
+                                    [ngClass]="{'selected': item.selected }" (click)="selectAvatar(item)">
+                                    <img [attr.src]="item.url" [attr.alt]="item.url">
+                                </div>
+                            </div>
+
+                            <div class="mat-error"
+                                *ngIf="form.get('image').invalid && (form.get('image').dirty || form.get('image').touched)"
+                                [ngClass]="{'error': form.get('image').errors }">
+                                <div *ngIf="form.get('image').errors">
+                                    {{ mesageError }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mat-form-field">
+                            <div class="_collection">
+                                <button (click)="register()" type="submit" [disabled]="!validateData()">
+                                    {{ 'singup' | translate }}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section-dinamic>
+
+        <section-dinamic design="acrilic">
+            <div class="navigation-bar">
+
+                <button class="link primaryText" (click)="configLanguage()">{{ 'action_step_language' | translate }}
+                </button>
+
+                <button class="link primaryText" (click)="configUser()">{{ 'action_step_language' | translate }}
+                </button>
+
+                <button class="link primaryText" (click)="configAvatar()">{{ 'action_step_avatar' | translate }}
+                </button>
+            </div>
+        </section-dinamic>
+
+        <div class="simple-section" *ngIf="false">
+            <div class="_content">
+
 
                 <h1>{{ 'register_title_question' | translate }}</h1>
 
@@ -52,10 +140,14 @@
                     <div class="mat-form-field">
                         <div class="mat-label-text">
                             <label for="legal" class="mat-checkbox">
-                                <input type="checkbox" id="legal" [formControl]="form.get('legal')"> <div>
-                                    {{ 'help_accept_terms' | translate }} 
-                                    <a href="https://sergal.site/#/legal/simexam/terms" target="_blank">{{ 'terms_conditions' | translate }}</a>, {{ 'help_accept_terms_join' | translate }} 
-                                    <a href="https://sergal.site/#/legal/simexam/privacy" target="_blank">{{ 'privacy_policy' | translate }} </a>
+                                <input type="checkbox" id="legal" [formControl]="form.get('legal')">
+                                <div>
+                                    {{ 'help_accept_terms' | translate }}
+                                    <a href="https://sergal.site/#/legal/simexam/terms" target="_blank">{{
+                                        'terms_conditions' | translate }}</a>, {{ 'help_accept_terms_join' | translate
+                                    }}
+                                    <a href="https://sergal.site/#/legal/simexam/privacy" target="_blank">{{
+                                        'privacy_policy' | translate }} </a>
                                 </div>
                             </label>
                         </div>

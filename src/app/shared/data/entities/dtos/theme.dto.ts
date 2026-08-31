@@ -6,6 +6,7 @@ export interface ThemeDTO {
 
 export interface ThemePropertiesDTO {
   appBackground?: String;
+  appBackgroundTransparent?: String;
   appColor?: String;
   appFontSize?: String;
   textFontSize?: String;
@@ -32,6 +33,7 @@ export interface ThemePropertiesDTO {
   formErrorColor?: String;
   formBackground?: String;
   formBackgroundSolid?: String;
+  formBackgroundTransparent?: String;
 
   notificationColor?: String;
   notificationColorContrast?: String;

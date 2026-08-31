@@ -1,4 +1,5 @@
 import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { IconNode } from 'lucide';
 
 @Component({
     selector: 'morph-i',
@@ -19,9 +20,8 @@ import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChi
 export class MorphIconComponent implements OnInit, OnChanges {
     @ViewChild('icon', { static: true }) iconRef!: ElementRef<HTMLElement>;
 
-    @Input() icon = 'M4 6h16M4 12h16M4 18h16';   // default / "closed" state
-    @Input() altIcon = 'M18 6L6 18M6 6l12 12';    // "open" state
-    @Input() open = false;
+    @Input() icon: IconNode | string = 'M4 6h16M4 12h16M4 18h16';   // default / "closed" state
+    @Input() altIcon: IconNode | string = 'M18 6L6 18M6 6l12 12';    // "open" state
     @Input() label = 'Menu';
     @Input() size = 24;
     @Input() color = 'currentColor';
@@ -34,12 +34,19 @@ export class MorphIconComponent implements OnInit, OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges) {
+        console.log('changes: ', changes);
         // if (changes['open']) {
         // (this.iconRef.nativeElement as any).morphTo(this.open ? this.altIcon : this.icon, this.spring);
         // }
     }
 
     change() {
+        console.log('this.Icon: ', this.icon);
+        console.log('this.altIcon: ', this.altIcon);
         (this.iconRef.nativeElement as any).morphTo(this.altIcon, this.spring);
+    }
+
+    morphTo(icon: IconNode | string) {
+        (this.iconRef.nativeElement as any).morphTo(icon, this.spring);
     }
 }

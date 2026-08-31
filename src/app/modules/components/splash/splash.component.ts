@@ -12,7 +12,7 @@ import { UiServices } from 'src/app/shared/services/ui.services';
   encapsulation: ViewEncapsulation.None,
 })
 export class SplashComponent implements OnInit {
-  timeDelay = 1500;
+  timeDelay = 6000;
   state = 'enter'
 
   isMenuOpen = false;
@@ -23,11 +23,9 @@ export class SplashComponent implements OnInit {
     public uiServices: UiServices) { }
 
   async ngOnInit() {
-
-    this.loadLuIcons();
     this.uiServices.showLoader(true);
-    const existStructure = await this.loadDatabaseStructure();
-    this.checkInit(existStructure);
+
+    // before logo finish animation send event and analyze the structure of database and init app
   }
 
   async loadDatabaseStructure() {
@@ -44,12 +42,15 @@ export class SplashComponent implements OnInit {
       const profile = await this.commonServices.getCurrentUser();
       module = !profile ? ScreenEnum.register : ScreenEnum.dashboard;
     }
-
-    setTimeout(() => {
-      // this.commonServices.navigate(module);
-    }, this.timeDelay);
-
     this.uiServices.showLoader(false);
+
+    
+    this.commonServices.navigate(module);
+  }
+
+  async onChange(evt: { event: string }) {
+    const existStructure = await this.loadDatabaseStructure();
+    this.checkInit(existStructure);
   }
 
   loadLuIcons() {

@@ -1,6 +1,8 @@
-import { AfterViewInit, Component, ElementRef, Input, OnInit, QueryList, ViewChildren, ViewEncapsulation } from '@angular/core';
-import { icons } from "lucide";
+import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren, ViewEncapsulation } from '@angular/core';
+import { IconNode, icons } from "lucide";
 import { MorphIconComponent } from '../morph-icon/morph-icon.component';
+import { svgToIcon } from 'morphicons/adapters';
+import { UxUtils } from '../../data/utils/uxUtils';
 
 @Component({
     selector: 'logo',
@@ -10,40 +12,88 @@ import { MorphIconComponent } from '../morph-icon/morph-icon.component';
 })
 export class LogoComponent implements AfterViewInit {
     // #region INPUT/OUTPUT
-    @Input() class: string = '';
+    @Output() onChange = new EventEmitter();
+    @ViewChildren(MorphIconComponent) morphIcons!: QueryList<MorphIconComponent>;
     // #endregion
 
     //#region PROOPERTIES
     isMenuOpen = false;
-    listIcons = [
+    listIcons: IconNode[] = [
         icons.GraduationCap,
-        icons.BookOpenText,
-        icons.Book,
-        icons.Notebook,
-        icons.Omega
+        icons.BookA,
+        icons.NotebookPen,
+        icons.BookOpenCheck,
     ]
-
+    morphIconsComponent: MorphIconComponent;
     _icon = {
-        start: icons.GraduationCap,
-        end: icons.Omega,
+        start: icons.GraduationCap, // icons.GraduationCap,
+        end: icons.BookOpenText,
+        label: 'Logo',
+        strokeWidth: 1,
+        size: 120
     }
 
-    ico = {
-        start: icons.Cpu,
-        end: icons.Sparkles
-    }
+    logoState = '';
+    elementLogo;
+    uxUtils = new UxUtils();
     //#endregion PROPERTIES
 
     constructor() {
     }
 
     ngOnInit(): void {
-        
     }
 
     ngAfterViewInit(): void {
-        // setTimeout(() => {
-        //     this.morphIcon?.change();
-        // }, 2000);
+        this.morphIconsComponent = this.morphIcons?.first;
+        setTimeout(() => {
+            this.logoState = 'init';
+            setTimeout(() => {
+                this.logoState = 'transitionIcons';
+            }, 500);
+            this.gotThroughIcons();
+        }, 1200);
+    }
+
+
+    async animateLog() {
+        this.elementLogo = document.querySelector('#logoApp');
+        console.log('elementLogo: ', this.elementLogo);
+        this.elementLogo.classList.add('init');
+        await this.uxUtils.waitForAnimation(this.elementLogo);
+        console.log('Animación init terminada');
+
+        this.elementLogo.classList.add('transitionend');
+        await this.uxUtils.waitForAnimation(this.elementLogo);
+
+        console.log('Animación terminada');
+    }
+
+    currentIndex = 0;
+    gotThroughIcons(next?: Function) {
+        console.log('this.currentIndex: ', this.currentIndex, this.listIcons.length);
+        if (this.currentIndex <= this.listIcons.length - 2) {
+            const start: IconNode = this.listIcons[this.currentIndex];
+            const end: IconNode = this.listIcons[this.currentIndex + 1];
+
+            this.morphIconsComponent.icon = start;
+            this.morphIconsComponent.icon = end;
+            this.currentIndex++;
+        } else {
+            this.currentIndex = 0;
+            this.logoState = '';
+            this.onFInishAnim();
+        }
+
+        if (this.logoState != '') {
+            setTimeout(() => {
+                this.morphIconsComponent.morphTo(this.listIcons[this.currentIndex]);
+                this.gotThroughIcons();
+            }, 1000);
+        }
+    }
+
+    onFInishAnim() {
+        this.onChange.emit({ event: 'finishLoad' });
     }
 }

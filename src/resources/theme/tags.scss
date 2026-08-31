@@ -42,7 +42,8 @@ input {
 }
 
 button,
-.button {
+.button,
+.btn {
     background: var(--primaryBackground);
     color: var(--primaryColor);
     border: 1px solid transparent;
@@ -96,6 +97,26 @@ button,
         &.hover {
             background: var(--secondaryBackgroundHover);
             color: var(--secondaryColor);
+        }
+    }
+
+    &.primaryText {
+        color: var(--secondaryBackground);
+
+        &:hover,
+        &.hover {
+            color: var(--secondaryBackgroundHover);
+        }
+    }
+
+    &.unselected {
+        background: var(--pillBackground);
+        color: var(--pillColorHover);
+
+        &:hover,
+        &.hover {
+            background: var(--pillBackgroundHover);
+            color: var(--pillColorHover);
         }
     }
 

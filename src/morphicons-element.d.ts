@@ -13,3 +13,8 @@ declare module 'morphicons/element' {
     destroy(): void;
   }
 }
+
+
+declare module 'morphicons/adapters' {
+  export function svgToIcon(markup: string): IconInput;
+}
